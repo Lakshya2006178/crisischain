@@ -13,29 +13,29 @@ export default function MapPanel() {
     const { addToast } = useDashboard();
 
     return (
-        <div className="bg-gray-800 backdrop-blur-lg bg-white/5 rounded-xl p-4 shadow-lg border border-gray-700 hover:shadow-xl hover:scale-[1.02] hover:border-blue-500 transition-all duration-300 flex flex-col h-full animate-fade-in duration-300">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Map className="w-5 h-5 text-blue-400" />
+        <div className="db-card">
+            <div className="db-card-header">
+                <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2">
+                    <Map className="w-4 h-4 text-blue-400 flex-shrink-0" />
                     Tactical Map View
                 </h2>
                 <div className="flex gap-2">
                     <button
                         onClick={() => addToast('Recalibrating GPS Centering...', 'info')}
-                        className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition-colors"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
                     >
                         <Crosshair className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => addToast('Activating Drone View...', 'info')}
-                        className="p-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-300 transition-colors"
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
                     >
                         <Navigation className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 rounded-lg border border-slate-700 bg-slate-900 overflow-hidden relative group">
+            <div className="flex-1 mx-4 mb-4 rounded-xl overflow-hidden relative group" style={{background:'#070f1d', border:'1px solid rgba(51,65,85,.5)'}}>
 
                 {/* Map Grid Background Simulation */}
                 <div className="absolute inset-0"

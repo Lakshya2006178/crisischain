@@ -1,51 +1,60 @@
 import { useDashboard } from '../../context/DashboardContext';
-import { Truck, Flame, Users, HeartPulse } from 'lucide-react';
+import { Truck } from 'lucide-react';
 
 export default function ResourceTrackingPanel() {
     const { resources, getIcon } = useDashboard();
 
     return (
-        <div className="bg-gray-800 backdrop-blur-lg bg-white/5 rounded-xl p-4 shadow-lg border border-gray-700 hover:shadow-xl hover:scale-[1.02] hover:border-blue-500 transition-all duration-300 flex flex-col h-full animate-fade-in duration-300">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Truck className="w-5 h-5 text-emerald-400" />
-                    Field Resources Active
+        <div className="db-card">
+            <div className="db-card-header">
+                <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2">
+                    <Truck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    Resource Tracking
                 </h2>
-                <span className="text-xs text-slate-400 font-mono flex items-center gap-1">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="font-inter text-[10px] text-slate-400 flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"/>
                     Live Sync
                 </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 mt-2 overflow-y-auto custom-scrollbar flex-1 pb-2 pr-2">
+            <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
                 {resources.map((res) => {
                     const Icon = getIcon(res.iconName);
-                    const percentage = Math.round((res.count / res.total) * 100);
+                    const pct = Math.min(Math.round((res.count / res.total) * 100), 100);
+                    const barColor = pct >= 80 ? '#ef4444' : pct >= 60 ? '#eab308' : '#22c55e';
+                    const labelColor = pct >= 80 ? 'text-red-400' : pct >= 60 ? 'text-yellow-400' : 'text-emerald-400';
+                    const status = pct >= 80 ? 'High Util' : pct >= 60 ? 'Moderate' : 'Available';
 
                     return (
-                        <div key={res.id} className="bg-slate-900 border border-slate-700 rounded-lg p-4 transition-transform hover:scale-[1.03] hover:shadow-lg group animate-in slide-in-from-bottom-2">
-                            <div className="flex justify-between items-start mb-3">
-                                <div className={`p-2 rounded-lg bg-slate-800 ${res.color}`}>
-                                    <Icon className="w-5 h-5" />
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-2xl font-bold font-mono text-slate-100">{res.count}</span>
-                                    <span className="text-xs text-slate-500 font-mono">/{res.total}</span>
-                                </div>
+                        <div key={res.id}
+                             className="flex items-center gap-4 px-5 py-4 border-b hover:bg-slate-800/25 transition-colors"
+                             style={{borderColor:'rgba(51,65,85,.35)'}}>
+                            {/* Icon */}
+                            <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${res.color}`}
+                                 style={{background:'rgba(30,41,59,.8)'}}>
+                                <Icon className="w-4.5 h-4.5" />
                             </div>
 
-                            <h3 className="text-sm font-semibold text-slate-300 mb-2">{res.name}</h3>
-
-                            <div className="w-full bg-slate-800 rounded-full h-1.5 mb-1 overflow-hidden">
-                                <div
-                                    className={`h-1.5 rounded-full ${res.bg} transition-all duration-1000 group-hover:brightness-125`}
-                                    style={{ width: `${percentage}%` }}
-                                ></div>
-                            </div>
-
-                            <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono">
-                                <span>Deployed</span>
-                                <span className="truncate ml-2">{percentage}% Util</span>
+                            {/* Bar + labels */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <span className="font-inter text-sm font-semibold text-slate-200">{res.name}</span>
+                                    <span className="font-inter text-xs font-mono text-slate-400">
+                                        <b className="text-slate-100">{res.count}</b>/{res.total}
+                                        <span className="text-slate-600 text-[10px] ml-1">({pct}%)</span>
+                                    </span>
+                                </div>
+                                <div className="w-full h-1.5 rounded-full overflow-hidden"
+                                     style={{background:'rgba(30,41,59,.9)'}}>
+                                    <div className="h-full rounded-full transition-all duration-1000"
+                                         style={{width: `${pct}%`, background: barColor}}/>
+                                </div>
+                                <div className="flex items-center justify-between mt-1">
+                                    <span className="font-inter text-[9px] text-slate-600 uppercase tracking-wider">Deployed</span>
+                                    <span className={`font-inter text-[9px] font-semibold uppercase tracking-wider ${labelColor}`}>
+                                        {status}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     );

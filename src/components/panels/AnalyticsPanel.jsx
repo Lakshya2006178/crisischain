@@ -1,80 +1,87 @@
-import { PieChart, BarChart } from 'lucide-react';
+import { PieChart, BarChart2, TrendingUp } from 'lucide-react';
+
+const BARS = [
+  { h: 40, label: 'M' }, { h: 65, label: 'T' }, { h: 30, label: 'W' },
+  { h: 85, label: 'T' }, { h: 50, label: 'F' }, { h: 45, label: 'S' }, { h: 90, label: 'S' },
+];
+const METRICS = [
+  { label: 'Critical', pct: 45, color: '#ef4444' },
+  { label: 'Warning',  pct: 30, color: '#eab308' },
+  { label: 'Resolved', pct: 25, color: '#3b82f6' },
+];
+const barColor = (h) => h > 70 ? '#ef4444' : h > 40 ? '#eab308' : '#3b82f6';
 
 export default function AnalyticsPanel() {
-    return (
-        <div className="bg-gray-800 backdrop-blur-lg bg-white/5 rounded-xl p-4 shadow-lg border border-gray-700 hover:shadow-xl hover:scale-[1.02] hover:border-blue-500 transition-all duration-300 flex flex-col h-full animate-fade-in duration-300">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <PieChart className="w-5 h-5 text-purple-400" />
-                    Incident Analytics
-                </h2>
+  return (
+    <div className="db-card">
+      <div className="db-card-header">
+        <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2">
+          <PieChart className="w-4 h-4 text-purple-400 flex-shrink-0" />
+          Analytics &amp; Key Metrics
+        </h2>
+        <span className="font-inter text-[10px] text-emerald-400 flex items-center gap-1.5">
+          <TrendingUp className="w-3 h-3" />
+          Live Data
+        </span>
+      </div>
+
+      <div className="flex-1 grid grid-cols-2 gap-4 p-5 overflow-hidden">
+
+        {/* Donut */}
+        <div className="flex flex-col items-center justify-center gap-4 rounded-xl p-4"
+             style={{background:'rgba(15,24,40,.8)', border:'1px solid rgba(51,65,85,.4)'}}>
+          <div className="relative w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0"
+               style={{ background:`conic-gradient(
+                 #ef4444 0% 45%,
+                 #eab308 45% 75%,
+                 #3b82f6 75% 100%
+               )`}}>
+            <div className="w-[58px] h-[58px] rounded-full flex flex-col items-center justify-center"
+                 style={{background:'#0c1523'}}>
+              <span className="font-bebas text-2xl text-slate-100 leading-none">142</span>
+              <span className="font-inter text-[9px] text-slate-500 mt-0.5">Total</span>
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-2 flex-1 items-center overflow-y-auto custom-scrollbar pr-2 pb-2">
-
-                {/* CSS Circular Chart Simulation */}
-                <div className="flex flex-col items-center justify-center p-4 bg-slate-900 rounded-xl border border-slate-700/50 hover:bg-slate-800/80 transition-colors">
-                    <div className="relative w-24 h-24 rounded-full flex items-center justify-center"
-                        style={{ background: 'conic-gradient(#ef4444 0% 45%, #eab308 45% 75%, #3b82f6 75% 100%)' }}>
-                        <div className="w-16 h-16 bg-slate-900 rounded-full flex flex-col items-center justify-center absolute">
-                            <span className="text-xl font-bold text-slate-100 font-mono">142</span>
-                            <span className="text-[10px] text-slate-500 leading-none">Total</span>
-                        </div>
-                    </div>
-
-                    <div className="mt-4 flex flex-col w-full gap-1.5 text-xs text-slate-400">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-red-500 rounded-sm"></div> Critical</div>
-                            <span className="font-mono text-slate-300">45%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-yellow-500 rounded-sm"></div> Warning</div>
-                            <span className="font-mono text-slate-300">30%</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1.5"><div className="w-2 h-2 bg-blue-500 rounded-sm"></div> Resolved</div>
-                            <span className="font-mono text-slate-300">25%</span>
-                        </div>
-                    </div>
-                </div>
-
-                {/* CSS Bar Chart Simulation */}
-                <div className="flex flex-col p-4 bg-slate-900 rounded-xl border border-slate-700/50 w-full h-full justify-between hover:bg-slate-800/80 transition-colors">
-                    <div className="flex items-center gap-2 mb-2 text-sm text-slate-400 font-semibold group cursor-pointer">
-                        <BarChart className="w-4 h-4" /> 7-Day Trend
-                    </div>
-
-                    <div className="flex items-end justify-between h-24 w-full gap-2 px-1 relative">
-                        {/* Simple grid line */}
-                        <div className="absolute top-1/2 left-0 w-full border-t border-slate-800 border-dashed z-0"></div>
-
-                        {/* Bars */}
-                        {[40, 65, 30, 85, 50, 45, 90].map((h, i) => (
-                            <div key={i} className="w-full bg-slate-800 rounded-t-sm relative group overflow-hidden z-10 hover:bg-slate-700 transition-colors" style={{ height: '100%' }}>
-                                <div className={`absolute bottom-0 w-full rounded-t-sm transition-all duration-500 group-hover:brightness-125
-                    ${h > 70 ? 'bg-red-500' : h > 40 ? 'bg-yellow-500' : 'bg-blue-500'}`}
-                                    style={{ height: `${h}%` }}>
-                                </div>
-                                {/* Tooltip on hover */}
-                                <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] bg-slate-950 text-slate-300 px-1 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 pointer-events-none">
-                                    {h} Alerts
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="flex justify-between w-full mt-2 text-[10px] text-slate-500 font-mono border-t border-slate-800 pt-1">
-                        <span>M</span>
-                        <span>T</span>
-                        <span>W</span>
-                        <span>T</span>
-                        <span>F</span>
-                        <span>S</span>
-                        <span>S</span>
-                    </div>
-                </div>
-
-            </div>
+          <div className="w-full flex flex-col gap-2">
+            {METRICS.map(m => (
+              <div key={m.label} className="flex items-center justify-between">
+                <span className="font-inter text-xs text-slate-400 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{background: m.color}}/>
+                  {m.label}
+                </span>
+                <span className="font-inter text-xs font-semibold font-mono" style={{color: m.color}}>
+                  {m.pct}%
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-    );
+
+        {/* Bar chart */}
+        <div className="flex flex-col gap-3 rounded-xl p-4"
+             style={{background:'rgba(15,24,40,.8)', border:'1px solid rgba(51,65,85,.4)'}}>
+          <div className="font-inter text-xs text-slate-400 font-semibold flex items-center gap-1.5 flex-shrink-0">
+            <BarChart2 className="w-3.5 h-3.5" /> 7-Day Trend
+          </div>
+          <div className="flex-1 flex items-end justify-between gap-1.5 relative min-h-0">
+            <div className="absolute inset-x-0 top-1/2 border-t border-dashed opacity-20"
+                 style={{borderColor:'#475569'}}/>
+            {BARS.map((b, i) => (
+              <div key={i} className="flex-1 flex flex-col items-center gap-1 h-full justify-end group">
+                <div className="w-full relative rounded-t overflow-hidden" style={{ height: '80%' }}>
+                  <div className="absolute bottom-0 w-full rounded-t transition-all duration-700 group-hover:brightness-110"
+                       style={{ height:`${b.h}%`, background: barColor(b.h) }}/>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between font-inter text-[9px] text-slate-600 font-mono flex-shrink-0">
+            {BARS.map(b => <span key={b.label}>{b.label}</span>)}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }

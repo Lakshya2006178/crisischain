@@ -1,59 +1,82 @@
 import { useDashboard } from '../../context/DashboardContext';
-import { AlertCircle, Waves, Wind, Flame } from 'lucide-react';
 
 export default function LiveAlertsPanel() {
     const { alerts, getIcon, addToast } = useDashboard();
     const criticalCount = alerts.filter(a => a.critical).length;
 
     return (
-        <div className="bg-gray-800 backdrop-blur-lg bg-white/5 rounded-xl p-4 shadow-lg border border-gray-700 hover:shadow-xl hover:scale-[1.02] hover:border-blue-500 transition-all duration-300 flex flex-col h-full animate-fade-in duration-300">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-red-500 animate-ping absolute"></span>
-                    <span className="w-2 h-2 rounded-full bg-red-500 relative"></span>
+        <div className="db-card">
+            {/* Header */}
+            <div className="db-card-header">
+                <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2.5">
+                    <span className="relative w-2.5 h-2.5 flex-shrink-0">
+                        <span className="absolute inset-0 rounded-full bg-red-500 animate-ping opacity-70"/>
+                        <span className="relative block w-full h-full rounded-full bg-red-500"/>
+                    </span>
                     Live Alerts
                 </h2>
-                <span className="bg-red-500/20 text-red-400 text-xs font-bold px-2.5 py-1 rounded-full border border-red-500/30">
+                <span className="font-inter text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase"
+                      style={{background:'rgba(239,68,68,.12)', color:'#f87171', border:'1px solid rgba(239,68,68,.25)'}}>
                     {criticalCount} Critical
                 </span>
             </div>
 
-            <div className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
+            {/* Body: alert rows */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 divide-y"
+                 style={{divideColor:'rgba(51,65,85,.4)'}}>
                 {alerts.map(alert => {
                     const Icon = getIcon(alert.iconName);
                     return (
                         <div
                             key={alert.id}
-                            className={`p-3 rounded-lg border transition-all duration-300 hover:scale-[1.02] hover:shadow-lg cursor-pointer flex items-start gap-4 
-                ${alert.critical
-                                    ? 'bg-red-500/10 border border-red-500 shadow-[0_0_15px_rgba(255,0,0,0.6)] hover:bg-red-500/20'
-                                    : 'bg-slate-900/50 border-slate-700 hover:border-slate-600'
-                                }`}
+                            onClick={() => addToast(`Alert: ${alert.type}`, 'info')}
+                            className={`flex items-start gap-3.5 px-5 py-3.5 cursor-pointer transition-colors hover:bg-slate-800/30
+                                ${alert.critical ? 'border-l-2 border-l-red-500 bg-red-500/[.03]' : 'border-l-2 border-l-transparent'}`}
                         >
-                            <div className={`p-2 rounded-lg ${alert.critical ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-orange-400'}`}>
-                                <Icon className="w-5 h-5" />
+                            {/* Icon */}
+                            <div className={`flex-shrink-0 mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center
+                                ${alert.critical ? 'bg-red-500/15 text-red-400' : 'bg-slate-800 text-orange-400'}`}>
+                                <Icon className="w-4 h-4" />
                             </div>
-                            <div className="flex-1">
-                                <div className="flex items-center justify-between mb-1">
-                                    <h4 className={`font-bold text-sm ${alert.critical ? 'text-red-400' : 'text-slate-200'}`}>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-1 mb-0.5">
+                                    <span className="font-bebas tracking-widest text-base leading-none"
+                                          style={{color: alert.critical ? '#fca5a5' : '#e2e8f0'}}>
                                         {alert.type}
-                                    </h4>
-                                    <span className="text-xs text-slate-500 font-mono">{alert.time}</span>
+                                    </span>
+                                    <span className="font-inter text-[10px] text-slate-500 font-mono flex-shrink-0">
+                                        {alert.time}
+                                    </span>
                                 </div>
-                                <p className="text-xs text-slate-400 flex items-center gap-1">
-                                    {alert.location}
-                                </p>
+                                <p className="font-inter text-[11px] text-slate-400 truncate">{alert.location}</p>
+                                <div className="flex items-center gap-1.5 mt-1.5">
+                                    <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${alert.critical ? 'bg-red-500' : 'bg-yellow-500'}`}/>
+                                    <span className={`font-inter text-[10px] font-semibold ${alert.critical ? 'text-red-400' : 'text-yellow-400'}`}>
+                                        {alert.critical ? 'Critical' : 'Warning'}
+                                    </span>
+                                    {alert.status && (
+                                        <span className="font-inter text-[10px] text-slate-600">· {alert.status}</span>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     );
                 })}
             </div>
-            <button
-                onClick={() => addToast('Opening full alerts modal...', 'info')}
-                className="w-full mt-4 py-2 text-sm text-slate-300 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-all duration-300 border border-dashed border-gray-600 hover:scale-[1.02] active:scale-95"
-            >
-                View All Alerts
-            </button>
+
+            {/* Footer */}
+            <div className="flex-shrink-0 px-5 py-3 border-t" style={{borderColor:'rgba(51,65,85,.5)'}}>
+                <button
+                    onClick={() => addToast('Opening full alerts…', 'info')}
+                    className="font-inter w-full py-2.5 text-xs font-semibold tracking-wider uppercase text-slate-400
+                        hover:text-slate-200 rounded-lg transition-colors border border-dashed border-slate-700/60
+                        hover:border-slate-500 hover:bg-slate-800/40"
+                >
+                    View All Alerts
+                </button>
+            </div>
         </div>
     );
 }

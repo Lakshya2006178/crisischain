@@ -1,100 +1,134 @@
 import { useState, useEffect } from 'react';
 import { useDashboard } from '../context/DashboardContext';
-import { Search, Bell, User, ChevronDown, Menu } from 'lucide-react';
+import { Search, Bell, Menu, User, ChevronDown } from 'lucide-react';
+
+// ── must match DashboardMain SZ ──────────────────────
+const W_CLOSED = 72;
+const W_OPEN   = 260;
+const H_NAV    = 68;
 
 export default function TopNavbar() {
     const [time, setTime] = useState(new Date());
-    const { addToast, isSidebarOpen, toggleSidebar, toggleMobileMenu } = useDashboard();
+    const { isSidebarOpen, toggleSidebar, addToast } = useDashboard();
 
     useEffect(() => {
-        const timer = setInterval(() => setTime(new Date()), 1000);
-        return () => clearInterval(timer);
+        const t = setInterval(() => setTime(new Date()), 1000);
+        return () => clearInterval(t);
     }, []);
 
-    const handleSearch = (e) => {
-        if (e.key === 'Enter') {
-            addToast(`Searching for: ${e.target.value}`, 'info');
-            e.target.value = '';
-        }
-    };
+    const ml = isSidebarOpen ? W_OPEN : W_CLOSED;
+
+    // Format helpers
+    const timeStr = time.toLocaleTimeString('en-US', { hour12: false });
+    const dateStr = time.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
 
     return (
-        <header className={`fixed top-0 right-0 h-20 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 flex items-center justify-between px-4 md:px-8 z-40 transition-all duration-300
-      ${isSidebarOpen ? 'left-0 md:left-64' : 'left-0 md:left-20'}
-    `}>
+        <header
+            className="fixed top-0 right-0 z-40 flex items-center transition-all duration-300"
+            style={{
+                left: ml,
+                height: H_NAV,
+                background: 'rgba(6,13,26,0.97)',
+                backdropFilter: 'blur(14px)',
+                borderBottom: '1px solid rgba(51,65,85,.55)',
+                padding: '0 24px',
+                gap: 16,
+            }}
+        >
+            {/* Hamburger toggle */}
+            <button
+                onClick={toggleSidebar}
+                className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
+                style={{color:'#64748b'}}
+                onMouseEnter={e => { e.currentTarget.style.background='rgba(255,255,255,.07)'; e.currentTarget.style.color='#e2e8f0'; }}
+                onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#64748b'; }}
+            >
+                <Menu className="w-5 h-5" />
+            </button>
 
-            {/* Brand & Title */}
-            <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
-                {/* Mobile Hamburger */}
-                <button className="md:hidden p-2 text-slate-400 hover:text-slate-200" onClick={toggleMobileMenu}>
-                    <Menu className="w-6 h-6" />
-                </button>
-                {/* Desktop Hamburger */}
-                <button className="hidden md:block p-2 text-slate-400 hover:text-slate-200 transition-colors" onClick={toggleSidebar}>
-                    <Menu className="w-6 h-6" />
-                </button>
-
-                <h1 className="text-xl md:text-2xl font-bold tracking-wider text-slate-100 uppercase hidden xl:block">
+            {/* Brand + divider (always visible) */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+                <span className="font-bebas text-xl tracking-[.14em] text-slate-100">
                     Crisis<span className="text-red-500">Chain</span>
-                </h1>
-                <div className="hidden xl:block h-6 w-px bg-slate-700 mx-2"></div>
-                <span className="text-slate-400 text-xs md:text-sm font-medium tracking-widest uppercase hidden lg:block">
+                </span>
+                <span className="w-px h-6 bg-slate-700/80" />
+                <span className="font-inter text-xs font-semibold tracking-[.18em] uppercase text-slate-500">
                     Command Center
                 </span>
             </div>
 
-            {/* Global Search */}
-            <div className="flex-1 max-w-xl mx-2 md:mx-8 relative group">
-                <div className="absolute inset-y-0 left-0 pl-3 md:pl-4 flex items-center pointer-events-none">
-                    <Search className="w-4 h-4 md:w-5 md:h-5 text-slate-500 group-focus-within:text-red-400 transition-colors" />
-                </div>
+            {/* Search — takes remaining space */}
+            <div className="flex-1 min-w-0 max-w-lg relative">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
+                        style={{color:'#475569'}} />
                 <input
                     type="text"
-                    onKeyDown={handleSearch}
-                    placeholder="Search incidents..."
-                    className="w-full bg-slate-800/50 border border-slate-700 text-slate-200 placeholder-slate-500 rounded-full py-2 pl-9 md:pl-12 pr-4 text-sm focus:outline-none focus:border-red-500/50 focus:bg-slate-800 focus:ring-1 focus:ring-red-500/50 transition-all shadow-inner"
+                    placeholder="Search incidents, alerts, resources…"
+                    className="font-inter w-full rounded-xl text-sm text-slate-300 placeholder-slate-600 outline-none transition-all"
+                    style={{
+                        background:'rgba(30,41,59,.6)',
+                        border:'1px solid rgba(51,65,85,.6)',
+                        padding:'9px 16px 9px 40px',
+                    }}
+                    onFocus={e => e.target.style.borderColor='rgba(59,130,246,.5)'}
+                    onBlur={e => e.target.style.borderColor='rgba(51,65,85,.6)'}
                 />
             </div>
 
-            {/* Right Actions */}
-            <div className="flex items-center gap-2 md:gap-6">
+            {/* Right side cluster */}
+            <div className="flex items-center gap-4 flex-shrink-0 ml-auto">
 
-                {/* Live Clock */}
-                <div className="flex flex-col items-end mr-2 md:mr-4">
-                    <span className="text-sm md:text-lg font-mono font-bold text-slate-200 tracking-wider">
-                        {time.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                        <span className="text-[10px] md:text-xs text-red-500 ml-1 animate-pulse hidden sm:inline-block">UTC</span>
-                    </span>
-                    <span className="text-[10px] md:text-xs text-slate-500 font-medium hidden sm:block">
-                        {time.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
+                {/* Clock */}
+                <div className="hidden md:flex flex-col items-end gap-0.5">
+                    <div className="flex items-baseline gap-1.5">
+                        <span className="font-inter text-base font-bold font-mono text-slate-100 tracking-wider">
+                            {timeStr}
+                        </span>
+                        <span className="font-bebas text-sm tracking-widest text-red-500">UTC</span>
+                    </div>
+                    <span className="font-inter text-[10px] text-slate-500">{dateStr}</span>
                 </div>
 
-                {/* Notifications */}
+                {/* Divider */}
+                <span className="hidden md:block w-px h-8 bg-slate-700/70" />
+
+                {/* Bell */}
                 <button
-                    onClick={() => addToast('Checking notifications...', 'info')}
-                    className="relative p-2 text-slate-400 hover:text-slate-200 transition-colors bg-slate-800 rounded-full hover:bg-slate-700"
+                    onClick={() => addToast('Checking notifications', 'info')}
+                    className="relative w-9 h-9 flex items-center justify-center rounded-xl transition-colors flex-shrink-0"
+                    style={{color:'#64748b', border:'1px solid rgba(51,65,85,.5)'}}
+                    onMouseEnter={e => { e.currentTarget.style.background='rgba(255,255,255,.06)'; e.currentTarget.style.color='#e2e8f0'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#64748b'; }}
                 >
-                    <Bell className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full shadow-[0_0_8px_rgba(239,68,68,1)] animate-ping"></span>
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
+                    <Bell className="w-4.5 h-4.5" />
+                    <span className="absolute top-2 right-2 w-2 h-2 rounded-full"
+                          style={{background:'#ef4444', boxShadow:'0 0 6px rgba(239,68,68,.8)'}} />
                 </button>
 
-                {/* Profile Dropdown */}
+                {/* Profile pill */}
                 <button
-                    onClick={() => addToast('Opening User Profile Settings', 'info')}
-                    className="flex items-center gap-2 md:gap-3 hover:bg-slate-800 p-1 md:p-1.5 md:pr-3 rounded-full border border-slate-800 hover:border-slate-700 transition-all"
+                    onClick={() => addToast('Profile settings', 'info')}
+                    className="flex items-center gap-2.5 rounded-xl transition-colors flex-shrink-0"
+                    style={{
+                        padding: '7px 14px 7px 8px',
+                        background:'rgba(30,41,59,.6)',
+                        border:'1px solid rgba(51,65,85,.5)',
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background='rgba(30,41,59,.9)'}
+                    onMouseLeave={e => e.currentTarget.style.background='rgba(30,41,59,.6)'}
                 >
-                    <div className="w-8 h-8 md:w-9 md:h-9 flex items-center justify-center rounded-full bg-slate-800 text-red-400 border border-slate-700">
-                        <User className="w-4 h-4 md:w-5 md:h-5" />
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                         style={{background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.25)'}}>
+                        <User className="w-4 h-4 text-red-400" />
                     </div>
-                    <div className="flex-col items-start hidden sm:flex">
-                        <span className="text-xs md:text-sm font-semibold text-slate-200">Commander</span>
-                        <span className="text-[10px] md:text-xs text-green-400 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> Online
+                    <div className="hidden sm:flex flex-col items-start gap-0.5">
+                        <span className="font-inter text-sm font-semibold text-slate-200 leading-none">Commander</span>
+                        <span className="font-inter text-[10px] text-emerald-400 flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            Online
                         </span>
                     </div>
-                    <ChevronDown className="w-3 h-3 md:w-4 md:h-4 text-slate-500 hidden sm:block" />
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-500 hidden sm:block" />
                 </button>
 
             </div>

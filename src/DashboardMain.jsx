@@ -9,62 +9,78 @@ import AnalyticsPanel from './components/panels/AnalyticsPanel';
 import IncidentActionPanel from './components/panels/IncidentActionPanel';
 import { useDashboard } from './context/DashboardContext';
 
-function ToastContainer({ toasts }) {
+// ── Shared size constants — keep in sync across Sidebar / TopNavbar / DashboardMain ──
+export const SZ = {
+  sidebarClosed: 72,   // px  w-[72px]
+  sidebarOpen:   260,  // px  w-[260px]
+  navbarH:       68,   // px  h-[68px]
+};
+
+function Toast({ message, type }) {
+  const bg = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#2563eb';
   return (
-    <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 pointer-events-none">
-      {toasts.map(toast => (
-        <div key={toast.id} className={`px-4 py-3 rounded-lg shadow-lg text-sm font-semibold text-white animate-in slide-in-from-right-8 fade-in 
-          ${toast.type === 'error' ? 'bg-red-600' : toast.type === 'success' ? 'bg-emerald-600' : 'bg-blue-600'}`}>
-          {toast.message}
-        </div>
-      ))}
+    <div className="font-inter px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold text-white"
+         style={{background: bg, border:'1px solid rgba(255,255,255,.12)'}}>
+      {message}
     </div>
   );
 }
 
-function DashboardMain() {
+function ToastContainer({ toasts }) {
+  return (
+    <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2.5 pointer-events-none">
+      {toasts.map(t => <Toast key={t.id} message={t.message} type={t.type} />)}
+    </div>
+  );
+}
+
+export default function DashboardMain() {
   const { toasts, isSidebarOpen } = useDashboard();
+  const ml = isSidebarOpen ? SZ.sidebarOpen : SZ.sidebarClosed;
 
   return (
-    <div className="h-screen w-full bg-[#0f172a] text-slate-100 flex overflow-hidden">
+    <div className="flex h-screen w-screen overflow-hidden" style={{background:'#060d1a'}}>
       <Sidebar />
       <TopNavbar />
 
-      {/* Main Content Area */}
-      <main className={`flex-1 h-screen overflow-y-auto w-full pt-28 pb-12 px-4 md:px-6 transition-all duration-300
-        ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}
-      `}>
-        {/* Dashboard Grid - 12 Columns */}
-        <div className="grid grid-cols-12 gap-4 max-w-[1600px] mx-auto pb-20 md:pb-10">
+      {/* ── Scrollable content ─────────────────────────── */}
+      <main
+        className="flex-1 overflow-y-auto overflow-x-hidden transition-all duration-300"
+        style={{
+          marginLeft: ml,
+          marginTop: SZ.navbarH,
+          height: `calc(100vh - ${SZ.navbarH}px)`,
+        }}
+      >
+        {/* 4-row layout — max 2 cards per row */}
+        <div className="grid grid-cols-12 gap-5 p-5">
 
-          {/* Row 1: WorkflowPanel (12) */}
+          {/* ── Row 1: Workflow strip ─────── full width */}
           <div className="col-span-12">
             <WorkflowPanel />
           </div>
 
-          {/* Row 2: Alerts (3), Map (6), Comms (3) */}
-          <div className="col-span-12 md:col-span-6 lg:col-span-3 flex flex-col h-[400px]">
+          {/* ── Row 2: Live Alerts (4) | Map (8) */}
+          <div className="col-span-12 lg:col-span-4" style={{minHeight: 420}}>
             <LiveAlertsPanel />
           </div>
-
-          <div className="col-span-12 lg:col-span-6 flex flex-col min-h-[400px] lg:h-[400px]">
+          <div className="col-span-12 lg:col-span-8" style={{minHeight: 420}}>
             <MapPanel />
           </div>
 
-          <div className="col-span-12 md:col-span-6 lg:col-span-3 flex flex-col h-[400px]">
+          {/* ── Row 3: Comms (5) | Resources (7) */}
+          <div className="col-span-12 lg:col-span-5" style={{minHeight: 320}}>
             <CommunicationPanel />
           </div>
-
-          {/* Row 3: Resource (4), Analytics (4), Incident (4) */}
-          <div className="col-span-12 md:col-span-6 lg:col-span-4 flex flex-col h-[350px] lg:h-[300px]">
+          <div className="col-span-12 lg:col-span-7" style={{minHeight: 320}}>
             <ResourceTrackingPanel />
           </div>
 
-          <div className="col-span-12 md:col-span-6 lg:col-span-4 flex flex-col h-[350px] lg:h-[300px]">
+          {/* ── Row 4: Analytics (7) | Actions (5) */}
+          <div className="col-span-12 lg:col-span-7" style={{minHeight: 300}}>
             <AnalyticsPanel />
           </div>
-
-          <div className="col-span-12 md:col-span-12 xl:col-span-4 lg:col-span-4 flex flex-col h-[350px] lg:h-[300px]">
+          <div className="col-span-12 lg:col-span-5" style={{minHeight: 300}}>
             <IncidentActionPanel />
           </div>
 
@@ -75,5 +91,3 @@ function DashboardMain() {
     </div>
   );
 }
-
-export default DashboardMain;
