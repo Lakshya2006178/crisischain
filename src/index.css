@@ -1,0 +1,65 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    @apply bg-slate-900 text-slate-100 antialiased overflow-x-hidden min-h-screen w-full;
+  }
+}
+
+/* ── Font helpers ── */
+.font-bebas   { font-family: 'Bebas Neue', sans-serif; }
+.font-inter   { font-family: 'Inter', sans-serif; }
+
+/* ── Panel heading style (uppercase tracking, Bebas) ── */
+.panel-title {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: .1em;
+  font-size: 1rem;       /* 16px */
+  line-height: 1;
+}
+
+/* ─── Custom scrollbar ─────────────────────────────── */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(100,116,139,.45); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(100,116,139,.7); }
+
+/* ─── Animations ───────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+.animate-fade-in  { animation: fadeIn  .5s ease-out both; }
+.animate-slide-up { animation: slideUp .5s ease-out both; }
+
+/* ─── Panel base card ──────────────────────────────── */
+.db-card {
+  background: #0f1826;
+  border: 1px solid rgba(51,65,85,.55);
+  border-radius: .875rem;   /* 14px = rounded-2xl-ish */
+  box-shadow: 0 4px 24px rgba(0,0,0,.35);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.db-card:hover {
+  border-color: rgba(59,130,246,.35);
+}
+
+/* ─── Panel header common ──────────────────────────── */
+.db-card-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(51,65,85,.5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
