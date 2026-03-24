@@ -3,28 +3,28 @@ import { useDashboard } from '../context/DashboardContext';
 import Sidebar from '../components/Sidebar';
 import TopNavbar from '../components/TopNavbar';
 import { SZ } from '../DashboardMain';
-import { 
-    Search, Plus, Package, MapPin, Database, Hospital, 
-    AlertCircle, CheckCircle2, ChevronRight, Pill, 
+import {
+    Search, Plus, Package, MapPin, Database, Hospital,
+    AlertCircle, CheckCircle2, ChevronRight, Pill,
     Truck, Navigation, Clock, Activity, Send, HeartPulse, Wrench
 } from 'lucide-react';
 
 function Toast({ message, type }) {
-  const bg = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#00c8ff';
-  return (
-    <div className="font-inter px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold text-white"
-         style={{background: bg, border:'1px solid rgba(255,255,255,.12)'}}>
-      {message}
-    </div>
-  );
+    const bg = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#00c8ff';
+    return (
+        <div className="font-inter px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold text-white"
+            style={{ background: bg, border: '1px solid rgba(255,255,255,.12)' }}>
+            {message}
+        </div>
+    );
 }
 
 function ToastContainer({ toasts }) {
-  return (
-    <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2.5 pointer-events-none">
-      {toasts.map(t => <Toast key={t.id} message={t.message} type={t.type} />)}
-    </div>
-  );
+    return (
+        <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2.5 pointer-events-none">
+            {toasts.map(t => <Toast key={t.id} message={t.message} type={t.type} />)}
+        </div>
+    );
 }
 
 // MiniMap visual for Hospital cards
@@ -44,7 +44,7 @@ const MiniMap = ({ isFull, isNear }) => {
                 <line x1="30" y1="0" x2="30" y2="40" stroke={strokeHex} strokeWidth="0.5" strokeDasharray="1 2" />
                 <line x1="70" y1="0" x2="70" y2="40" stroke={strokeHex} strokeWidth="0.5" strokeDasharray="1 2" />
             </svg>
-            
+
             {/* Pulsating Map Pin (Red if full) */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <div className={`w-3 h-3 rounded-full ${bgColor} shadow-[0_0_8px_currentColor] ${colorClass}`} />
@@ -110,8 +110,8 @@ export default function ResourceInventory() {
     useEffect(() => {
         fetch('/api/resources')
             .then(res => res.json())
-            .then(data => { if(data && data.length > 0) setResources(data); })
-            .catch(() => {}); 
+            .then(data => { if (data && data.length > 0) setResources(data); })
+            .catch(() => { });
     }, []);
 
     const handleAddStock = async (e) => {
@@ -137,7 +137,7 @@ export default function ResourceInventory() {
     const filteredFleet = fleet.filter(f => f.unit.toLowerCase().includes(fleetSearch.toLowerCase()) || f.type.toLowerCase().includes(fleetSearch.toLowerCase()) || f.status.toLowerCase().includes(fleetSearch.toLowerCase()));
 
     const getFleetIcon = (type) => {
-        switch(type) {
+        switch (type) {
             case 'Ambulance': return <HeartPulse className="w-5 h-5" />;
             case 'Supply Truck': return <Truck className="w-5 h-5" />;
             case 'Air Support': return <Navigation className="w-5 h-5" />;
@@ -146,34 +146,34 @@ export default function ResourceInventory() {
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden" style={{background:'#070d2a'}}>
+        <div className="flex h-screen w-full overflow-hidden" style={{ background: '#070d2a' }}>
             <Sidebar />
             <TopNavbar />
 
             <main
                 className="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300"
                 style={{
-                  marginLeft: ml,
-                  marginTop: SZ.navbarH,
-                  height: `calc(100vh - ${SZ.navbarH}px)`,
+                    marginLeft: ml,
+                    marginTop: SZ.navbarH,
+                    height: `calc(100vh - ${SZ.navbarH}px)`,
                 }}
             >
                 <div className="p-8 lg:p-12 max-w-[1400px] mx-auto text-slate-200">
-                    
+
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 border-b border-[#1a2a5e] pb-8">
                         <div>
-                            <span className="font-bebas text-[#00c8ff]" style={{fontSize: 14, letterSpacing: ".28em", display: "block", marginBottom: 6}}>NETWORK STATUS</span>
-                            <h1 className="font-bebas text-slate-100 flex items-center gap-4" style={{fontSize: "clamp(32px, 4vw, 56px)", letterSpacing: ".04em", lineHeight: 1}}>
-                                RESOURCE & FACILITY<br/>MANAGEMENT
+                            <span className="font-bebas text-[#00c8ff]" style={{ fontSize: 14, letterSpacing: ".28em", display: "block", marginBottom: 6 }}>NETWORK STATUS</span>
+                            <h1 className="font-bebas text-slate-100 flex items-center gap-4" style={{ fontSize: "clamp(32px, 4vw, 56px)", letterSpacing: ".04em", lineHeight: 1 }}>
+                                RESOURCE & FACILITY<br />MANAGEMENT
                             </h1>
-                            <p className="font-inter text-slate-400 mt-4 max-w-2xl" style={{fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", lineHeight: 1.8}}>
+                            <p className="font-inter text-slate-400 mt-4 max-w-2xl" style={{ fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", lineHeight: 1.8 }}>
                                 Track NGO supplies, monitor real-time hospital capacities, and manage logistics fleet globally.
                             </p>
                         </div>
-                        
+
                         {activeTab === 'supplies' && (
-                            <button 
+                            <button
                                 onClick={() => setIsSpaceModalOpen(true)}
                                 className="font-inter text-white rounded-full transition-all flex items-center gap-2"
                                 style={{
@@ -202,7 +202,7 @@ export default function ResourceInventory() {
                             const isActive = activeTab === tab.id;
                             const Icon = tab.icon;
                             return (
-                                <button 
+                                <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`px-8 py-3.5 font-inter font-bold text-[13px] rounded-full transition-all whitespace-nowrap flex items-center gap-2 border-2`}
@@ -212,8 +212,8 @@ export default function ResourceInventory() {
                                         color: isActive ? (tab.id === 'hospitals' ? "#00c8ff" : "#e53935") : "rgba(255,255,255,.5)",
                                         borderColor: isActive ? (tab.id === 'hospitals' ? "rgba(0,200,255,.4)" : "rgba(229,57,53,.4)") : "rgba(255,255,255,.15)",
                                     }}
-                                    onMouseEnter={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,.4)"; e.currentTarget.style.color = "#fff"; } }}
-                                    onMouseLeave={e => { if(!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,.15)"; e.currentTarget.style.color = "rgba(255,255,255,.5)"; } }}
+                                    onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,.4)"; e.currentTarget.style.color = "#fff"; } }}
+                                    onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,.15)"; e.currentTarget.style.color = "rgba(255,255,255,.5)"; } }}
                                 >
                                     <Icon className="w-4 h-4" /> {tab.label}
                                 </button>
@@ -224,14 +224,14 @@ export default function ResourceInventory() {
                     {/* Content Area - Supplies */}
                     {activeTab === 'supplies' && (
                         <div className="animate-in fade-in duration-300 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                            
+
                             {/* Left: Inventory Table */}
                             <div className="lg:col-span-2 space-y-6">
                                 <div className="relative">
                                     <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                    <input 
-                                        type="text" 
-                                        placeholder="SEARCH RESOURCES..." 
+                                    <input
+                                        type="text"
+                                        placeholder="SEARCH RESOURCES..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="w-full bg-[#0a1130] border border-[#1a2a5e] rounded-xl py-4 pl-14 pr-4 transition-colors font-inter text-sm font-semibold tracking-wider text-white"
@@ -245,7 +245,7 @@ export default function ResourceInventory() {
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-left border-collapse min-w-[700px]">
                                             <thead>
-                                                <tr className="border-b border-[#1a2a5e] font-bebas text-slate-400" style={{fontSize: 16, letterSpacing: ".12em"}}>
+                                                <tr className="border-b border-[#1a2a5e] font-bebas text-slate-400" style={{ fontSize: 16, letterSpacing: ".12em" }}>
                                                     <th className="px-6 py-5 font-normal">ITEM NAME</th>
                                                     <th className="px-6 py-5 font-normal">QUANTITY</th>
                                                     <th className="px-6 py-5 font-normal">LOCATION</th>
@@ -257,7 +257,7 @@ export default function ResourceInventory() {
                                                     <tr key={item.id} className="border-b border-[#1a2a5e]/50 hover:bg-[#0f1a42] transition-colors cursor-pointer">
                                                         <td className="px-6 py-5 font-inter text-[14px] font-bold text-slate-100 tracking-wide">
                                                             <div className="flex items-center gap-4">
-                                                                <div className="w-10 h-10 rounded-full flex flex-shrink-0 items-center justify-center text-[#e53935]" style={{border: "1px solid rgba(229,57,53,.3)", background: "rgba(229,57,53,.1)"}}>
+                                                                <div className="w-10 h-10 rounded-full flex flex-shrink-0 items-center justify-center text-[#e53935]" style={{ border: "1px solid rgba(229,57,53,.3)", background: "rgba(229,57,53,.1)" }}>
                                                                     <Package className="w-4 h-4" />
                                                                 </div>
                                                                 {item.name}
@@ -304,14 +304,14 @@ export default function ResourceInventory() {
                             <div className="lg:col-span-1">
                                 <div className="bg-[#0a1130] border border-[#1a2a5e] rounded-xl p-8 h-full shadow-xl">
                                     <h3 className="font-bebas text-2xl tracking-[0.1em] text-slate-100 mb-6 flex items-center gap-3 border-b border-[#1a2a5e] pb-5">
-                                        <div style={{width: 8, height: 8, background: "#00c8ff", borderRadius: "50%", boxShadow: "0 0 10px #00c8ff"}}/>
+                                        <div style={{ width: 8, height: 8, background: "#00c8ff", borderRadius: "50%", boxShadow: "0 0 10px #00c8ff" }} />
                                         LIVE DISPATCHES
                                     </h3>
-                                    
+
                                     <div className="space-y-5">
                                         {dispatches.map(dispatch => (
                                             <div key={dispatch.id} className="relative pl-6 pb-5 border-l-2 border-[#1a2a5e] last:border-transparent last:pb-0">
-                                                <div className="absolute left-[-5px] top-1 w-2 h-2 rounded-full" style={{background: "#e53935", boxShadow: "0 0 8px rgba(229,57,53,0.8)"}} />
+                                                <div className="absolute left-[-5px] top-1 w-2 h-2 rounded-full" style={{ background: "#e53935", boxShadow: "0 0 8px rgba(229,57,53,0.8)" }} />
                                                 <div className="bg-[#070d2a] border border-[#1a2a5e] rounded-xl p-5 hover:border-[#e53935]/50 transition-colors">
                                                     <div className="flex justify-between items-start mb-2">
                                                         <span className="font-inter text-[13px] font-bold text-slate-100 tracking-wide">{dispatch.item}</span>
@@ -342,9 +342,9 @@ export default function ResourceInventory() {
                         <div className="animate-in fade-in duration-300">
                             <div className="mb-6 relative max-w-xl">
                                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="SEARCH HOSPITALS..." 
+                                <input
+                                    type="text"
+                                    placeholder="SEARCH HOSPITALS..."
                                     value={hospitalSearch}
                                     onChange={(e) => setHospitalSearch(e.target.value)}
                                     className="w-full bg-[#0a1130] border border-[#1a2a5e] rounded-xl py-4 pl-14 pr-4 transition-colors font-inter text-sm font-semibold tracking-wider text-white"
@@ -358,20 +358,20 @@ export default function ResourceInventory() {
                                 {filteredHospitals.length > 0 ? filteredHospitals.map(hosp => {
                                     const isFull = hosp.status === 'Full';
                                     const isNear = hosp.status === 'Near Capacity';
-                                    
+
                                     const statusColor = isFull ? '#e53935' : isNear ? '#eab308' : '#00c8ff';
                                     const pctFull = Math.round(((hosp.bedsTotal - hosp.bedsAvailable) / hosp.bedsTotal) * 100);
-                                    
+
                                     return (
                                         <div key={hosp.id} className="bg-[#0a1130] border border-[#1a2a5e] rounded-xl p-6 shadow-xl hover:border-[#00c8ff]/50 transition-colors relative overflow-hidden group">
-                                            
+
                                             {/* MINI MAP COMPONENT */}
                                             <MiniMap isFull={isFull} isNear={isNear} />
 
                                             {/* Status Badge Overlapped */}
                                             <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
                                                 <span className="px-3 py-1 rounded bg-[#070d2a]/90 backdrop-blur border text-[10px] font-bold uppercase tracking-[0.15em]"
-                                                      style={{ borderColor: statusColor, color: statusColor }}>
+                                                    style={{ borderColor: statusColor, color: statusColor }}>
                                                     {hosp.status}
                                                 </span>
                                             </div>
@@ -402,7 +402,7 @@ export default function ResourceInventory() {
                                                         <div className="h-full rounded-full" style={{ width: `${pctFull}%`, background: statusColor }} />
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="bg-[#070d2a] rounded-xl p-4 border border-[#1a2a5e]">
                                                     <p className="text-[10px] font-inter text-slate-400 uppercase tracking-[0.1em] mb-2 font-bold flex items-center gap-1.5">
                                                         <Pill className="w-3.5 h-3.5" /> MEDICINES
@@ -447,9 +447,9 @@ export default function ResourceInventory() {
                             {/* Similar adjustments for Fleet if needed, keeping it consistent */}
                             <div className="mb-6 relative max-w-xl">
                                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                                <input 
-                                    type="text" 
-                                    placeholder="SEARCH FLEET..." 
+                                <input
+                                    type="text"
+                                    placeholder="SEARCH FLEET..."
                                     value={fleetSearch}
                                     onChange={(e) => setFleetSearch(e.target.value)}
                                     className="w-full bg-[#0a1130] border border-[#1a2a5e] rounded-xl py-4 pl-14 pr-4 transition-colors font-inter text-sm font-semibold tracking-wider text-white"
@@ -470,7 +470,7 @@ export default function ResourceInventory() {
                                             <div className="flex items-center justify-between mb-6">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 rounded-full flex items-center justify-center border"
-                                                         style={{ borderColor: `${statusColor}40`, background: `${statusColor}10`, color: statusColor }}>
+                                                        style={{ borderColor: `${statusColor}40`, background: `${statusColor}10`, color: statusColor }}>
                                                         {isMaint ? <Wrench className="w-5 h-5" /> : getFleetIcon(unit.type)}
                                                     </div>
                                                     <div>
@@ -479,19 +479,19 @@ export default function ResourceInventory() {
                                                     </div>
                                                 </div>
                                                 <span className="px-3 py-1 rounded bg-[#070d2a] border text-[10px] font-bold uppercase tracking-[0.15em] whitespace-nowrap"
-                                                      style={{ borderColor: statusColor, color: statusColor }}>
+                                                    style={{ borderColor: statusColor, color: statusColor }}>
                                                     {unit.status}
                                                 </span>
                                             </div>
 
-                                            <div className="space-y-4 p-5 bg-[#070d2a] rounded-xl border border-[#1a2a5e] flex flex-col justify-between" style={{minHeight: 120}}>
+                                            <div className="space-y-4 p-5 bg-[#070d2a] rounded-xl border border-[#1a2a5e] flex flex-col justify-between" style={{ minHeight: 120 }}>
                                                 <div>
                                                     <p className="text-[10px] font-inter text-slate-400 uppercase tracking-[0.1em] mb-1.5 font-bold flex items-center gap-1.5">
                                                         <MapPin className="w-3.5 h-3.5" /> CURRENT LOCATION
                                                     </p>
                                                     <p className="font-inter text-[13px] font-bold tracking-wide text-slate-200">{unit.location}</p>
                                                 </div>
-                                                
+
                                                 {isEnRoute ? (
                                                     <div className="border-t border-[#1a2a5e] pt-4 flex justify-between items-center">
                                                         <span className="text-[10px] font-inter text-slate-500 uppercase tracking-[0.15em] font-bold flex items-center gap-1.5">
@@ -513,7 +513,7 @@ export default function ResourceInventory() {
 
                                             {!isMaint && !isEnRoute && (
                                                 <button className="w-full mt-5 bg-transparent border-2 hover:bg-white/5 py-3 rounded-full font-inter text-[12px] font-bold uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-2"
-                                                        style={{ borderColor: statusColor, color: statusColor }}>
+                                                    style={{ borderColor: statusColor, color: statusColor }}>
                                                     <Send className="w-4 h-4" /> DISPATCH UNIT
                                                 </button>
                                             )}
@@ -547,11 +547,11 @@ export default function ResourceInventory() {
                         <form onSubmit={handleAddStock} className="p-8 flex flex-col gap-6">
                             <div>
                                 <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">ITEM NAME</label>
-                                <input 
+                                <input
                                     required
-                                    type="text" 
+                                    type="text"
                                     value={newItem.name}
-                                    onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                                     className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none"
                                     style={{ outline: "none" }}
                                     onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
@@ -561,12 +561,12 @@ export default function ResourceInventory() {
                             <div className="flex gap-5">
                                 <div className="flex-1">
                                     <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">QUANTITY</label>
-                                    <input 
+                                    <input
                                         required
-                                        type="number" 
+                                        type="number"
                                         min="0"
                                         value={newItem.quantity}
-                                        onChange={(e) => setNewItem({...newItem, quantity: e.target.value})}
+                                        onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
                                         className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none"
                                         onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
                                         onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
@@ -574,9 +574,9 @@ export default function ResourceInventory() {
                                 </div>
                                 <div className="w-1/3">
                                     <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">UNIT</label>
-                                    <select 
+                                    <select
                                         value={newItem.unit}
-                                        onChange={(e) => setNewItem({...newItem, unit: e.target.value})}
+                                        onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
                                         className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none uppercase"
                                         onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
                                         onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
@@ -590,25 +590,25 @@ export default function ResourceInventory() {
                             </div>
                             <div>
                                 <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">LOCATION</label>
-                                <input 
+                                <input
                                     required
-                                    type="text" 
+                                    type="text"
                                     value={newItem.location}
-                                    onChange={(e) => setNewItem({...newItem, location: e.target.value})}
+                                    onChange={(e) => setNewItem({ ...newItem, location: e.target.value })}
                                     className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none"
                                     onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
                                     onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
                                 />
                             </div>
                             <div className="mt-4 flex justify-end gap-4 pt-6 border-t border-[#1a2a5e]">
-                                <button 
+                                <button
                                     type="button"
                                     onClick={() => setIsSpaceModalOpen(false)}
                                     className="px-6 py-3 rounded-full font-inter text-[12px] font-bold tracking-[0.1em] text-slate-300 hover:bg-[#1a2a5e] transition-colors border border-transparent hover:border-slate-700"
                                 >
                                     CANCEL
                                 </button>
-                                <button 
+                                <button
                                     type="submit"
                                     disabled={isSubmitting}
                                     className="text-white px-8 py-3 rounded-full font-inter text-[12px] font-bold tracking-[0.15em] transition-all disabled:opacity-50"
