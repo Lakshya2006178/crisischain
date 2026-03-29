@@ -143,7 +143,7 @@ export default function SignUpPage() {
       </div>
 
       {/* ── RIGHT PANEL: SIGNUP FORM ── */}
-      <div className="flex-1 flex flex-col items-center justify-center p-8 relative z-10 overflow-y-auto">
+      <div className="flex-1 flex items-start lg:items-center justify-center p-6 md:p-12 relative z-10 pt-24 lg:pt-12 min-h-screen">
         <div className="max-w-[540px] w-full py-12 animate-slide-up">
           
           <div className="mb-12">
