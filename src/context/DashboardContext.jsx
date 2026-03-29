@@ -41,6 +41,7 @@ export function DashboardProvider({ children }) {
 
     // --- ACTIONS ---
     const toggleSidebar = () => setIsSidebarOpen(prev => !prev);
+    const closeSidebar  = () => setIsSidebarOpen(false);
     const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
 
     const addToast = (message, type = 'info') => {
@@ -124,7 +125,7 @@ export function DashboardProvider({ children }) {
     return (
         <DashboardContext.Provider value={{
             alerts, actions, messages, resources, workflowId, toasts,
-            isSidebarOpen, isMobileMenuOpen, toggleSidebar, toggleMobileMenu,
+            isSidebarOpen, isMobileMenuOpen, toggleSidebar, closeSidebar, toggleMobileMenu,
             acknowledgeAction, escalateAction, addMessage, addAlert, advanceWorkflow,
             getIcon, searchQuery, setSearchQuery, addToast
         }}>

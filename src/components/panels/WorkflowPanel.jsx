@@ -1,28 +1,28 @@
 import { useDashboard } from '../../context/DashboardContext';
-import { AlertTriangle, ClipboardCheck, Siren, HeartHandshake } from 'lucide-react';
+import { AlertTriangle, ClipboardCheck, Siren, HeartHandshake, ChevronRight } from 'lucide-react';
 
 const STEPS = [
-    { id:1, title:'ALERT',      sub:'12:01 UTC · Active',   icon: AlertTriangle,  dot:'#ef4444', bar:'#ef4444', dim:'text-red-400',    ring:'ring-red-500/30',    desc:'Coastal Cyclone identified, warning issued' },
-    { id:2, title:'ASSESSMENT', sub:'12:45 UTC · Current',  icon: ClipboardCheck, dot:'#eab308', bar:'#eab308', dim:'text-yellow-400', ring:'ring-yellow-400/30',  desc:'Impact analysis, damage reporting, resource needs' },
-    { id:3, title:'RESPONSE',   sub:'13:30 UTC · Active',   icon: Siren,          dot:'#3b82f6', bar:'#3b82f6', dim:'text-blue-400',   ring:'ring-blue-500/30',    desc:'Search & Rescue, Aid distribution' },
-    { id:4, title:'RECOVERY',   sub:'Planned',              icon: HeartHandshake, dot:'#22c55e', bar:'#22c55e', dim:'text-emerald-400',ring:'ring-emerald-500/25', desc:'Long term rehabilitation planning' },
+    { id:1, title:'SIGNAL_INTAKE',      sub:'12:01 UTC',   icon: AlertTriangle,  color:'#ef4444', desc:'Anomaly detected in coastal sectors.' },
+    { id:2, title:'THREAT_VECTOR',     sub:'12:45 UTC',   icon: ClipboardCheck, color:'#fbbf24', desc:'Structural impact modeling active.' },
+    { id:3, title:'RESPONSE_SYNC',    sub:'13:30 UTC',   icon: Siren,          color:'#3b82f6', desc:'Deployment of priority response units.' },
+    { id:4, title:'RECOVERY_LOG',      sub:'PLANNED',     icon: HeartHandshake, color:'#10b981', desc:'Post-incident stability assessment.' },
 ];
 
 export default function WorkflowPanel() {
     const { workflowId, advanceWorkflow } = useDashboard();
 
     return (
-        <div className="db-card" style={{flexDirection:'row', overflow:'visible', minHeight:0}}>
-            {/* Label */}
-            <div className="flex-shrink-0 flex items-center px-5 border-r border-slate-700/50">
-                <p className="font-bebas text-slate-500 tracking-[.22em] text-sm whitespace-nowrap"
-                   style={{writingMode:'unset'}}>
-                    WORKFLOW
+        <div className="flex h-full w-full items-stretch divide-x divide-white/5 overflow-x-auto custom-scrollbar">
+            {/* Header Label */}
+            <div className="flex-shrink-0 flex flex-col justify-center px-8 bg-white/[0.02]">
+                <div className="h-1 w-8 bg-[#00FFCC] mb-4" />
+                <p className="font-mono text-[10px] text-white/40 tracking-[0.5em] uppercase vertical-text">
+                    LIFECYCLE
                 </p>
             </div>
 
             {/* Steps */}
-            <div className="flex flex-1 items-stretch overflow-x-auto">
+            <div className="flex flex-1 min-w-max">
                 {STEPS.map((step, idx) => {
                     const Icon = step.icon;
                     const isActive    = step.id === workflowId;
@@ -30,54 +30,68 @@ export default function WorkflowPanel() {
                     const isDimmed    = step.id > workflowId;
 
                     return (
-                        <div key={step.id} className="flex flex-1 items-center min-w-0 min-w-[180px]">
+                        <div key={step.id} className="flex items-center">
                             <button
                                 onClick={() => { if (isActive && step.id < 4) advanceWorkflow(); }}
-                                className={`flex-1 flex items-start gap-4 px-5 py-4 text-left transition-all duration-200
-                                    ${isActive ? `bg-slate-800/70 ring-1 ${step.ring}` : ''}
-                                    ${isDimmed ? 'opacity-35' : ''}
-                                    hover:bg-slate-800/40 cursor-pointer`}
+                                className={`
+                                    group/step relative flex flex-col justify-center gap-4 px-10 py-8 text-left transition-all duration-700 w-[280px] h-full
+                                    ${isActive ? 'bg-[#00FFCC]/[0.03] shadow-[inset_0_0_40px_rgba(0,255,204,0.02)]' : 'hover:bg-white/[0.02]'}
+                                    ${isDimmed ? 'opacity-30 grayscale' : ''}
+                                `}
                             >
-                                {/* Icon circle */}
-                                <div className={`flex-shrink-0 mt-0.5 w-10 h-10 rounded-full flex items-center justify-center
-                                    ${isActive ? 'ring-2 ' + step.ring : ''}`}
-                                     style={{background: isActive || isCompleted ? step.dot + '22' : 'rgba(30,41,59,.6)'}}>
-                                    <Icon className="w-5 h-5 flex-shrink-0"
-                                          style={{color: isActive || isCompleted ? step.dot : '#475569'}} />
+                                {/* Step Indicator */}
+                                <div className="absolute top-4 left-10 flex items-center gap-2">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00FFCC] animate-pulse shadow-[0_0_8px_#00FFCC]' : isCompleted ? 'bg-white/40' : 'bg-white/10'}`} />
+                                    <span className="font-mono text-[9px] text-white/20 tracking-widest uppercase">STAGE_0{step.id}</span>
                                 </div>
 
-                                {/* Text */}
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-bebas tracking-widest text-lg leading-none mb-1"
-                                       style={{color: isActive || isCompleted ? '#e2e8f0' : '#475569'}}>
-                                        {step.title}
-                                    </p>
-                                    <p className="text-[11px] font-semibold mb-1.5"
-                                       style={{color: isActive ? step.dot : '#475569', fontFamily:'Inter,sans-serif'}}>
-                                        {step.sub}
-                                    </p>
-                                    <p className="text-[11px] leading-snug text-slate-500 font-inter line-clamp-2">
-                                        {step.desc}
-                                    </p>
+                                {/* Icon & Title */}
+                                <div className="flex items-start gap-5">
+                                    <div className={`
+                                        flex-shrink-0 w-12 h-12 flex items-center justify-center border transition-all duration-500
+                                        ${isActive ? 'bg-[#00FFCC]/10 border-[#00FFCC]/40 text-[#00FFCC]' : isCompleted ? 'bg-white/5 border-white/10 text-white/60' : 'bg-transparent border-white/5 text-white/20'}
+                                    `}>
+                                        <Icon className="w-6 h-6" />
+                                    </div>
+                                    <div className="flex-1 min-w-0 pt-1">
+                                        <h4 className={`font-outfit font-black text-lg tracking-tight uppercase leading-none mb-1 ${isActive ? 'text-white' : 'text-white/40'}`}>
+                                            {step.title}
+                                        </h4>
+                                        <p className={`font-mono text-[9px] font-bold tracking-[0.2em] mb-3 ${isActive ? 'text-[#00FFCC]' : 'text-white/20'}`}>
+                                            {step.sub}
+                                        </p>
+                                    </div>
                                 </div>
+
+                                <p className="text-[10px] leading-relaxed text-white/40 font-inter uppercase italic group-hover/step:text-white/60 transition-colors">
+                                    {step.desc}
+                                </p>
+
+                                {isActive && (
+                                    <div className="absolute bottom-0 left-0 h-1 bg-[#00FFCC] animate-progress-glow" style={{ width: '40%' }} />
+                                )}
                             </button>
 
-                            {/* Connector */}
+                            {/* Chevron Divider */}
                             {idx < STEPS.length - 1 && (
-                                <div className="flex-shrink-0 w-8 flex items-center justify-center">
-                                    <div className="h-px w-full rounded-full relative overflow-hidden"
-                                         style={{background: isCompleted ? step.bar : 'rgba(51,65,85,.8)'}}>
-                                        {isActive && (
-                                            <div className="absolute inset-y-0 left-0 w-1/2 animate-pulse"
-                                                 style={{background: step.bar}}/>
-                                        )}
-                                    </div>
+                                <div className="flex-shrink-0 h-full flex items-center px-2">
+                                    <ChevronRight className="w-4 h-4 text-white/5" />
                                 </div>
                             )}
                         </div>
                     );
                 })}
             </div>
+            
+            <style dangerouslySetInnerHTML={{ __html: `
+                .vertical-text { writing-mode: vertical-rl; transform: rotate(180deg); }
+                @keyframes progress-glow {
+                    0% { opacity: 0.3; width: 0%; }
+                    50% { opacity: 1; width: 100%; }
+                    100% { opacity: 0.3; width: 0%; }
+                }
+                .animate-progress-glow { animation: progress-glow 4s ease-in-out infinite; }
+            `}} />
         </div>
     );
 }

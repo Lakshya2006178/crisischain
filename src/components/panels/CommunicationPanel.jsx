@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
-import { MessageSquare, AlertTriangle, Radio, Send } from 'lucide-react';
+import { MessageSquare, AlertTriangle, Radio, Send, Terminal, Shield, Lock } from 'lucide-react';
 
 export default function CommunicationPanel() {
     const { messages, addMessage } = useDashboard();
@@ -14,53 +14,63 @@ export default function CommunicationPanel() {
         if (input.trim()) { addMessage('Commander', input.trim(), 'Active'); setInput(''); }
     };
 
-    const statusStyle = (s) => ({
-        Critical: 'bg-red-500/15 text-red-400 border border-red-500/25',
-        Active:   'bg-blue-500/15 text-blue-400 border border-blue-500/25',
-        Warning:  'bg-yellow-500/15 text-yellow-400 border border-yellow-500/25',
-    })[s] || 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/25';
-
     return (
-        <div className="db-card">
-            <div className="db-card-header">
-                <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2">
-                    <Radio className="w-4 h-4 text-emerald-400 animate-pulse flex-shrink-0" />
-                    Comms &amp; Feed
-                </h2>
-                <div className="flex gap-0.5 rounded-lg p-0.5" style={{background:'rgba(30,41,59,.7)', border:'1px solid rgba(51,65,85,.5)'}}>
+        <div className="flex flex-col h-full w-full bg-[#0A0A0B]/20 relative overflow-hidden backdrop-blur-3xl group">
+            
+            {/* Secur-Link Header */}
+            <div className="flex items-center justify-between px-10 py-8 border-b border-white/5 bg-white/[0.02]">
+                <div className="flex items-center gap-6">
+                    <div className="w-10 h-10 border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-center relative">
+                        <Radio className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform animate-pulse" />
+                        <div className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_#10b981]" />
+                    </div>
+                    <div>
+                        <h4 className="font-outfit font-black text-xl tracking-tight text-white uppercase leading-none mb-1">COMMS_ARRAY</h4>
+                        <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-white/30 uppercase flex items-center gap-2">
+                           <Lock className="w-3 h-3" /> E2E_ENCRYPTED_UPLINK
+                        </p>
+                    </div>
+                </div>
+                
+                <div className="flex gap-1 p-1 bg-black/40 border border-white/5">
                     {['All','Critical'].map(f => (
                         <button key={f} onClick={() => setFilter(f)}
-                                className={`font-inter px-3 py-1 text-[10px] font-semibold rounded-md tracking-wide transition-colors
-                                    ${filter === f ? 'bg-slate-700 text-slate-100' : 'text-slate-500 hover:text-slate-300'}`}>
+                                className={`font-mono px-4 py-2 text-[10px] font-black tracking-widest uppercase transition-all
+                                    ${filter === f ? 'bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.05)]' : 'text-white/20 hover:text-white/40'}`}>
                             {f}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 divide-y"
-                 style={{divideColor:'rgba(51,65,85,.4)'}}>
+            {/* Message Stream */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
                 {filtered.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-24 gap-2 text-slate-500">
-                        <MessageSquare className="w-5 h-5 opacity-25" />
-                        <span className="font-inter text-xs italic">No messages</span>
+                    <div className="flex flex-col items-center justify-center h-full gap-6 opacity-10">
+                        <Terminal className="w-12 h-12" />
+                        <span className="font-mono text-[10px] font-black tracking-[0.5em] uppercase">NO_SIGNAL_DETECTED</span>
                     </div>
                 )}
                 {filtered.map(msg => (
-                    <div key={msg.id} className="px-5 py-3.5 hover:bg-slate-800/25 transition-colors">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                            <span className={`font-inter text-xs font-bold flex items-center gap-1
-                                ${msg.sender === 'Commander' ? 'text-purple-400' : 'text-blue-400'}`}>
-                                {(msg.sender === 'HQ Command' || msg.sender === 'Commander') &&
-                                    <AlertTriangle className="w-3 h-3 flex-shrink-0" />}
-                                {msg.sender}
-                            </span>
-                            <span className="font-inter text-[10px] font-mono text-slate-500 flex-shrink-0">{msg.time}</span>
+                    <div key={msg.id} className="group/msg px-10 py-8 hover:bg-white/[0.02] transition-colors relative">
+                        <div className="flex items-start justify-between gap-6 mb-4">
+                            <div className="flex items-center gap-4">
+                               <div className={`w-1 h-6 ${msg.sender === 'Commander' ? 'bg-purple-500' : 'bg-blue-500'}`} />
+                               <span className={`font-outfit font-black text-sm tracking-tight uppercase transition-all group-hover/msg:translate-x-1
+                                   ${msg.sender === 'Commander' ? 'text-purple-400' : 'text-blue-400'}`}>
+                                   {msg.sender}
+                               </span>
+                            </div>
+                            <span className="font-mono text-[9px] text-white/10 tracking-widest font-bold uppercase transition-transform group-hover/msg:translate-x-2">[{msg.time}]</span>
                         </div>
-                        <p className="font-inter text-[11px] text-slate-400 leading-relaxed mb-2">{msg.text}</p>
-                        <div className="flex justify-end">
-                            <span className={`font-inter text-[9px] uppercase font-bold px-2 py-0.5 rounded tracking-wider ${statusStyle(msg.status)}`}>
+                        <p className="font-inter text-[11px] text-white/40 leading-relaxed mb-6 uppercase italic tracking-[0.02em]">{msg.text}</p>
+                        
+                        <div className="flex justify-end items-center gap-4">
+                            <div className="h-[1px] flex-1 bg-white/[0.03]" />
+                            <span className={`
+                                font-mono text-[8px] font-black tracking-widest uppercase px-3 py-1 border
+                                ${msg.status === 'Critical' ? 'bg-red-500/5 text-red-500 border-red-500/20' : 'bg-white/5 text-white/20 border-white/5'}
+                            `}>
                                 {msg.status}
                             </span>
                         </div>
@@ -68,27 +78,24 @@ export default function CommunicationPanel() {
                 ))}
             </div>
 
-            {/* Send box */}
-            <form onSubmit={handleSend}
-                  className="flex gap-2.5 px-4 py-3 flex-shrink-0 border-t"
-                  style={{borderColor:'rgba(51,65,85,.5)'}}>
-                <input
-                    type="text" value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') handleSend(e); }}
-                    placeholder="Type message to all units…"
-                    className="font-inter flex-1 min-w-0 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-600
-                        outline-none transition-all"
-                    style={{
-                        background:'rgba(15,24,40,.8)',
-                        border:'1px solid rgba(51,65,85,.6)',
-                    }}
-                />
-                <button type="submit"
-                        className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-white transition-colors active:scale-95"
-                        style={{background:'#2563eb'}}>
-                    <Send className="w-3.5 h-3.5" />
-                </button>
+            {/* Terminal Input Array */}
+            <form onSubmit={handleSend} className="p-10 bg-black/40 border-t border-white/5">
+                <div className="relative group/input">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-3">
+                         <Terminal className="w-4 h-4 text-emerald-500/40" />
+                         <span className="text-[9px] font-mono text-emerald-500/20 font-black tracking-widest group-focus-within/input:text-emerald-500/60 transition-colors uppercase">CMD_INPUT:</span>
+                    </div>
+                    <input
+                        type="text" value={input}
+                        onChange={e => setInput(e.target.value)}
+                        placeholder="INPUT_UPLINK_COMMAND..."
+                        className="font-mono w-full bg-white/[0.02] border border-white/5 focus:border-[#00FFCC]/40 focus:bg-[#00FFCC]/[0.02] pl-36 pr-20 py-5 text-[11px] font-black tracking-widest text-[#00FFCC] placeholder-white/5 outline-none transition-all duration-700 uppercase"
+                    />
+                    <button type="submit"
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-14 h-14 bg-white/5 hover:bg-[#00FFCC] border border-white/10 hover:border-transparent flex items-center justify-center text-white/40 hover:text-black transition-all duration-500 group-hover/input:border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.4)]">
+                        <Send className="w-4 h-4" />
+                    </button>
+                </div>
             </form>
         </div>
     );

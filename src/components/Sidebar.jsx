@@ -1,128 +1,167 @@
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDashboard } from '../context/DashboardContext';
 import {
     LayoutDashboard, AlertTriangle, Activity,
-    Database, Settings, ShieldAlert,
+    Database, Settings, Shield,
+    Terminal, Lock, Radio, ChevronRight, Zap
 } from 'lucide-react';
 
-// ── must match DashboardMain SZ ──────────────────────
-const W_CLOSED = 72;
-const W_OPEN   = 260;
-const H_TOP    = 68;
+const W_CLOSED = 80;
+const W_OPEN   = 300;
+const H_TOP    = 80;
 
 const NAV = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { id: 'alerts',    icon: AlertTriangle,   label: 'Alerts',    path: '/alerts' },
-    { id: 'resources', icon: Database,         label: 'Resources', path: '/resources' },
-    { id: 'analytics', icon: Activity,         label: 'Analytics', path: '/analytics' },
-    { id: 'settings',  icon: Settings,         label: 'Settings',  path: '/settings' },
+    { id: 'dashboard', icon: LayoutDashboard, label: 'DASHBOARD_LIVE', path: '/dashboard' },
+    { id: 'alerts',    icon: AlertTriangle,   label: 'CRITICAL_ALERTS',    path: '/alerts' },
+    { id: 'resources', icon: Database,         label: 'RESOURCE_DATABASE', path: '/resources' },
+    { id: 'analytics', icon: Activity,         label: 'CORTEX_ANALYTICS',  path: '/analytics' },
+    { id: 'settings',  icon: Settings,         label: 'NODE_SETTINGS',     path: '/settings' },
 ];
 
 export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isSidebarOpen } = useDashboard();
+    const { isSidebarOpen, toggleSidebar } = useDashboard();
     const w = isSidebarOpen ? W_OPEN : W_CLOSED;
 
     return (
         <aside
-            className="fixed left-0 top-0 h-screen flex flex-col z-50 transition-all duration-300 overflow-hidden"
-            style={{
-                width: w,
-                background: '#07101e',
-                borderRight: '1px solid rgba(51,65,85,.55)',
-            }}
+            className={`fixed top-0 h-screen flex flex-col z-50 transition-all duration-500 overflow-hidden bg-[#08080A] border-r border-white/5 backdrop-blur-md group/aside will-change-transform ${isSidebarOpen ? 'w-sidebar-open left-0' : 'w-sidebar-closed left-[-100%] lg:left-0'}`}
         >
-            {/* ── Logo bar (matches navbar height) ─────── */}
-            <div className="flex items-center justify-center flex-shrink-0"
-                 style={{height: H_TOP, borderBottom:'1px solid rgba(51,65,85,.55)'}}>
-                {isSidebarOpen ? (
-                    <div className="flex items-center gap-2.5 px-5" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                             style={{background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.3)'}}>
-                            <ShieldAlert className="w-4 h-4 text-red-400" />
+            {/* ── LOGO CLUSTER ── */}
+            <div className="flex items-center flex-shrink-0 relative overflow-hidden group/logo"
+                 style={{ height: H_TOP }}>
+                <Link to="/" className={`flex items-center gap-6 px-8 transition-all duration-700 ${!isSidebarOpen && 'justify-center w-full px-0'}`}>
+                    <div className="relative">
+                        <div className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center group-hover/logo:border-[#00FFCC]/60 transition-all duration-500 shadow-[inset_0_0_20px_rgba(0,255,204,0.05)]">
+                            <Shield className="w-6 h-6 text-[#00FFCC] group-hover/logo:scale-110 transition-transform" />
                         </div>
-                        <span className="font-bebas text-xl tracking-[.14em] text-slate-100 whitespace-nowrap">
-                            Crisis<span className="text-red-500">Chain</span>
-                        </span>
+                        <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-[#00FFCC] shadow-[0_0_10px_#00FFCC] animate-pulse" />
                     </div>
-                ) : (
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer"
-                         onClick={() => navigate('/')}
-                         style={{background:'rgba(239,68,68,.15)', border:'1px solid rgba(239,68,68,.3)'}}>
-                        <ShieldAlert className="w-5 h-5 text-red-400" />
-                    </div>
+                    {isSidebarOpen && (
+                        <div className="flex flex-col gap-0.5 leading-none">
+                            <span className="font-outfit font-black text-2xl tracking-tighter uppercase text-white whitespace-nowrap">CRISISCHAIN</span>
+                            <span className="text-[10px] font-mono font-bold text-blue-500 tracking-[0.5em] opacity-40 uppercase">TACTICAL_V5</span>
+                        </div>
+                    )}
+                </Link>
+
+                {/* Mobile Close Button */}
+                {isSidebarOpen && (
+                    <button 
+                        onClick={() => toggleSidebar()}
+                        className="lg:hidden ml-auto mr-8 w-10 h-10 flex items-center justify-center border border-white/10 text-white/40 hover:text-white"
+                    >
+                        <Lock className="w-4 h-4" />
+                    </button>
                 )}
+
+                {/* Visual Blade Accent */}
+                <div className="absolute top-0 right-0 w-[2px] h-full bg-gradient-to-b from-transparent via-[#00FFCC]/20 to-transparent" />
             </div>
 
-            {/* ── Nav items ──────────────────────────────── */}
-            <nav className="flex-1 flex flex-col gap-1 p-2.5 mt-1 overflow-hidden">
+            {/* ── NAVIGATION BLADE ── */}
+            <nav className="flex-1 py-16 px-5 space-y-6">
                 {NAV.map(({ id, icon: Icon, label, path }) => {
                     const isActive = location.pathname === path;
                     return (
                         <button
                             key={id}
                             onClick={() => navigate(path)}
-                            title={!isSidebarOpen ? label : undefined}
-                            className="relative flex items-center rounded-xl transition-all duration-200 group"
-                            style={{
-                                padding: isSidebarOpen ? '10px 14px' : '10px',
-                                justifyContent: isSidebarOpen ? 'flex-start' : 'center',
-                                gap: isSidebarOpen ? 12 : 0,
-                                background: isActive ? 'rgba(255,255,255,.07)' : 'transparent',
-                                color: isActive ? '#e2e8f0' : '#64748b',
-                            }}
-                            onMouseEnter={e => { if(!isActive) e.currentTarget.style.background='rgba(255,255,255,.04)'; }}
-                            onMouseLeave={e => { if(!isActive) e.currentTarget.style.background='transparent'; }}
+                            className={`
+                                group relative flex items-center w-full transition-all duration-700 rounded-sm
+                                ${isSidebarOpen ? 'px-8 py-5' : 'justify-center py-5'}
+                                ${isActive ? 'bg-white/[0.03] shadow-[inset_0_0_30px_rgba(255,255,255,0.02)]' : 'hover:bg-white/[0.01]'}
+                            `}
                         >
-                            {/* Active bar */}
+                            {/* Linear Status Indicator */}
                             {isActive && (
-                                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 rounded-r-full"
-                                      style={{background:'#ef4444', boxShadow:'0 0 8px rgba(239,68,68,.6)'}} />
+                                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-10 bg-[#00FFCC] blur-[4px] animate-pulse" />
                             )}
-                            <Icon className="flex-shrink-0" style={{
-                                width: 20, height: 20,
-                                color: isActive ? '#f87171' : '#64748b',
-                            }} />
+                            
+                            <Icon className={`flex-shrink-0 transition-all duration-500 ${isActive ? 'text-[#00FFCC] scale-110 drop-shadow-[0_0_10px_rgba(0,255,204,0.3)]' : 'text-white/10 group-hover:text-white/50'}`} 
+                                  size={24} />
+                            
                             {isSidebarOpen && (
-                                <span className="font-inter text-sm font-medium whitespace-nowrap"
-                                      style={{color: isActive ? '#e2e8f0' : '#94a3b8'}}>
-                                    {label}
-                                </span>
+                                <div className="ml-8 flex flex-col items-start min-w-0">
+                                    <span className={`text-[11px] font-mono font-black tracking-[0.4em] uppercase transition-all duration-700 ${isActive ? 'text-white' : 'text-white/10 group-hover:text-white/30'}`}>
+                                        {label}
+                                    </span>
+                                    {isActive && (
+                                        <div className="h-[1px] w-full bg-gradient-to-r from-[#00FFCC]/40 to-transparent mt-2 animate-width-reveal" />
+                                    )}
+                                </div>
+                            )}
+
+                            {isActive && isSidebarOpen && (
+                                <ChevronRight size={14} className="ml-auto text-[#00FFCC]/40" />
+                            )}
+                            
+                            {/* Floating Metadata Tooltip (Closed Mode) */}
+                            {!isSidebarOpen && (
+                                <div className="absolute left-[80px] p-6 bg-[#0A0A0B] border border-white/10 shadow-2xl opacity-0 pointer-events-none group-hover:opacity-100 transition-all duration-500 translate-x-4 group-hover:translate-x-0 z-[100] min-w-[200px]">
+                                    <div className="flex items-center gap-4 mb-4">
+                                       <div className="w-1.5 h-1.5 bg-[#00FFCC] rounded-full" />
+                                       <span className="text-[10px] font-mono font-black tracking-[0.4em] text-white uppercase">{label}</span>
+                                    </div>
+                                    <p className="text-[8px] font-mono text-white/20 uppercase tracking-widest leading-relaxed">
+                                       Routing_Auth: Verified<br />
+                                       Sync_Node: 0xA4F2
+                                    </p>
+                                </div>
                             )}
                         </button>
                     );
                 })}
             </nav>
 
-            {/* ── User ───────────────────────────────────── */}
-            <div className="flex-shrink-0 p-2.5"
-                 style={{borderTop:'1px solid rgba(51,65,85,.45)'}}>
-                <button
-                    className="flex items-center w-full rounded-xl transition-colors"
-                    style={{
-                        padding: isSidebarOpen ? '10px 14px' : '10px',
-                        justifyContent: isSidebarOpen ? 'flex-start' : 'center',
-                        gap: 12,
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background='rgba(255,255,255,.04)'}
-                    onMouseLeave={e => e.currentTarget.style.background='transparent'}
-                >
-                    <div className="w-9 h-9 flex-shrink-0 rounded-full flex items-center justify-center"
-                         style={{background:'rgba(30,41,59,.9)', border:'1px solid rgba(51,65,85,.6)'}}>
-                        <span className="font-bebas text-sm tracking-wider text-red-400">CC</span>
-                    </div>
-                    {isSidebarOpen && (
-                        <div className="flex flex-col items-start min-w-0">
-                            <span className="font-inter text-sm font-semibold text-slate-200">Commander</span>
-                            <span className="font-inter text-[10px] text-emerald-400 flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
-                                Online
-                            </span>
+            {/* ── SECURITY / IDENT / STATUS ── */}
+            <div className="p-8 border-t border-white/5 space-y-10 pb-16 bg-white/[0.01]">
+                <div className={`flex flex-col gap-8 ${!isSidebarOpen && 'items-center'}`}>
+                    {/* Status Nodes */}
+                    <div className={`flex items-center gap-6 transition-all duration-500 ${isSidebarOpen ? 'px-8' : 'justify-center'}`}>
+                        <div className="w-11 h-11 bg-white/5 border border-white/5 flex items-center justify-center relative group/status">
+                            <Radio size={20} className="text-[#00FFCC] animate-pulse" />
+                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_12px_#22c55e]" />
                         </div>
-                    )}
-                </button>
+                        {isSidebarOpen && (
+                          <div className="flex flex-col text-left">
+                            <span className="text-[11px] font-mono font-black text-white/40 uppercase tracking-widest">SIGNAL</span>
+                            <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest font-black animate-pulse">SYNC_OPTIMAL</span>
+                          </div>
+                        )}
+                    </div>
+                </div>
+                
+                {/* Sovereign Identity Card */}
+                <div className={`p-6 bg-white/[0.03] border border-white/5 relative group/user cursor-pointer overflow-hidden ${!isSidebarOpen && 'lg:p-0 lg:border-none lg:bg-transparent lg:flex lg:justify-center'}`}>
+                   <div className="absolute inset-0 bg-gradient-to-tr from-[#00FFCC]/5 to-transparent opacity-0 group-hover/user:opacity-100 transition-opacity" />
+                   <div className="flex items-center gap-6 relative z-10">
+                      <div className="w-12 h-12 bg-black border border-white/10 flex items-center justify-center font-outfit font-black text-2xl text-white group-hover/user:border-[#00FFCC]/40 transition-all">
+                         C
+                      </div>
+                      {isSidebarOpen && (
+                         <div className="flex flex-col gap-1 leading-none">
+                            <span className="text-[13px] font-outfit font-black text-white uppercase tracking-wider">COMMANDER_01</span>
+                            <div className="flex items-center gap-2">
+                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                               <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Rank: Sovereign</span>
+                            </div>
+                         </div>
+                      )}
+                   </div>
+                </div>
             </div>
+            
+            <style dangerouslySetInnerHTML={{ __html: `
+              aside { scrollbar-width: none; }
+              aside::-webkit-scrollbar { display: none; }
+              @keyframes width-reveal {
+                from { width: 0%; }
+                to { width: 100%; }
+              }
+              .animate-width-reveal { animation: width-reveal 1s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+            `}} />
         </aside>
     );
 }

@@ -1,63 +1,68 @@
 import { useDashboard } from '../../context/DashboardContext';
-import { Truck } from 'lucide-react';
+import { Truck, Activity, Package, Battery, Zap, ChevronRight, HardDrive } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
 
 export default function ResourceTrackingPanel() {
     const { resources, getIcon } = useDashboard();
     const navigate = useNavigate();
 
     return (
-        <div className="db-card">
-            <div className="db-card-header cursor-pointer hover:bg-slate-800/40 transition-colors group"
+        <div className="flex flex-col h-full w-full bg-[#0A0A0B]/20 relative overflow-hidden backdrop-blur-3xl group">
+            
+            {/* Header Status Bar */}
+            <div className="flex items-center justify-between px-10 py-8 border-b border-white/5 bg-white/[0.02] cursor-pointer hover:bg-white/[0.05] transition-all"
                  onClick={() => navigate('/resources')}>
-                <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2 group-hover:text-emerald-400 transition-colors">
-                    <Truck className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                    Resource Tracking
-                </h2>
-                <span className="font-inter text-[10px] text-slate-400 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"/>
-                    Live Sync
-                </span>
+                <div className="flex items-center gap-6">
+                    <div className="w-10 h-10 border border-emerald-500/20 bg-emerald-500/5 flex items-center justify-center">
+                        <Truck className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div>
+                        <h4 className="font-outfit font-black text-xl tracking-tight text-white uppercase leading-none mb-1">ASSET_DEPLOYMENT</h4>
+                        <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-white/30 uppercase">LIVE_INVENTORY: {resources.length} CHANNELS</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-3">
+                   <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_#10b981]" />
+                   <span className="font-mono text-[9px] text-emerald-500 font-black tracking-widest uppercase italic">SYNC_STABLE</span>
+                </div>
             </div>
 
-
-            <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0">
+            {/* Asset List */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-white/[0.03]">
                 {resources.map((res) => {
                     const Icon = getIcon(res.iconName);
                     const pct = Math.min(Math.round((res.count / res.total) * 100), 100);
-                    const barColor = pct >= 80 ? '#ef4444' : pct >= 60 ? '#eab308' : '#22c55e';
-                    const labelColor = pct >= 80 ? 'text-red-400' : pct >= 60 ? 'text-yellow-400' : 'text-emerald-400';
-                    const status = pct >= 80 ? 'High Util' : pct >= 60 ? 'Moderate' : 'Available';
+                    const barColor = pct >= 80 ? '#ef4444' : pct >= 60 ? '#fbbf24' : '#00FFCC';
+                    const textColor = pct >= 80 ? 'text-red-500' : pct >= 60 ? 'text-yellow-500' : 'text-[#00FFCC]';
 
                     return (
-                        <div key={res.id}
-                             className="flex items-center gap-4 px-5 py-4 border-b hover:bg-slate-800/25 transition-colors"
-                             style={{borderColor:'rgba(51,65,85,.35)'}}>
-                            {/* Icon */}
-                            <div className={`flex-shrink-0 w-9 h-9 rounded-xl flex items-center justify-center ${res.color}`}
-                                 style={{background:'rgba(30,41,59,.8)'}}>
-                                <Icon className="w-4.5 h-4.5" />
+                        <div key={res.id} className="group/asset px-10 py-8 hover:bg-white/[0.02] transition-all duration-500 flex items-center gap-8 border-l-2 border-l-transparent hover:border-l-emerald-500/40">
+                            {/* Icon Pod */}
+                            <div className="flex-shrink-0 w-12 h-12 bg-white/5 border border-white/5 flex items-center justify-center transition-all group-hover/asset:border-emerald-500/40 group-hover/asset:bg-emerald-500/5">
+                                <Icon className="w-5 h-5 text-white/20 group-hover/asset:text-emerald-400 transition-colors" />
                             </div>
 
-                            {/* Bar + labels */}
-                            <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between mb-1.5">
-                                    <span className="font-inter text-sm font-semibold text-slate-200">{res.name}</span>
-                                    <span className="font-inter text-xs font-mono text-slate-400">
-                                        <b className="text-slate-100">{res.count}</b>/{res.total}
-                                        <span className="text-slate-600 text-[10px] ml-1">({pct}%)</span>
-                                    </span>
+                            {/* Data Block */}
+                            <div className="flex-1 min-w-0 flex flex-col gap-3">
+                                <div className="flex items-center justify-between">
+                                    <h5 className="font-outfit font-black text-lg tracking-tight uppercase leading-none text-white group-hover/asset:text-emerald-400 transition-colors">
+                                        {res.name}
+                                    </h5>
+                                    <div className="font-mono text-[10px] font-black tracking-widest text-white/10 uppercase">
+                                        <b className="text-white/60">{res.count}</b> / {res.total}
+                                    </div>
                                 </div>
-                                <div className="w-full h-1.5 rounded-full overflow-hidden"
-                                     style={{background:'rgba(30,41,59,.9)'}}>
-                                    <div className="h-full rounded-full transition-all duration-1000"
-                                         style={{width: `${pct}%`, background: barColor}}/>
+                                
+                                {/* Progress HUD */}
+                                <div className="relative h-2 bg-white/[0.05] overflow-hidden">
+                                     <div className="absolute top-0 left-0 h-full transition-all duration-1000 bg-gradient-to-r from-transparent via-current to-current shadow-[0_0_10px_currentColor]"
+                                          style={{ width: `${pct}%`, color: barColor }} />
                                 </div>
-                                <div className="flex items-center justify-between mt-1">
-                                    <span className="font-inter text-[9px] text-slate-600 uppercase tracking-wider">Deployed</span>
-                                    <span className={`font-inter text-[9px] font-semibold uppercase tracking-wider ${labelColor}`}>
-                                        {status}
+
+                                <div className="flex items-center justify-between">
+                                    <span className="font-mono text-[8px] font-black tracking-widest uppercase text-white/20">DEPLOYMENT_FLUX</span>
+                                    <span className={`font-mono text-[9px] font-black tracking-widest uppercase italic ${textColor}`}>
+                                        {pct >= 80 ? 'CAPACITY_CRITICAL' : pct >= 60 ? 'MODERATE_FLUX' : 'LINK_OPTIMAL'}
                                     </span>
                                 </div>
                             </div>
@@ -66,18 +71,16 @@ export default function ResourceTrackingPanel() {
                 })}
             </div>
 
-            {/* Footer */}
-            <div className="flex-shrink-0 px-5 py-3 border-t" style={{borderColor:'rgba(51,65,85,.5)'}}>
+            {/* View Full Inventory Action */}
+            <div className="p-10 border-t border-white/5 bg-black/40">
                 <button
                     onClick={() => navigate('/resources')}
-                    className="font-inter w-full py-2.5 text-xs font-semibold tracking-wider uppercase text-slate-400
-                        hover:text-slate-200 rounded-lg transition-colors border border-dashed border-slate-700/60
-                        hover:border-slate-500 hover:bg-slate-800/40"
+                    className="w-full h-12 bg-white/[0.03] hover:bg-emerald-500 text-white/40 hover:text-black border border-white/5 hover:border-transparent transition-all duration-500 font-mono text-[10px] font-black tracking-[0.5em] uppercase flex items-center justify-center gap-4 group/btn shadow-[0_0_20px_rgba(0,0,0,0.4)]"
                 >
-                    View Full Inventory
+                    INITIALIZE_INVENTORY_UPLINK
+                    <ChevronRight className="w-4 h-4 transition-transform group-hover/btn:translate-x-2" />
                 </button>
             </div>
         </div>
     );
 }
-

@@ -1,5 +1,5 @@
 import { useDashboard } from '../../context/DashboardContext';
-import { Map, Crosshair, Navigation } from 'lucide-react';
+import { Map as MapIcon, Crosshair, Navigation, Target, Zap, Globe } from 'lucide-react';
 
 const markers = [
     { id: 1, top: '25%', left: '30%', type: 'critical', pulse: true },
@@ -13,97 +13,128 @@ export default function MapPanel() {
     const { addToast } = useDashboard();
 
     return (
-        <div className="db-card">
-            <div className="db-card-header">
-                <h2 className="font-bebas tracking-widest text-lg text-slate-100 flex items-center gap-2">
-                    <Map className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    Tactical Map View
-                </h2>
-                <div className="flex gap-2">
+        <div className="flex flex-col h-full w-full bg-[#0A0A0B]/20 relative overflow-hidden backdrop-blur-3xl group">
+            
+            {/* Header HUD */}
+            <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-white/[0.02] relative">
+                <div className="flex items-center gap-6">
+                    <div className="w-10 h-10 border border-blue-500/20 bg-blue-500/5 flex items-center justify-center">
+                        <MapIcon className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+                    </div>
+                    <div>
+                        <h4 className="font-outfit font-black text-xl tracking-tight text-white uppercase leading-none mb-1">GEOSPATIAL_INTEL</h4>
+                        <p className="font-mono text-[9px] font-bold tracking-[0.2em] text-white/30 uppercase">SAT_LINK: AETHER_GRID_STABLE</p>
+                    </div>
+                </div>
+                
+                <div className="flex gap-4">
                     <button
-                        onClick={() => addToast('Recalibrating GPS Centering...', 'info')}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
+                        onClick={() => addToast('Recalibrating GPS...', 'info')}
+                        className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all"
                     >
                         <Crosshair className="w-4 h-4" />
                     </button>
                     <button
-                        onClick={() => addToast('Activating Drone View...', 'info')}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-colors"
+                        onClick={() => addToast('Engaging Drone Uplink...', 'info')}
+                        className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/5 transition-all"
                     >
                         <Navigation className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
-            <div className="flex-1 mx-4 mb-4 rounded-xl overflow-hidden relative group" style={{background:'#070f1d', border:'1px solid rgba(51,65,85,.5)'}}>
-
-                {/* Map Grid Background Simulation */}
-                <div className="absolute inset-0"
+            {/* Map Body */}
+            <div className="flex-1 relative overflow-hidden bg-black/40 border-b border-white/5">
+                
+                {/* Advanced Grid Overlay */}
+                <div className="absolute inset-0 opacity-20 pointer-events-none"
                     style={{
-                        backgroundImage: 'linear-gradient(rgba(30, 41, 59, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(30, 41, 59, 0.4) 1px, transparent 1px)',
-                        backgroundSize: '2rem 2rem',
-                        backgroundPosition: 'center center',
+                        backgroundImage: 'linear-gradient(rgba(0, 255, 204, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 204, 0.1) 1px, transparent 1px)',
+                        backgroundSize: '3rem 3rem',
                     }}
                 />
-
-                {/* Topographic Lines Simulation */}
-                <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0,150 Q150,250 300,150 T600,150 T900,150" fill="none" stroke="#475569" strokeWidth="2" />
-                    <path d="M0,250 Q200,350 400,200 T800,250 T1200,200" fill="none" stroke="#475569" strokeWidth="1" />
-                    <path d="M-100,50 Q100,150 300,50 T700,50 T1100,50" fill="none" stroke="#475569" strokeWidth="1" />
-                </svg>
-
-                {/* Radar Sweep Animation Simulation */}
-                <div className="absolute inset-0 pointer-events-none overflow-hidden origin-center text-blue-500/10">
-                    <div className="w-[1000px] h-[1000px] rounded-full border border-blue-500/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-[ping_10s_linear_infinite]" />
+                
+                {/* Scanning Radar Sweep */}
+                <div className="absolute inset-0 opacity-10 pointer-events-none overflow-hidden origin-center">
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] border border-blue-500/30 rounded-full animate-radar-spin" />
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-blue-500/20 rounded-full animate-radar-spin-reverse" />
                 </div>
 
-                {/* Dynamic Markers */}
+                {/* Topographic Lines */}
+                <svg className="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0,150 Q150,250 300,150 T600,150 T900,150" fill="none" stroke="#fff" strokeWidth="2" />
+                    <circle cx="20%" cy="30%" r="50" fill="none" stroke="#fff" strokeWidth="1" />
+                    <circle cx="70%" cy="60%" r="80" fill="none" stroke="#fff" strokeWidth="1" />
+                </svg>
+
+                {/* Markers */}
                 {markers.map(marker => (
                     <div
                         key={marker.id}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 group/marker cursor-crosshair z-10"
+                        className="absolute -translate-x-1/2 -translate-y-1/2 group/marker z-10"
                         style={{ top: marker.top, left: marker.left }}
                     >
                         <div className="relative flex items-center justify-center">
                             {marker.pulse && (
-                                <div className={`absolute w-8 h-8 rounded-full animate-ping opacity-50 ${marker.type === 'critical' ? 'bg-red-500' :
-                                    marker.type === 'warning' ? 'bg-yellow-500' :
-                                        marker.type === 'safe' ? 'bg-green-500' : 'bg-blue-500'
-                                    }`} />
+                                <div className={`absolute w-12 h-12 rounded-full animate-[ping_4s_linear_infinite] opacity-30 ${marker.type === 'critical' ? 'bg-red-500' : 'bg-blue-400'}`} />
                             )}
 
-                            <div className={`w-3 h-3 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] z-10 ${marker.type === 'critical' ? 'bg-red-500 border-2 border-slate-900' :
-                                marker.type === 'warning' ? 'bg-yellow-500 border-2 border-slate-900' :
-                                    marker.type === 'safe' ? 'bg-green-500 border-2 border-slate-900' :
-                                        'bg-blue-400 border-2 border-slate-900'
-                                }`} />
-
-                            {/* Tooltip on hover */}
-                            <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-800 text-xs font-mono px-2 py-1 rounded border border-slate-700 opacity-0 group-hover/marker:opacity-100 transition-opacity whitespace-nowrap shadow-lg z-20 pointer-events-none">
-                                {marker.type === 'critical' ? 'CRITICAL EVAC' : marker.type.toUpperCase()} - {marker.top},{marker.left}
+                            <div className={`w-3 h-3 transition-all duration-700 group-hover/marker:scale-[3] ${marker.type === 'critical' ? 'bg-red-500' : marker.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-400'}`} />
+                            
+                            {/* Marker Metadata HUD */}
+                            <div className="absolute top-8 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/80 backdrop-blur-xl border border-white/10 opacity-0 group-hover/marker:opacity-100 transition-all duration-500 whitespace-nowrap z-20 pointer-events-none">
+                                <div className="flex items-center gap-3 mb-1">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${marker.type === 'critical' ? 'bg-red-500 animate-pulse' : 'bg-blue-400'}`} />
+                                    <span className="font-mono text-[9px] font-black text-white uppercase tracking-widest">{marker.type === 'critical' ? 'EVENT_ALPHA' : 'EVENT_STABLE'}</span>
+                                </div>
+                                <div className="font-mono text-[8px] text-white/40 tracking-[0.2em]">LAT_SYNC: {marker.top} | LNG_SYNC: {marker.left}</div>
                             </div>
                         </div>
                     </div>
                 ))}
 
-                {/* Map Overlays */}
-                <div className="absolute bottom-4 right-4 bg-slate-900/80 backdrop-blur border border-slate-700 rounded-lg p-2 text-xs font-mono text-slate-400">
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]" /> Critical
+                {/* Legend HUD */}
+                <div className="absolute bottom-10 right-10 flex flex-col gap-4 p-8 bg-black/60 backdrop-blur-2xl border border-white/5 opacity-40 hover:opacity-100 transition-opacity">
+                    {[
+                        { label: 'CRITICAL_HIT', color: '#ef4444' },
+                        { label: 'THREAT_WARN', color: '#fbbf24' },
+                        { label: 'ACTIVE_SYNK', color: '#3b82f6' },
+                        { label: 'SECURE_ZONE', color: '#10b981' }
+                    ].map(item => (
+                        <div key={item.label} className="flex items-center gap-4">
+                            <div className="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_currentColor]" style={{ backgroundColor: item.color, color: item.color }} />
+                            <span className="font-mono text-[8px] font-black uppercase text-white tracking-widest">{item.label}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Bottom Footer Telemetry */}
+            <div className="px-6 py-4 bg-black flex justify-between items-center bg-white/[0.02]">
+                <div className="flex gap-10">
+                    <div className="flex items-center gap-3">
+                         <Globe className="w-3.5 h-3.5 text-white/20" />
+                         <span className="font-mono text-[9px] text-white/40 tracking-widest uppercase italic">COORD_SYS: WGS84_OPTIMIZED</span>
                     </div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_rgba(234,179,8,0.8)]" /> Warning
-                    </div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" /> Active Response
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]" /> Safe Zone
+                    <div className="flex items-center gap-3">
+                         <Zap className="w-3.5 h-3.5 text-yellow-500/40" />
+                         <span className="font-mono text-[9px] text-white/40 tracking-widest uppercase italic">SIGNAL: 44.2dBm</span>
                     </div>
                 </div>
-
             </div>
+            
+            <style dangerouslySetInnerHTML={{ __html: `
+                @keyframes radar-spin {
+                    from { transform: translate(-50%, -50%) rotate(0deg); }
+                    to { transform: translate(-50%, -50%) rotate(360deg); }
+                }
+                @keyframes radar-spin-reverse {
+                    from { transform: translate(-50%, -50%) rotate(360deg); }
+                    to { transform: translate(-50%, -50%) rotate(0deg); }
+                }
+                .animate-radar-spin { animation: radar-spin 10s linear infinite; }
+                .animate-radar-spin-reverse { animation: radar-spin-reverse 15s linear infinite; }
+            `}} />
         </div>
     );
 }

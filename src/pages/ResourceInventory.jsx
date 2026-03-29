@@ -6,22 +6,28 @@ import { SZ } from '../DashboardMain';
 import {
     Search, Plus, Package, MapPin, Database, Hospital,
     AlertCircle, CheckCircle2, ChevronRight, Pill,
-    Truck, Navigation, Clock, Activity, Send, HeartPulse, Wrench
+    Truck, Navigation, Clock, Activity, Send, HeartPulse, Wrench, Shield, Globe, Zap
 } from 'lucide-react';
 
 function Toast({ message, type }) {
-    const bg = type === 'error' ? '#dc2626' : type === 'success' ? '#16a34a' : '#00c8ff';
+    const bg = type === 'error' ? 'rgba(239, 68, 68, 0.1)' : type === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(0, 240, 255, 0.1)';
+    const border = type === 'error' ? 'rgba(239, 68, 68, 0.2)' : type === 'success' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(0, 240, 255, 0.2)';
+    const textColor = type === 'error' ? '#ef4444' : type === 'success' ? '#10b981' : '#00F0FF';
+    
     return (
-        <div className="font-inter px-4 py-3 rounded-xl shadow-2xl text-sm font-semibold text-white"
-            style={{ background: bg, border: '1px solid rgba(255,255,255,.12)' }}>
-            {message}
+      <div className="font-mono px-6 py-4 backdrop-blur-3xl border text-[10px] font-bold tracking-[0.2em] uppercase"
+           style={{background: bg, borderColor: border, color: textColor}}>
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{backgroundColor: textColor}} />
+          {message}
         </div>
+      </div>
     );
 }
 
 function ToastContainer({ toasts }) {
     return (
-        <div className="fixed bottom-6 right-6 z-[200] flex flex-col gap-2.5 pointer-events-none">
+        <div className="fixed bottom-8 right-8 z-[200] flex flex-col gap-4 pointer-events-none">
             {toasts.map(t => <Toast key={t.id} message={t.message} type={t.type} />)}
         </div>
     );
@@ -29,15 +35,15 @@ function ToastContainer({ toasts }) {
 
 // MiniMap visual for Hospital cards
 const MiniMap = ({ isFull, isNear }) => {
-    const colorClass = isFull ? "text-red-500 border-red-500" : isNear ? "text-yellow-500 border-yellow-500" : "text-[#00c8ff] border-[#00c8ff]";
-    const bgColor = isFull ? "bg-red-500" : isNear ? "bg-yellow-500" : "bg-[#00c8ff]";
-    const pulseColor = isFull ? "border-red-500" : isNear ? "border-yellow-500" : "border-[#00c8ff]";
-    const strokeHex = isFull ? "#ef4444" : isNear ? "#eab308" : "#00c8ff";
+    const colorClass = isFull ? "text-red-500 border-red-500" : isNear ? "text-yellow-500 border-yellow-500" : "text-[#00FFCC] border-[#00FFCC]";
+    const bgColor = isFull ? "bg-red-500" : isNear ? "bg-yellow-500" : "bg-[#00FFCC]";
+    const pulseColor = isFull ? "border-red-500" : isNear ? "border-yellow-500" : "border-[#00FFCC]";
+    const strokeHex = isFull ? "#ef4444" : isNear ? "#eab308" : "#00FFCC";
 
     return (
-        <div className="relative w-full h-24 bg-slate-900/40 rounded-xl overflow-hidden border border-slate-700/50 mb-5 flex items-center justify-center">
+        <div className="relative w-full h-24 bg-black/40 rounded-xl overflow-hidden border border-white/5 mb-5 flex items-center justify-center">
             {/* Map Grid/Topography Mock */}
-            <svg viewBox="0 0 100 40" className="absolute w-full h-full opacity-30" preserveAspectRatio="none">
+            <svg viewBox="0 0 100 40" className="absolute w-full h-full opacity-20" preserveAspectRatio="none">
                 <path d="M0,20 Q15,5 25,20 T50,20 T75,5 T100,20" fill="none" stroke={strokeHex} strokeWidth="0.8" />
                 <path d="M-10,30 Q10,15 25,30 T50,30 T75,15 T110,30" fill="none" stroke={strokeHex} strokeWidth="0.4" />
                 <path d="M0,10 Q25,-5 50,10 T100,10" fill="none" stroke={strokeHex} strokeWidth="0.3" strokeDasharray="2 2" />
@@ -49,13 +55,12 @@ const MiniMap = ({ isFull, isNear }) => {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <div className={`w-3 h-3 rounded-full ${bgColor} shadow-[0_0_8px_currentColor] ${colorClass}`} />
                 <div className={`absolute -inset-2 rounded-full border ${pulseColor} animate-ping opacity-60`} style={{ animationDuration: '1.5s' }} />
-                <div className={`absolute -inset-4 rounded-full border ${pulseColor} animate-ping opacity-30`} style={{ animationDuration: '2.5s' }} />
             </div>
 
             {/* Label Overlay */}
-            <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-slate-900/80 backdrop-blur-sm border border-slate-700/50">
-                <span className="font-inter text-[9px] font-bold tracking-[0.1em] text-slate-300 uppercase">
-                    Live Sector Sync
+            <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm border border-white/5">
+                <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/40 uppercase">
+                    Sector_Telemetry_Sync
                 </span>
             </div>
         </div>
@@ -65,8 +70,15 @@ const MiniMap = ({ isFull, isNear }) => {
 export default function ResourceInventory() {
     const { toasts, isSidebarOpen } = useDashboard();
     const ml = isSidebarOpen ? SZ.sidebarOpen : SZ.sidebarClosed;
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
     const [activeTab, setActiveTab] = useState('hospitals');
+
+    useEffect(() => {
+        const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
     // Supplies State
     const [resources, setResources] = useState([
@@ -107,13 +119,6 @@ export default function ResourceInventory() {
         { id: 104, item: 'Emergency Rations', qty: 500, to: 'Camp B Supply', time: '2 hours ago', status: 'Delivered' },
     ]);
 
-    useEffect(() => {
-        fetch('/api/resources')
-            .then(res => res.json())
-            .then(data => { if (data && data.length > 0) setResources(data); })
-            .catch(() => { });
-    }, []);
-
     const handleAddStock = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -146,58 +151,60 @@ export default function ResourceInventory() {
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden" style={{ background: '#070d2a' }}>
+        <div className="flex h-screen w-full overflow-hidden bg-[#08080A] text-[#E5E5E7] font-inter">
+            
+            {/* ── AMBIENT MESH BACKGROUND ── */}
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+                <div 
+                  className="absolute w-[1000px] h-[1000px] rounded-full blur-[200px] opacity-[0.05] bg-blue-600 transition-transform duration-1000 ease-out"
+                  style={{ transform: `translate(${mousePos.x - 500}px, ${mousePos.y - 500}px)` }}
+                />
+                <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full blur-[180px] opacity-[0.03] bg-cyan-500 animate-pulse" />
+                <div className="absolute inset-0 opacity-[0.02] contrast-150 brightness-150 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            </div>
+
             <Sidebar />
             <TopNavbar />
 
             <main
-                className="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300"
+                className="flex-1 overflow-x-hidden overflow-y-auto transition-all duration-500 relative z-10 custom-scrollbar"
                 style={{
                     marginLeft: ml,
                     marginTop: SZ.navbarH,
                     height: `calc(100vh - ${SZ.navbarH}px)`,
                 }}
             >
-                <div className="p-8 lg:p-12 max-w-[1400px] mx-auto text-slate-200">
+                <div className="p-8 lg:p-12 max-w-[1600px] mx-auto">
 
                     {/* Header Section */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 border-b border-[#1a2a5e] pb-8">
-                        <div>
-                            <span className="font-bebas text-[#00c8ff]" style={{ fontSize: 14, letterSpacing: ".28em", display: "block", marginBottom: 6 }}>NETWORK STATUS</span>
-                            <h1 className="font-bebas text-slate-100 flex items-center gap-4" style={{ fontSize: "clamp(32px, 4vw, 56px)", letterSpacing: ".04em", lineHeight: 1 }}>
-                                RESOURCE & FACILITY<br />MANAGEMENT
-                            </h1>
-                            <p className="font-inter text-slate-400 mt-4 max-w-2xl" style={{ fontSize: 13, letterSpacing: ".08em", textTransform: "uppercase", lineHeight: 1.8 }}>
-                                Track NGO supplies, monitor real-time hospital capacities, and manage logistics fleet globally.
-                            </p>
+                    <div className="mb-12 animate-fade-in">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="h-[1px] w-8 bg-[#00FFCC]/40" />
+                            <span className="text-[10px] font-mono tracking-[0.6em] text-[#00FFCC] uppercase">Resource_Intelligence_Annex</span>
                         </div>
-
-                        {activeTab === 'supplies' && (
-                            <button
-                                onClick={() => setIsSpaceModalOpen(true)}
-                                className="font-inter text-white rounded-full transition-all flex items-center gap-2"
-                                style={{
-                                    background: "#e53935",
-                                    padding: "16px 36px",
-                                    fontSize: 15,
-                                    letterSpacing: ".1em",
-                                    fontWeight: 700,
-                                    boxShadow: "0 0 24px rgba(229,57,53,.45)",
-                                }}
-                                onMouseEnter={e => { e.currentTarget.style.transform = "scale(1.04)"; e.currentTarget.style.boxShadow = "0 0 42px rgba(229,57,53,.8)"; }}
-                                onMouseLeave={e => { e.currentTarget.style.transform = "scale(1)"; e.currentTarget.style.boxShadow = "0 0 24px rgba(229,57,53,.45)"; }}
-                            >
-                                <Plus className="w-5 h-5" /> ADD NEW STOCK
-                            </button>
-                        )}
+                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                           <h1 className="font-outfit text-5xl lg:text-7xl font-black tracking-tighter uppercase leading-none">
+                             SATELLITE<br />
+                             <span className="bg-gradient-to-r from-[#00FFCC] via-white to-white/40 bg-clip-text text-transparent italic">LOGISTICS_HUB</span>
+                           </h1>
+                           
+                           {activeTab === 'supplies' && (
+                                <button
+                                    onClick={() => setIsSpaceModalOpen(true)}
+                                    className="px-10 py-5 bg-[#00FFCC] text-black font-outfit font-black uppercase tracking-widest hover:brightness-110 transition-all flex items-center gap-4 shadow-[0_0_40px_rgba(0,255,204,0.15)]"
+                                >
+                                    <Plus className="w-6 h-6" /> INITIALIZE_NEW_STOCK
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Tab Navigation */}
-                    <div className="flex gap-2 mb-8 overflow-x-auto no-scrollbar">
+                    <div className="flex gap-4 mb-12 overflow-x-auto no-scrollbar pb-2">
                         {[
-                            { id: 'supplies', label: 'NGO SUPPLIES', icon: Package },
-                            { id: 'hospitals', label: 'HOSPITALS & MAPS', icon: Hospital },
-                            { id: 'fleet', label: 'FLEET & LOGISTICS', icon: Truck },
+                            { id: 'supplies', label: 'NGO_SUPPLY_GRID', icon: Package },
+                            { id: 'hospitals', label: 'FACILITY_STATUS', icon: Hospital },
+                            { id: 'fleet', label: 'LOGISTICS_FLEET', icon: Truck },
                         ].map((tab) => {
                             const isActive = activeTab === tab.id;
                             const Icon = tab.icon;
@@ -205,15 +212,7 @@ export default function ResourceInventory() {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`px-8 py-3.5 font-inter font-bold text-[13px] rounded-full transition-all whitespace-nowrap flex items-center gap-2 border-2`}
-                                    style={{
-                                        letterSpacing: ".1em",
-                                        background: isActive ? (tab.id === 'hospitals' ? "rgba(0,200,255,.1)" : "rgba(229,57,53,.1)") : "transparent",
-                                        color: isActive ? (tab.id === 'hospitals' ? "#00c8ff" : "#e53935") : "rgba(255,255,255,.5)",
-                                        borderColor: isActive ? (tab.id === 'hospitals' ? "rgba(0,200,255,.4)" : "rgba(229,57,53,.4)") : "rgba(255,255,255,.15)",
-                                    }}
-                                    onMouseEnter={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,.4)"; e.currentTarget.style.color = "#fff"; } }}
-                                    onMouseLeave={e => { if (!isActive) { e.currentTarget.style.borderColor = "rgba(255,255,255,.15)"; e.currentTarget.style.color = "rgba(255,255,255,.5)"; } }}
+                                    className={`px-10 py-4 font-mono font-bold text-[10px] tracking-[0.3em] transition-all whitespace-nowrap flex items-center gap-4 border border-white/5 backdrop-blur-3xl uppercase ${isActive ? 'bg-[#00FFCC] text-black border-transparent' : 'bg-white/5 text-white/40 hover:text-white hover:border-white/10'}`}
                                 >
                                     <Icon className="w-4 h-4" /> {tab.label}
                                 </button>
@@ -223,108 +222,108 @@ export default function ResourceInventory() {
 
                     {/* Content Area - Supplies */}
                     {activeTab === 'supplies' && (
-                        <div className="animate-in fade-in duration-300 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="grid grid-cols-12 gap-8 animate-slide-up">
 
                             {/* Left: Inventory Table */}
-                            <div className="lg:col-span-2 space-y-6">
-                                <div className="relative">
-                                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                            <div className="col-span-12 lg:col-span-8 space-y-6">
+                                <div className="relative group">
+                                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                     <input
                                         type="text"
-                                        placeholder="SEARCH RESOURCES..."
+                                        placeholder="SCAN_SUPPLY_IDENTIFIER..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="w-full bg-[#0a1130] border border-[#1a2a5e] rounded-xl py-4 pl-14 pr-4 transition-colors font-inter text-sm font-semibold tracking-wider text-white"
-                                        style={{ outline: "none" }}
-                                        onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
-                                        onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                        className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
                                     />
                                 </div>
 
-                                <div className="bg-[#0a1130] border border-[#1a2a5e] rounded-xl overflow-hidden shadow-xl">
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-left border-collapse min-w-[700px]">
-                                            <thead>
-                                                <tr className="border-b border-[#1a2a5e] font-bebas text-slate-400" style={{ fontSize: 16, letterSpacing: ".12em" }}>
-                                                    <th className="px-6 py-5 font-normal">ITEM NAME</th>
-                                                    <th className="px-6 py-5 font-normal">QUANTITY</th>
-                                                    <th className="px-6 py-5 font-normal">LOCATION</th>
-                                                    <th className="px-6 py-5 font-normal text-right">STATUS</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {filteredResources.length > 0 ? filteredResources.map((item) => (
-                                                    <tr key={item.id} className="border-b border-[#1a2a5e]/50 hover:bg-[#0f1a42] transition-colors cursor-pointer">
-                                                        <td className="px-6 py-5 font-inter text-[14px] font-bold text-slate-100 tracking-wide">
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="w-10 h-10 rounded-full flex flex-shrink-0 items-center justify-center text-[#e53935]" style={{ border: "1px solid rgba(229,57,53,.3)", background: "rgba(229,57,53,.1)" }}>
-                                                                    <Package className="w-4 h-4" />
-                                                                </div>
-                                                                {item.name}
+                                <div className="bg-white/5 border border-white/5 backdrop-blur-3xl overflow-hidden overflow-x-auto custom-scrollbar">
+                                    <table className="w-full text-left border-collapse min-w-[800px]">
+                                        <thead>
+                                            <tr className="border-b border-white/5 font-mono text-white/20 text-[10px] tracking-[0.4em] uppercase">
+                                                <th className="px-8 py-6 font-normal">ASSET_IDENTIFIER</th>
+                                                <th className="px-8 py-6 font-normal">VOLUMETRIC_DATA</th>
+                                                <th className="px-8 py-6 font-normal">CURRENT_LOCALITY</th>
+                                                <th className="px-8 py-6 font-normal text-right">STATUS_VERIFICATION</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredResources.length > 0 ? filteredResources.map((item) => (
+                                                <tr key={item.id} className="border-b border-white/[0.02] hover:bg-white/[0.04] transition-all cursor-pointer group">
+                                                    <td className="px-8 py-8">
+                                                        <div className="flex items-center gap-6">
+                                                            <div className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center text-[#00FFCC] group-hover:border-[#00FFCC]/40 transition-all">
+                                                                <Package className="w-5 h-5" />
                                                             </div>
-                                                        </td>
-                                                        <td className="px-6 py-5 font-inter">
-                                                            <span className="font-bebas text-2xl text-slate-100 mr-2 tracking-wider">{item.quantity.toLocaleString()}</span>
-                                                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.1em] border border-[#1a2a5e] px-2 py-1 rounded">
+                                                            <div className="flex flex-col leading-tight">
+                                                                <span className="font-outfit font-black text-lg text-white uppercase tracking-tight">{item.name}</span>
+                                                                <span className="font-mono text-[9px] text-white/20 uppercase tracking-widest mt-1">ID_REF_{item.id}</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-8 font-mono">
+                                                        <div className="flex items-baseline gap-2">
+                                                            <span className="font-outfit font-black text-3xl text-white tracking-tighter">{item.quantity.toLocaleString()}</span>
+                                                            <span className="text-[10px] text-blue-400 font-bold uppercase tracking-widest opacity-60">
                                                                 {item.unit}
                                                             </span>
-                                                        </td>
-                                                        <td className="px-6 py-5 font-inter text-[13px] text-slate-300 font-medium tracking-wide">
-                                                            <div className="flex items-center gap-2">
-                                                                <MapPin className="w-4 h-4 text-[#e53935] flex-shrink-0" />
-                                                                <span className="truncate max-w-[150px]">{item.location}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-6 py-5 text-right">
-                                                            {item.quantity > 500 ? (
-                                                                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-[0.1em] text-[#00c8ff] border border-[#00c8ff]/30 bg-[#00c8ff]/10 px-3 py-1.5 rounded-full whitespace-nowrap">
-                                                                    <CheckCircle2 className="w-3 h-3" /> OPTIMAL
-                                                                </span>
-                                                            ) : (
-                                                                <span className="inline-flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-[0.1em] text-[#e53935] border border-[#e53935]/30 bg-[#e53935]/10 px-3 py-1.5 rounded-full whitespace-nowrap">
-                                                                    <AlertCircle className="w-3 h-3" /> LOW STOCK
-                                                                </span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                )) : (
-                                                    <tr>
-                                                        <td colSpan="4" className="px-6 py-16 text-center text-slate-500 font-inter text-[13px] tracking-widest uppercase font-bold">
-                                                            No resources match criteria
-                                                        </td>
-                                                    </tr>
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-8">
+                                                        <div className="flex items-center gap-3 text-white/40">
+                                                            <MapPin className="w-4 h-4 text-[#00FFCC]" />
+                                                            <span className="font-mono text-[11px] uppercase tracking-widest truncate max-w-[180px]">{item.location}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-8 py-8 text-right">
+                                                        {item.quantity > 500 ? (
+                                                            <span className="inline-flex items-center gap-3 px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono text-[9px] font-bold tracking-[0.2em] uppercase">
+                                                                <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" /> OPTIMAL_RESERVE
+                                                            </span>
+                                                        ) : (
+                                                            <span className="inline-flex items-center gap-3 px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 font-mono text-[9px] font-bold tracking-[0.2em] uppercase">
+                                                                <AlertCircle className="w-3.5 h-3.5" /> CRITICAL_LOW
+                                                            </span>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            )) : (
+                                                <tr>
+                                                    <td colSpan="4" className="px-8 py-20 text-center text-white/10 font-mono text-[11px] tracking-[0.5em] uppercase">
+                                                        SCAN_ZERO_RESULTS // ATTEMPT_RE_IDENTIFICATION
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
 
                             {/* Right Panel: Recent Dispatches */}
-                            <div className="lg:col-span-1">
-                                <div className="bg-[#0a1130] border border-[#1a2a5e] rounded-xl p-8 h-full shadow-xl">
-                                    <h3 className="font-bebas text-2xl tracking-[0.1em] text-slate-100 mb-6 flex items-center gap-3 border-b border-[#1a2a5e] pb-5">
-                                        <div style={{ width: 8, height: 8, background: "#00c8ff", borderRadius: "50%", boxShadow: "0 0 10px #00c8ff" }} />
-                                        LIVE DISPATCHES
-                                    </h3>
+                            <div className="col-span-12 lg:col-span-4">
+                                <div className="bg-white/5 border border-white/5 backdrop-blur-3xl p-10 h-full">
+                                    <div className="flex items-center gap-3 mb-10">
+                                        <div className="w-2 h-2 bg-[#00FFCC] rounded-full animate-pulse shadow-[0_0_10px_#00FFCC]" />
+                                        <h3 className="font-outfit font-black text-2xl tracking-tighter text-white uppercase">LIVE_DISPATCH_TELEM</h3>
+                                    </div>
 
-                                    <div className="space-y-5">
+                                    <div className="space-y-8">
                                         {dispatches.map(dispatch => (
-                                            <div key={dispatch.id} className="relative pl-6 pb-5 border-l-2 border-[#1a2a5e] last:border-transparent last:pb-0">
-                                                <div className="absolute left-[-5px] top-1 w-2 h-2 rounded-full" style={{ background: "#e53935", boxShadow: "0 0 8px rgba(229,57,53,0.8)" }} />
-                                                <div className="bg-[#070d2a] border border-[#1a2a5e] rounded-xl p-5 hover:border-[#e53935]/50 transition-colors">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <span className="font-inter text-[13px] font-bold text-slate-100 tracking-wide">{dispatch.item}</span>
-                                                        <span className="font-bebas text-lg tracking-wider text-[#e53935] bg-[#e53935]/10 px-2 py-0.5 rounded border border-[#e53935]/20">
+                                            <div key={dispatch.id} className="relative pl-10 border-l border-white/5 last:border-transparent">
+                                                <div className="absolute left-[-4px] top-1 w-2 h-2 rounded-full border border-red-500/40 bg-red-600/20 shadow-[0_0_8px_rgba(239,57,53,0.4)]" />
+                                                <div className="bg-white/[0.02] border border-white/5 hover:border-red-500/30 transition-all p-6 space-y-4">
+                                                    <div className="flex justify-between items-start">
+                                                        <span className="font-outfit font-black text-lg text-white uppercase tracking-tight leading-none">{dispatch.item}</span>
+                                                        <span className="font-mono text-xs font-black text-red-500 tracking-wider">
                                                             x{dispatch.qty}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-[12px] font-inter text-slate-400 font-semibold mb-3">
-                                                        <MapPin className="w-3.5 h-3.5 text-[#00c8ff]" /> TO: {dispatch.to}
+                                                    <div className="flex items-center gap-3 text-[10px] font-mono text-white/40 uppercase tracking-widest">
+                                                        <Globe className="w-3.5 h-3.5 text-blue-400" /> TO: {dispatch.to}
                                                     </div>
-                                                    <div className="flex items-center justify-between text-[10px] font-inter uppercase font-bold tracking-[0.15em]">
-                                                        <span className="text-slate-500 flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {dispatch.time}</span>
-                                                        <span style={{ color: dispatch.status === 'In Transit' ? "#00c8ff" : "#64748b" }}>
+                                                    <div className="flex items-center justify-between text-[8px] font-mono uppercase tracking-[0.3em] font-bold mt-4 pt-4 border-t border-white/[0.02]">
+                                                        <span className="text-white/20 flex items-center gap-2"><Clock className="w-3.5 h-3.5" /> {dispatch.time}</span>
+                                                        <span className={dispatch.status === 'In Transit' ? "text-blue-400" : "text-white/10"}>
                                                             {dispatch.status}
                                                         </span>
                                                     </div>
@@ -339,102 +338,91 @@ export default function ResourceInventory() {
 
                     {/* Content Area - Hospitals */}
                     {activeTab === 'hospitals' && (
-                        <div className="animate-in fade-in duration-300">
-                            <div className="mb-6 relative max-w-xl">
-                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <div className="animate-slide-up">
+                            <div className="mb-10 relative max-w-xl group">
+                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="SEARCH HOSPITALS..."
+                                    placeholder="SCAN_MEDICAL_NODES..."
                                     value={hospitalSearch}
                                     onChange={(e) => setHospitalSearch(e.target.value)}
-                                    className="w-full bg-[#0a1130] border border-[#1a2a5e] rounded-xl py-4 pl-14 pr-4 transition-colors font-inter text-sm font-semibold tracking-wider text-white"
-                                    style={{ outline: "none" }}
-                                    onFocus={e => e.currentTarget.style.borderColor = "#00c8ff"}
-                                    onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                    className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filteredHospitals.length > 0 ? filteredHospitals.map(hosp => {
                                     const isFull = hosp.status === 'Full';
                                     const isNear = hosp.status === 'Near Capacity';
-
-                                    const statusColor = isFull ? '#e53935' : isNear ? '#eab308' : '#00c8ff';
+                                    const statusColor = isFull ? '#ef4444' : isNear ? '#f59e0b' : '#00FFCC';
                                     const pctFull = Math.round(((hosp.bedsTotal - hosp.bedsAvailable) / hosp.bedsTotal) * 100);
 
                                     return (
-                                        <div key={hosp.id} className="bg-[#0a1130] border border-[#1a2a5e] rounded-xl p-6 shadow-xl hover:border-[#00c8ff]/50 transition-colors relative overflow-hidden group">
+                                        <div key={hosp.id} className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 hover:border-[#00FFCC]/20 transition-all relative overflow-hidden group">
+                                            
+                                            {/* Pulsing state ring */}
+                                            <div className="absolute top-[-40px] right-[-40px] w-32 h-32 border border-white/[0.02] rounded-full group-hover:scale-110 transition-transform" />
 
-                                            {/* MINI MAP COMPONENT */}
                                             <MiniMap isFull={isFull} isNear={isNear} />
 
-                                            {/* Status Badge Overlapped */}
-                                            <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
-                                                <span className="px-3 py-1 rounded bg-[#070d2a]/90 backdrop-blur border text-[10px] font-bold uppercase tracking-[0.15em]"
-                                                    style={{ borderColor: statusColor, color: statusColor }}>
+                                            <div className="absolute top-8 right-8 z-10 flex flex-col items-end gap-2">
+                                                <span className="px-4 py-1.5 bg-black/60 backdrop-blur border text-[9px] font-mono font-black uppercase tracking-[0.2em]"
+                                                    style={{ borderColor: `${statusColor}40`, color: statusColor }}>
                                                     {hosp.status}
                                                 </span>
                                             </div>
 
-                                            <div className="flex items-start gap-4 mb-6 pr-20 relative z-10">
-                                                <div className="w-12 h-12 rounded-full border border-[rgba(0,200,255,0.3)] bg-[rgba(0,200,255,0.1)] flex flex-shrink-0 items-center justify-center text-[#00c8ff]">
-                                                    <Hospital className="w-5 h-5" />
+                                            <div className="flex items-start gap-6 mb-10 pr-24 relative z-10">
+                                                <div className="w-14 h-14 bg-white/5 border border-white/10 flex flex-shrink-0 items-center justify-center text-[#00FFCC] group-hover:border-[#00FFCC]/40 transition-all">
+                                                    <Hospital className="w-6 h-6" />
                                                 </div>
-                                                <div>
-                                                    <h3 className="text-xl font-bold font-inter text-slate-100 uppercase tracking-wide">{hosp.name}</h3>
-                                                    <p className="text-[12px] font-inter font-bold text-slate-400 flex items-center gap-1.5 mt-1 tracking-wider uppercase">
-                                                        <MapPin className="w-3.5 h-3.5 text-[#e53935]" /> {hosp.distance} AWAY
+                                                <div className="flex flex-col gap-1">
+                                                    <h3 className="text-2xl font-outfit font-black text-white uppercase tracking-tight leading-none">{hosp.name}</h3>
+                                                    <p className="text-[10px] font-mono font-bold text-white/20 flex items-center gap-2 mt-2 tracking-widest uppercase italic">
+                                                        <MapPin className="w-3.5 h-3.5 text-red-500" /> {hosp.distance} RADIUS
                                                     </p>
                                                 </div>
                                             </div>
 
-                                            {/* Metrics Grid */}
-                                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                                <div className="bg-[#070d2a] rounded-xl p-4 border border-[#1a2a5e]">
-                                                    <p className="text-[10px] font-inter text-slate-400 uppercase tracking-[0.1em] mb-2 font-bold">AVAILABLE BEDS</p>
-                                                    <div className="flex items-end gap-2">
-                                                        <span className="font-bebas text-4xl leading-none" style={{ color: statusColor, letterSpacing: ".05em" }}>
+                                            <div className="grid grid-cols-2 gap-6 mb-8 relative z-10">
+                                                <div className="bg-white/[0.03] p-6 border border-white/5">
+                                                    <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold">NODE_CAPACITY</p>
+                                                    <div className="flex items-baseline gap-2">
+                                                        <span className="font-outfit font-black text-4xl leading-none tracking-tighter" style={{ color: statusColor }}>
                                                             {hosp.bedsAvailable}
                                                         </span>
-                                                        <span className="text-xs font-inter font-bold text-slate-500 pb-1">/ {hosp.bedsTotal}</span>
+                                                        <span className="text-sm font-outfit font-black text-white/10">/ {hosp.bedsTotal}</span>
                                                     </div>
-                                                    <div className="w-full h-1.5 bg-[#1a2a5e] rounded-full mt-3 overflow-hidden">
-                                                        <div className="h-full rounded-full" style={{ width: `${pctFull}%`, background: statusColor }} />
+                                                    <div className="w-full h-1 bg-white/5 mt-4 overflow-hidden">
+                                                        <div className="h-full transition-all duration-1000" style={{ width: `${pctFull}%`, background: statusColor }} />
                                                     </div>
                                                 </div>
 
-                                                <div className="bg-[#070d2a] rounded-xl p-4 border border-[#1a2a5e]">
-                                                    <p className="text-[10px] font-inter text-slate-400 uppercase tracking-[0.1em] mb-2 font-bold flex items-center gap-1.5">
-                                                        <Pill className="w-3.5 h-3.5" /> MEDICINES
+                                                <div className="bg-white/[0.03] p-6 border border-white/5">
+                                                    <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold flex items-center gap-3">
+                                                        <Zap className="w-3.5 h-3.5 text-blue-400" /> CORTEX_INV
                                                     </p>
-                                                    <div className="mt-2 space-y-2">
+                                                    <div className="space-y-2">
                                                         <div className="flex justify-between items-center">
-                                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Critical</span>
-                                                            <span className="font-bebas text-lg text-slate-200 tracking-widest">{hosp.medicines.critical}</span>
+                                                            <span className="text-[9px] font-mono font-bold text-white/20 uppercase tracking-widest">CRITICAL</span>
+                                                            <span className="font-outfit font-black text-lg text-white leading-none">{hosp.medicines.critical}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center">
-                                                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">General</span>
-                                                            <span className="font-bebas text-lg text-slate-200 tracking-widest">{hosp.medicines.general}</span>
+                                                            <span className="text-[9px] font-mono font-bold text-white/20 uppercase tracking-widest">GENERAL</span>
+                                                            <span className="font-outfit font-black text-lg text-white leading-none">{hosp.medicines.general}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {/* Action Button */}
-                                            {isFull ? (
-                                                <button className="w-full text-white py-3.5 rounded-full font-inter text-[12px] font-bold uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-3 border border-[#e53935] hover:bg-[#e53935]">
-                                                    <Search className="w-4 h-4" /> FIND ALTERNATIVE
-                                                </button>
-                                            ) : (
-                                                <button className="w-full bg-[#00c8ff] hover:bg-[#009ecc] text-slate-900 py-3.5 rounded-full font-inter text-[12px] font-extrabold uppercase tracking-[0.15em] transition-all flex items-center justify-center gap-3 shadow-[0_0_15px_rgba(0,200,255,0.4)] hover:shadow-[0_0_25px_rgba(0,200,255,0.6)]">
-                                                    ROUTE PATIENTS <ChevronRight className="w-4 h-4" />
-                                                </button>
-                                            )}
+                                            <button className={`w-full py-5 font-outfit font-black text-xs uppercase tracking-[0.3em] transition-all group-hover:scale-[1.02] ${isFull ? 'bg-white/5 border border-red-500/20 text-red-500' : 'bg-[#00FFCC] text-black shadow-[0_0_30px_rgba(0,255,204,0.1)]'}`}>
+                                                {isFull ? 'SCAN_FOR_ALTERNATIVES' : 'INITIALIZE_ROUTING'}
+                                            </button>
                                         </div>
                                     );
                                 }) : (
-                                    <div className="col-span-full py-12 text-center text-slate-500 font-inter font-bold tracking-widest uppercase">
-                                        No hospitals match criteria
+                                    <div className="col-span-full py-20 text-center text-white/10 font-mono tracking-[0.5em] uppercase text-sm">
+                                        SCAN_ERROR // NODE_NOT_FOUND
                                     </div>
                                 )}
                             </div>
@@ -443,85 +431,80 @@ export default function ResourceInventory() {
 
                     {/* Content Area - Fleet */}
                     {activeTab === 'fleet' && (
-                        <div className="animate-in fade-in duration-300">
-                            {/* Similar adjustments for Fleet if needed, keeping it consistent */}
-                            <div className="mb-6 relative max-w-xl">
-                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <div className="animate-slide-up">
+                            <div className="mb-10 relative max-w-xl group">
+                                <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="SEARCH FLEET..."
+                                    placeholder="SCAN_LOGISTICS_VEHICLES..."
                                     value={fleetSearch}
                                     onChange={(e) => setFleetSearch(e.target.value)}
-                                    className="w-full bg-[#0a1130] border border-[#1a2a5e] rounded-xl py-4 pl-14 pr-4 transition-colors font-inter text-sm font-semibold tracking-wider text-white"
-                                    style={{ outline: "none" }}
-                                    onFocus={e => e.currentTarget.style.borderColor = "#00c8ff"}
-                                    onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                    className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filteredFleet.length > 0 ? filteredFleet.map(unit => {
                                     const isEnRoute = unit.status === 'En Route' || unit.status === 'Deployed';
                                     const isMaint = unit.status === 'Maintenance';
-                                    const statusColor = isEnRoute ? '#00c8ff' : isMaint ? '#e53935' : '#10b981';
+                                    const statusColor = isEnRoute ? '#3b82f6' : isMaint ? '#ef4444' : '#10b981';
 
                                     return (
-                                        <div key={unit.id} className="bg-[#0a1130] border border-[#1a2a5e] rounded-xl p-6 shadow-xl relative">
-                                            <div className="flex items-center justify-between mb-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-12 h-12 rounded-full flex items-center justify-center border"
-                                                        style={{ borderColor: `${statusColor}40`, background: `${statusColor}10`, color: statusColor }}>
-                                                        {isMaint ? <Wrench className="w-5 h-5" /> : getFleetIcon(unit.type)}
+                                        <div key={unit.id} className="bg-white/5 border border-white/5 backdrop-blur-3xl p-8 hover:border-white/20 transition-all group">
+                                            <div className="flex items-start justify-between mb-10">
+                                                <div className="flex items-center gap-6">
+                                                    <div className="w-14 h-14 bg-white/5 border flex items-center justify-center transition-all group-hover:border-white/20"
+                                                        style={{ borderColor: `${statusColor}40`, color: statusColor }}>
+                                                        {isMaint ? <Wrench className="w-6 h-6" /> : getFleetIcon(unit.type)}
                                                     </div>
-                                                    <div>
-                                                        <h3 className="font-bebas text-2xl tracking-[0.1em] text-slate-100">{unit.unit}</h3>
-                                                        <p className="text-[11px] font-bold uppercase tracking-wider font-inter text-slate-400">{unit.type}</p>
+                                                    <div className="flex flex-col gap-1">
+                                                        <h3 className="font-outfit font-black text-2xl tracking-tighter text-white uppercase leading-none">{unit.unit}</h3>
+                                                        <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-white/20">{unit.type}</span>
                                                     </div>
                                                 </div>
-                                                <span className="px-3 py-1 rounded bg-[#070d2a] border text-[10px] font-bold uppercase tracking-[0.15em] whitespace-nowrap"
-                                                    style={{ borderColor: statusColor, color: statusColor }}>
+                                                <span className="px-4 py-1.5 bg-black/60 border text-[9px] font-mono font-black uppercase tracking-[0.2em]"
+                                                    style={{ borderColor: `${statusColor}60`, color: statusColor }}>
                                                     {unit.status}
                                                 </span>
                                             </div>
 
-                                            <div className="space-y-4 p-5 bg-[#070d2a] rounded-xl border border-[#1a2a5e] flex flex-col justify-between" style={{ minHeight: 120 }}>
+                                            <div className="space-y-6 p-8 bg-white/[0.02] border border-white/5" style={{ minHeight: 160 }}>
                                                 <div>
-                                                    <p className="text-[10px] font-inter text-slate-400 uppercase tracking-[0.1em] mb-1.5 font-bold flex items-center gap-1.5">
-                                                        <MapPin className="w-3.5 h-3.5" /> CURRENT LOCATION
+                                                    <p className="text-[9px] font-mono text-white/20 uppercase tracking-[0.3em] mb-3 font-bold flex items-center gap-3">
+                                                        <MapPin className="w-3.5 h-3.5 text-blue-400" /> LOCALITY_POINT
                                                     </p>
-                                                    <p className="font-inter text-[13px] font-bold tracking-wide text-slate-200">{unit.location}</p>
+                                                    <p className="font-mono text-sm font-black tracking-widest text-white uppercase">{unit.location}</p>
                                                 </div>
 
-                                                {isEnRoute ? (
-                                                    <div className="border-t border-[#1a2a5e] pt-4 flex justify-between items-center">
-                                                        <span className="text-[10px] font-inter text-slate-500 uppercase tracking-[0.15em] font-bold flex items-center gap-1.5">
-                                                            <Clock className="w-3.5 h-3.5 text-[#00c8ff]" /> ETA
-                                                        </span>
-                                                        <span className="font-bebas text-xl tracking-[0.1em] text-[#00c8ff]">{unit.eta}</span>
+                                                <div className="pt-6 border-t border-white/[0.03] flex justify-between items-end">
+                                                    <div className="flex flex-col gap-2">
+                                                       <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.2em] font-bold">TELEM_PARA</span>
+                                                       <div className="flex items-center gap-2">
+                                                          <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                                                          <span className="text-[10px] font-mono text-blue-500 uppercase font-black">{isEnRoute ? 'TRANSMITTING' : 'IDLE'}</span>
+                                                       </div>
                                                     </div>
-                                                ) : (
-                                                    <div className="border-t border-[#1a2a5e] pt-4 flex justify-between items-center">
-                                                        <span className="text-[10px] font-inter text-slate-500 uppercase tracking-[0.15em] font-bold">
-                                                            STATUS DETAIL
-                                                        </span>
-                                                        <span className="font-inter text-[12px] font-bold uppercase tracking-wide text-slate-400">
-                                                            {isMaint ? 'Out of Service' : 'Stationed'}
-                                                        </span>
-                                                    </div>
-                                                )}
+                                                    {isEnRoute ? (
+                                                       <div className="flex flex-col items-end gap-1">
+                                                          <span className="text-[9px] font-mono text-white/20 uppercase font-bold pr-1">EST_TELEM</span>
+                                                          <span className="font-outfit font-black text-3xl tracking-tighter text-blue-400 leading-none">{unit.eta}</span>
+                                                       </div>
+                                                    ) : (
+                                                       <span className="font-mono text-[10px] text-white/20 font-bold uppercase tracking-widest italic">{isMaint ? 'OFFLINE' : 'STANDBY'}</span>
+                                                    )}
+                                                </div>
                                             </div>
 
                                             {!isMaint && !isEnRoute && (
-                                                <button className="w-full mt-5 bg-transparent border-2 hover:bg-white/5 py-3 rounded-full font-inter text-[12px] font-bold uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-2"
-                                                    style={{ borderColor: statusColor, color: statusColor }}>
-                                                    <Send className="w-4 h-4" /> DISPATCH UNIT
+                                                <button className="w-full mt-8 bg-white/5 border border-white/10 hover:border-[#00FFCC] hover:text-[#00FFCC] py-5 font-outfit font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-4">
+                                                    <Send className="w-4 h-4" /> AUTHORIZE_DISPATCH
                                                 </button>
                                             )}
                                         </div>
                                     );
                                 }) : (
-                                    <div className="col-span-full py-12 text-center text-slate-500 font-inter font-bold tracking-widest uppercase">
-                                        No fleet units match criteria
+                                    <div className="col-span-full py-20 text-center text-white/10 font-mono tracking-[0.5em] uppercase text-sm">
+                                        FLEET_SIG_NOT_FOUND // SCANNING...
                                     </div>
                                 )}
                             </div>
@@ -533,93 +516,86 @@ export default function ResourceInventory() {
 
             {/* Add Stock Modal */}
             {isSpaceModalOpen && (
-                <div className="fixed inset-0 z-[300] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-                    <div className="bg-[#0a1130] border border-[#1a2a5e] rounded-2xl w-full max-w-lg shadow-[0_0_50px_rgba(0,0,0,0.8)] overflow-hidden">
-                        <div className="px-8 py-6 border-b border-[#1a2a5e] flex justify-between items-center bg-[#070d2a]">
-                            <h2 className="font-bebas text-3xl text-slate-100 tracking-[0.1em] flex items-center gap-4">
-                                <Package className="w-7 h-7 text-[#e53935]" />
-                                ADD NEW STOCK
-                            </h2>
-                            <button onClick={() => setIsSpaceModalOpen(false)} className="text-slate-400 hover:text-white transition-colors text-2xl leading-none">
+                <div className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-xl flex items-center justify-center p-8 animate-fade-in">
+                    <div className="bg-[#08080A] border border-white/5 w-full max-w-xl shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden relative">
+                        <div className="absolute inset-0 bg-[#00FFCC]/5 blur-3xl pointer-events-none" />
+                        
+                        <div className="relative px-12 py-10 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
+                            <div className="flex flex-col gap-1">
+                                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-[0.5em]">Inventory_Provisioning</span>
+                                <h2 className="font-outfit text-4xl font-black text-white tracking-tighter uppercase leading-none">
+                                  NEW_STOCK_INTAKE
+                                </h2>
+                            </div>
+                            <button onClick={() => setIsSpaceModalOpen(false)} className="w-12 h-12 flex items-center justify-center bg-white/5 border border-white/5 text-white/40 hover:text-white transition-all text-3xl">
                                 &times;
                             </button>
                         </div>
-                        <form onSubmit={handleAddStock} className="p-8 flex flex-col gap-6">
-                            <div>
-                                <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">ITEM NAME</label>
+
+                        <form onSubmit={handleAddStock} className="relative p-12 space-y-8 bg-black/40">
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] ml-1">ITEM_IDENTIFIER*</label>
                                 <input
                                     required
                                     type="text"
                                     value={newItem.name}
                                     onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                                    className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none"
-                                    style={{ outline: "none" }}
-                                    onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
-                                    onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                    className="w-full bg-white/5 border border-white/5 focus:border-[#00FFCC]/40 px-6 py-5 font-mono text-sm tracking-widest focus:outline-none transition-all text-white placeholder:text-white/10 uppercase"
+                                    placeholder="ENTRY_VALUE"
                                 />
                             </div>
-                            <div className="flex gap-5">
-                                <div className="flex-1">
-                                    <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">QUANTITY</label>
+                            <div className="flex gap-8">
+                                <div className="flex-1 space-y-3">
+                                    <label className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] ml-1">QUANTUM_VALUE*</label>
                                     <input
                                         required
                                         type="number"
                                         min="0"
                                         value={newItem.quantity}
                                         onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
-                                        className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none"
-                                        onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
-                                        onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                        className="w-full bg-white/5 border border-white/5 focus:border-[#00FFCC]/40 px-6 py-5 font-mono text-sm tracking-widest focus:outline-none transition-all text-white placeholder:text-white/10"
+                                        placeholder="000"
                                     />
                                 </div>
-                                <div className="w-1/3">
-                                    <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">UNIT</label>
+                                <div className="w-[40%] space-y-3">
+                                    <label className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] ml-1">UNIT_MEASURE*</label>
                                     <select
                                         value={newItem.unit}
                                         onChange={(e) => setNewItem({ ...newItem, unit: e.target.value })}
-                                        className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none uppercase"
-                                        onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
-                                        onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                        className="w-full bg-white/5 border border-white/5 focus:border-[#00FFCC]/40 px-6 py-5 font-mono text-sm tracking-widest focus:outline-none transition-all text-white appearance-none cursor-pointer uppercase"
                                     >
-                                        <option value="kg">KG</option>
-                                        <option value="liters">LITERS</option>
-                                        <option value="kits">KITS</option>
-                                        <option value="units">UNITS</option>
+                                        <option value="kg" className="bg-[#08080A]">KG</option>
+                                        <option value="liters" className="bg-[#08080A]">LITERS</option>
+                                        <option value="kits" className="bg-[#08080A]">KITS</option>
+                                        <option value="units" className="bg-[#08080A]">UNITS</option>
                                     </select>
                                 </div>
                             </div>
-                            <div>
-                                <label className="block text-[11px] font-inter text-slate-400 mb-2 uppercase font-bold tracking-[0.15em]">LOCATION</label>
+                            <div className="space-y-3">
+                                <label className="text-[10px] font-mono text-white/40 uppercase tracking-[0.2em] ml-1">LOCALITY_COORDINATES*</label>
                                 <input
                                     required
                                     type="text"
                                     value={newItem.location}
                                     onChange={(e) => setNewItem({ ...newItem, location: e.target.value })}
-                                    className="w-full bg-[#070d2a] border border-[#1a2a5e] rounded-xl py-4 px-4 font-inter text-sm font-semibold tracking-wider text-slate-200 transition-all outline-none"
-                                    onFocus={e => e.currentTarget.style.borderColor = "#e53935"}
-                                    onBlur={e => e.currentTarget.style.borderColor = "#1a2a5e"}
+                                    className="w-full bg-white/5 border border-white/5 focus:border-[#00FFCC]/40 px-6 py-5 font-mono text-sm tracking-widest focus:outline-none transition-all text-white placeholder:text-white/10 uppercase"
+                                    placeholder="SECTOR_REF"
                                 />
                             </div>
-                            <div className="mt-4 flex justify-end gap-4 pt-6 border-t border-[#1a2a5e]">
+                            <div className="pt-8 border-t border-white/5 flex justify-end gap-6">
                                 <button
                                     type="button"
                                     onClick={() => setIsSpaceModalOpen(false)}
-                                    className="px-6 py-3 rounded-full font-inter text-[12px] font-bold tracking-[0.1em] text-slate-300 hover:bg-[#1a2a5e] transition-colors border border-transparent hover:border-slate-700"
+                                    className="px-10 py-4 font-mono text-[10px] tracking-[0.3em] text-white/40 hover:text-white transition-all uppercase"
                                 >
-                                    CANCEL
+                                    ABORT
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={isSubmitting}
-                                    className="text-white px-8 py-3 rounded-full font-inter text-[12px] font-bold tracking-[0.15em] transition-all disabled:opacity-50"
-                                    style={{
-                                        background: "#e53935",
-                                        boxShadow: "0 0 18px rgba(229,57,53,.4)",
-                                    }}
-                                    onMouseEnter={e => { e.currentTarget.style.background = "#ff4444"; e.currentTarget.style.boxShadow = "0 0 28px rgba(229,57,53,.7)"; }}
-                                    onMouseLeave={e => { e.currentTarget.style.background = "#e53935"; e.currentTarget.style.boxShadow = "0 0 18px rgba(229,57,53,.4)"; }}
+                                    className="bg-[#00FFCC] text-black px-12 py-4 font-outfit font-black text-xs tracking-[0.2em] transition-all hover:brightness-110 disabled:opacity-50 uppercase shadow-[0_0_30px_rgba(0,255,204,0.1)]"
                                 >
-                                    {isSubmitting ? 'SAVING...' : 'ADD STOCK'}
+                                    {isSubmitting ? 'PROVISIONING...' : 'AUTHORIZE_STOCK'}
                                 </button>
                             </div>
                         </form>
@@ -628,6 +604,18 @@ export default function ResourceInventory() {
             )}
 
             <ToastContainer toasts={toasts} />
+            
+            <style dangerouslySetInnerHTML={{ __html: `
+                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 240, 255, 0.1); }
+                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.2); }
+                .stroke-text {
+                  -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+                  text-stroke: 1px rgba(255,255,255,0.2);
+                  color: transparent;
+                }
+            `}} />
         </div>
     );
 }

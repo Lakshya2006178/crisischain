@@ -2,16 +2,23 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LandingPage from './pages/LandingPage';
 import DashboardMain from './DashboardMain';
 import ResourceInventory from './pages/ResourceInventory';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
+import ReportIncident from './pages/ReportIncident';
+import { DashboardProvider } from './context/DashboardContext';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<DashboardMain />} />
-        <Route path="/resources" element={<ResourceInventory />} />
-        {/* Redirect /login to /dashboard for now as per user request to test navigation */}
-        <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+        {/* Dashboard routes — fresh DashboardProvider on every mount */}
+        <Route path="/dashboard" element={<DashboardProvider><DashboardMain /></DashboardProvider>} />
+        <Route path="/resources" element={<DashboardProvider><ResourceInventory /></DashboardProvider>} />
+        {/* Auth & utility pages */}
+        <Route path="/login"    element={<LoginPage />} />
+        <Route path="/register" element={<SignUpPage />} />
+        <Route path="/report"   element={<ReportIncident />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
