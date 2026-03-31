@@ -3,7 +3,7 @@ import { useDashboard } from '../context/DashboardContext';
 import {
     LayoutDashboard, AlertTriangle, Activity,
     Database, Settings, Shield,
-    Terminal, Lock, Radio, ChevronRight, Zap
+    Terminal, Lock, Radio, ChevronRight, Zap, LogOut
 } from 'lucide-react';
 
 const W_CLOSED = 80;
@@ -11,18 +11,25 @@ const W_OPEN   = 300;
 const H_TOP    = 80;
 
 const NAV = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'DASHBOARD_LIVE', path: '/dashboard' },
-    { id: 'alerts',    icon: AlertTriangle,   label: 'CRITICAL_ALERTS',    path: '/alerts' },
-    { id: 'resources', icon: Database,         label: 'RESOURCE_DATABASE', path: '/resources' },
-    { id: 'analytics', icon: Activity,         label: 'CORTEX_ANALYTICS',  path: '/analytics' },
-    { id: 'settings',  icon: Settings,         label: 'NODE_SETTINGS',     path: '/settings' },
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { id: 'alerts',    icon: AlertTriangle,   label: 'Emergency Alerts',    path: '/alerts' },
+    { id: 'resources', icon: Database,         label: 'Resources', path: '/resources' },
+    { id: 'analytics', icon: Activity,         label: 'Analytics',  path: '/analytics' },
+    { id: 'settings',  icon: Settings,         label: 'Settings',     path: '/settings' },
 ];
 
 export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isSidebarOpen, toggleSidebar } = useDashboard();
+    const { isSidebarOpen, toggleSidebar, addToast } = useDashboard();
     const w = isSidebarOpen ? W_OPEN : W_CLOSED;
+
+    const handleLogout = () => {
+        addToast('Terminating session...', 'info');
+        setTimeout(() => {
+            navigate('/');
+        }, 800);
+    };
 
     return (
         <aside
@@ -41,7 +48,7 @@ export default function Sidebar() {
                     {isSidebarOpen && (
                         <div className="flex flex-col gap-0.5 leading-none">
                             <span className="font-outfit font-black text-2xl tracking-tighter uppercase text-white whitespace-nowrap">CRISISCHAIN</span>
-                            <span className="text-[10px] font-mono font-bold text-blue-500 tracking-[0.5em] opacity-40 uppercase">TACTICAL_V5</span>
+                            <span className="text-[10px] font-mono font-bold text-blue-500 tracking-[0.5em] opacity-40 uppercase">COMMAND_SYS_V5</span>
                         </div>
                     )}
                 </Link>
@@ -105,8 +112,8 @@ export default function Sidebar() {
                                        <span className="text-[10px] font-mono font-black tracking-[0.4em] text-white uppercase">{label}</span>
                                     </div>
                                     <p className="text-[8px] font-mono text-white/20 uppercase tracking-widest leading-relaxed">
-                                       Routing_Auth: Verified<br />
-                                       Sync_Node: 0xA4F2
+                                       Status: Verified<br />
+                                       Encryption: Active
                                     </p>
                                 </div>
                             )}
@@ -126,8 +133,8 @@ export default function Sidebar() {
                         </div>
                         {isSidebarOpen && (
                           <div className="flex flex-col text-left">
-                            <span className="text-[11px] font-mono font-black text-white/40 uppercase tracking-widest">SIGNAL</span>
-                            <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest font-black animate-pulse">SYNC_OPTIMAL</span>
+                            <span className="text-[11px] font-mono font-black text-white/40 uppercase tracking-widest">Signal Status</span>
+                            <span className="text-[9px] font-mono text-emerald-500 uppercase tracking-widest font-black animate-pulse">Sync Optimal</span>
                           </div>
                         )}
                     </div>
@@ -136,18 +143,34 @@ export default function Sidebar() {
                 {/* Sovereign Identity Card */}
                 <div className={`p-6 bg-white/[0.03] border border-white/5 relative group/user cursor-pointer overflow-hidden ${!isSidebarOpen && 'lg:p-0 lg:border-none lg:bg-transparent lg:flex lg:justify-center'}`}>
                    <div className="absolute inset-0 bg-gradient-to-tr from-[#00FFCC]/5 to-transparent opacity-0 group-hover/user:opacity-100 transition-opacity" />
-                   <div className="flex items-center gap-6 relative z-10">
+                   <div className="flex items-center gap-6 relative z-10 w-full">
                       <div className="w-12 h-12 bg-black border border-white/10 flex items-center justify-center font-outfit font-black text-2xl text-white group-hover/user:border-[#00FFCC]/40 transition-all">
                          C
                       </div>
-                      {isSidebarOpen && (
-                         <div className="flex flex-col gap-1 leading-none">
-                            <span className="text-[13px] font-outfit font-black text-white uppercase tracking-wider">COMMANDER_01</span>
-                            <div className="flex items-center gap-2">
-                               <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                               <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Rank: Sovereign</span>
+                      {isSidebarOpen ? (
+                         <div className="flex items-center justify-between flex-1">
+                            <div className="flex flex-col gap-1 leading-none">
+                                <span className="text-[13px] font-outfit font-black text-white uppercase tracking-wider">Commander Alex</span>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                                    <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Rank: Administrator</span>
+                                </div>
                             </div>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); handleLogout(); }}
+                                className="p-2 text-white/10 hover:text-red-500 transition-colors"
+                                title="Logout Session"
+                            >
+                                <LogOut size={16} />
+                            </button>
                          </div>
+                      ) : (
+                        <button 
+                            onClick={handleLogout}
+                            className="absolute inset-0 z-20 flex items-center justify-center opacity-0 hover:opacity-100 bg-red-600/10 transition-opacity"
+                        >
+                            <LogOut size={16} className="text-red-500" />
+                        </button>
                       )}
                    </div>
                 </div>

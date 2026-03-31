@@ -106,7 +106,7 @@ const LandingPage = () => {
                 <div className="w-1 h-12 bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
                 REPORT_EMERGENCY
               </Link>
-              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
                 <div className="w-1 h-12 bg-blue-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
                 COMMAND_CENTER
               </Link>
@@ -195,7 +195,7 @@ const LandingPage = () => {
                   </div>
                 </Link>
 
-                <Link to="/dashboard" className="px-10 py-5 bg-blue-600/10 border border-blue-500/40 hover:bg-blue-600/20 transition-all duration-500 flex items-center gap-4">
+                <Link to="/login" className="px-10 py-5 bg-blue-600/10 border border-blue-500/40 hover:bg-blue-600/20 transition-all duration-500 flex items-center gap-4">
                   <Shield className="w-6 h-6 text-blue-500" />
                   <div className="flex flex-col items-start text-left">
                     <span className="text-[8px] font-mono text-white/60 uppercase">Command_Access</span>
@@ -214,7 +214,7 @@ const LandingPage = () => {
                </div>
 
                {/* UI Overlays */}
-               <div className="absolute top-5 left-5 lg:top-10 lg:left-10 p-4 lg:p-6 bg-black/40 border border-blue-500/20 backdrop-blur-3xl z-40 max-w-[150px] lg:max-w-[200px]">
+               <div className={`absolute top-5 left-5 lg:top-10 lg:left-10 p-4 lg:p-6 bg-black/40 border border-blue-500/20 backdrop-blur-3xl z-40 max-w-[150px] lg:max-w-[200px] transition-all duration-700 ${isZoomed ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
                   <div className="text-[8px] lg:text-[10px] font-mono text-blue-400 uppercase mb-4 flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
                     Live_Telemetry
@@ -231,7 +231,7 @@ const LandingPage = () => {
                   </div>
                </div>
 
-               <div className="absolute bottom-5 right-5 lg:bottom-10 lg:right-10 p-4 lg:p-6 bg-black/40 border border-red-500/20 backdrop-blur-3xl z-40 max-w-[180px] lg:max-w-[240px]">
+               <div className={`absolute bottom-5 right-5 lg:bottom-10 lg:right-10 p-4 lg:p-6 bg-black/40 border border-red-500/20 backdrop-blur-3xl z-40 max-w-[180px] lg:max-w-[240px] transition-all duration-700 ${isZoomed ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
                   <div className="text-[8px] lg:text-[10px] font-mono text-red-400 uppercase mb-4 flex items-center gap-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                     CRITICAL_ALERTS
@@ -246,19 +246,18 @@ const LandingPage = () => {
                   </div>
                </div>
 
-               {/* BIG Globe Node */}
                <div 
-                  className={`relative cursor-crosshair transition-all duration-700 ${isZoomed ? 'scale-125 lg:scale-150' : 'scale-90 lg:scale-110'}`}
+                  className={`relative cursor-crosshair transition-all duration-1000 ease-in-out ${isZoomed ? 'scale-[2.0] lg:scale-[2.8]' : 'scale-90 lg:scale-110'}`}
                   onClick={() => setIsZoomed(!isZoomed)}
                >
-                  <div className="absolute inset-[-40px] lg:inset-[-60px] border border-blue-500/10 rounded-full animate-spin-slow" />
-                  <div className="absolute inset-[-15px] lg:inset-[-20px] border border-white/5 rounded-full animate-reverse-spin" />
+                  <div className={`absolute border border-blue-500/10 rounded-full animate-spin-slow transition-all duration-1000 ${isZoomed ? 'inset-[-80px] lg:inset-[-120px] opacity-0' : 'inset-[-40px] lg:inset-[-60px] opacity-100'}`} />
+                  <div className={`absolute border border-white/5 rounded-full animate-reverse-spin transition-all duration-1000 ${isZoomed ? 'inset-[-40px] lg:inset-[-60px] opacity-0' : 'inset-[-15px] lg:inset-[-20px] opacity-100'}`} />
                   <div className="absolute inset-0 bg-blue-500/5 rounded-full blur-3xl opacity-50" />
                   
                   <div className="w-[300px] h-[300px] lg:w-[450px] lg:h-[450px] relative z-20">
                     <ComposableMap 
                       projection="geoOrthographic" 
-                      projectionConfig={{ rotate: [rotation, -15, 0], scale: 120 }}
+                      projectionConfig={{ rotate: [rotation, -15, 0], scale: isZoomed ? 140 : 120 }}
                       className="w-full h-full opacity-90 drop-shadow-[0_0_20px_rgba(59,130,246,0.2)]"
                     >
                       <Geographies geography={geoUrl}>
@@ -310,7 +309,7 @@ const LandingPage = () => {
                </div>
 
                {/* Bottom Telemetry HUD */}
-               <div className="absolute bottom-10 left-10 right-10 grid grid-cols-2 gap-8">
+               <div className={`absolute bottom-10 left-10 right-10 grid grid-cols-2 gap-8 transition-all duration-700 ${isZoomed ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
                   <div className="p-4 bg-white/5 border border-white/5 backdrop-blur-xl">
                     <div className="text-[8px] font-mono text-white/20 uppercase mb-2">Zone_Alpha_Telemetry</div>
                     <div className="h-1 bg-white/10 w-full overflow-hidden">

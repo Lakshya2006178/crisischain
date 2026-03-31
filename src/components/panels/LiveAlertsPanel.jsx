@@ -1,7 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../../context/DashboardContext';
 import { ShieldAlert, Zap, Clock, Terminal, Activity, ChevronRight, Activity as Heartbeat } from 'lucide-react';
 
 export default function LiveAlertsPanel() {
+    const navigate = useNavigate();
     const { alerts, getIcon, addToast } = useDashboard();
     const criticalCount = alerts.filter(a => a.critical).length;
 
@@ -75,10 +77,12 @@ export default function LiveAlertsPanel() {
                 })}
             </div>
 
-            {/* Action Bottom Link */}
             <div className="p-10 border-t border-white/5 bg-black/40">
                 <button
-                    onClick={() => addToast('Opening strategic cortex…', 'info')}
+                    onClick={() => {
+                        addToast('Opening strategic cortex…', 'info');
+                        navigate('/alerts');
+                    }}
                     className="w-full h-12 bg-white/[0.03] hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all font-mono text-[10px] font-black tracking-[0.5em] text-white/40 hover:text-[#00FFCC] uppercase"
                 >
                     INITIALIZE_FULL_UPLINK
