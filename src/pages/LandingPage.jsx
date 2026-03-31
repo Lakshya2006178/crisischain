@@ -37,7 +37,7 @@ const LandingPage = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState(0);
   const [hoveredMarker, setHoveredMarker] = useState(null);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(true); // Default to big globe
   const [incidents, setIncidents] = useState([
     { coords: [-74.006, 40.7128], type: 'CRITICAL', label: 'Cyclone – Coastal Zone 4', time: '2 min ago', color: '#ef4444' },
     { coords: [139.6917, 35.6895], type: 'DISPATCHED', label: 'Fire – Industrial Sector B', time: '5 min ago', color: '#3b82f6' },
@@ -214,24 +214,24 @@ const LandingPage = () => {
                </div>
 
                {/* UI Overlays */}
-               <div className={`absolute top-5 left-5 lg:top-10 lg:left-10 p-4 lg:p-6 bg-black/40 border border-blue-500/20 backdrop-blur-3xl z-40 max-w-[150px] lg:max-w-[200px] transition-all duration-700 ${isZoomed ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
+               <div className={`absolute top-5 left-5 lg:top-10 lg:left-10 p-4 lg:p-6 bg-black/40 border border-blue-500/20 backdrop-blur-3xl z-40 max-w-[150px] lg:max-w-[200px] transition-all duration-700 opacity-100`}>
                   <div className="text-[8px] lg:text-[10px] font-mono text-blue-400 uppercase mb-4 flex items-center gap-2">
                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
                     Live_Telemetry
                   </div>
                   <div className="space-y-3 lg:space-y-4">
                     <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                      <span className="text-[7px] lg:text-[8px] font-mono text-white/40">LATENCY</span>
-                      <span className="text-[10px] lg:text-xs font-outfit text-white">12MS</span>
+                       <span className="text-[7px] lg:text-[8px] font-mono text-white/40">LATENCY</span>
+                       <span className="text-[10px] lg:text-xs font-outfit text-white">12MS</span>
                     </div>
                     <div className="flex justify-between items-end border-b border-white/5 pb-2">
-                      <span className="text-[7px] lg:text-[8px] font-mono text-white/40">NODES</span>
-                      <span className="text-[10px] lg:text-xs font-outfit text-white">405 ACTIVE</span>
+                       <span className="text-[7px] lg:text-[8px] font-mono text-white/40">NODES</span>
+                       <span className="text-[10px] lg:text-xs font-outfit text-white">405 ACTIVE</span>
                     </div>
                   </div>
                </div>
 
-               <div className={`absolute bottom-5 right-5 lg:bottom-10 lg:right-10 p-4 lg:p-6 bg-black/40 border border-red-500/20 backdrop-blur-3xl z-40 max-w-[180px] lg:max-w-[240px] transition-all duration-700 ${isZoomed ? 'opacity-20 blur-sm pointer-events-none' : 'opacity-100'}`}>
+               <div className={`absolute bottom-5 right-5 lg:bottom-10 lg:right-10 p-4 lg:p-6 bg-black/40 border border-red-500/20 backdrop-blur-3xl z-40 max-w-[180px] lg:max-w-[240px] transition-all duration-700 opacity-100`}>
                   <div className="text-[8px] lg:text-[10px] font-mono text-red-400 uppercase mb-4 flex items-center gap-2">
                     <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                     CRITICAL_ALERTS
@@ -247,17 +247,17 @@ const LandingPage = () => {
                </div>
 
                <div 
-                  className={`relative cursor-crosshair transition-all duration-1000 ease-in-out ${isZoomed ? 'scale-[2.0] lg:scale-[2.8]' : 'scale-90 lg:scale-110'}`}
+                  className={`relative cursor-crosshair transition-all duration-1000 ease-in-out scale-[2.0] lg:scale-[2.8]`}
                   onClick={() => setIsZoomed(!isZoomed)}
                >
-                  <div className={`absolute border border-blue-500/10 rounded-full animate-spin-slow transition-all duration-1000 ${isZoomed ? 'inset-[-80px] lg:inset-[-120px] opacity-0' : 'inset-[-40px] lg:inset-[-60px] opacity-100'}`} />
-                  <div className={`absolute border border-white/5 rounded-full animate-reverse-spin transition-all duration-1000 ${isZoomed ? 'inset-[-40px] lg:inset-[-60px] opacity-0' : 'inset-[-15px] lg:inset-[-20px] opacity-100'}`} />
+                  <div className={`absolute border border-blue-500/10 rounded-full animate-spin-slow transition-all duration-1000 inset-[-80px] lg:inset-[-120px] opacity-20`} />
+                  <div className={`absolute border border-white/5 rounded-full animate-reverse-spin transition-all duration-1000 inset-[-40px] lg:inset-[-60px] opacity-10`} />
                   <div className="absolute inset-0 bg-blue-500/5 rounded-full blur-3xl opacity-50" />
                   
                   <div className="w-[300px] h-[300px] lg:w-[450px] lg:h-[450px] relative z-20">
                     <ComposableMap 
                       projection="geoOrthographic" 
-                      projectionConfig={{ rotate: [rotation, -15, 0], scale: isZoomed ? 140 : 120 }}
+                      projectionConfig={{ rotate: [rotation, -15, 0], scale: 140 }}
                       className="w-full h-full opacity-90 drop-shadow-[0_0_20px_rgba(59,130,246,0.2)]"
                     >
                       <Geographies geography={geoUrl}>
@@ -309,7 +309,7 @@ const LandingPage = () => {
                </div>
 
                {/* Bottom Telemetry HUD */}
-               <div className={`absolute bottom-10 left-10 right-10 grid grid-cols-2 gap-8 transition-all duration-700 ${isZoomed ? 'opacity-0 translate-y-10 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
+               <div className={`absolute bottom-10 left-10 right-10 grid grid-cols-2 gap-8 transition-all duration-700 opacity-100 translate-y-0`}>
                   <div className="p-4 bg-white/5 border border-white/5 backdrop-blur-xl">
                     <div className="text-[8px] font-mono text-white/20 uppercase mb-2">Zone_Alpha_Telemetry</div>
                     <div className="h-1 bg-white/10 w-full overflow-hidden">
