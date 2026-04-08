@@ -60,7 +60,7 @@ const MiniMap = ({ isFull, isNear }) => {
             {/* Label Overlay */}
             <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm border border-white/5">
                 <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/40 uppercase">
-                    Sector_Telemetry_Sync
+                    Location Data
                 </span>
             </div>
         </div>
@@ -180,11 +180,10 @@ export default function ResourceInventory() {
                     <div className="mb-12 animate-fade-in">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="h-[1px] w-8 bg-[#00FFCC]/40" />
-                            <span className="text-[10px] font-mono tracking-[0.6em] text-[#00FFCC] uppercase">Resource_Intelligence_Annex</span>
+                            <span className="text-[10px] font-mono tracking-[0.6em] text-[#00FFCC] uppercase">Resources</span>
                         </div>
                         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                            <h1 className="font-outfit text-5xl lg:text-7xl font-black tracking-tighter uppercase leading-none">
-                             SATELLITE<br />
                              <span className="bg-gradient-to-r from-[#00FFCC] via-white to-white/40 bg-clip-text text-transparent italic">LOGISTICS_HUB</span>
                            </h1>
                            
@@ -193,7 +192,7 @@ export default function ResourceInventory() {
                                     onClick={() => setIsSpaceModalOpen(true)}
                                     className="px-10 py-5 bg-[#00FFCC] text-black font-outfit font-black uppercase tracking-widest hover:brightness-110 transition-all flex items-center gap-4 shadow-[0_0_40px_rgba(0,255,204,0.15)]"
                                 >
-                                    <Plus className="w-6 h-6" /> INITIALIZE_NEW_STOCK
+                                    <Plus className="w-6 h-6" /> Add Stock
                                 </button>
                             )}
                         </div>
@@ -202,9 +201,9 @@ export default function ResourceInventory() {
                     {/* Tab Navigation */}
                     <div className="flex gap-4 mb-12 overflow-x-auto no-scrollbar pb-2">
                         {[
-                            { id: 'supplies', label: 'NGO_SUPPLY_GRID', icon: Package },
-                            { id: 'hospitals', label: 'FACILITY_STATUS', icon: Hospital },
-                            { id: 'fleet', label: 'LOGISTICS_FLEET', icon: Truck },
+                            { id: 'supplies', label: 'SUPPLIES', icon: Package },
+                            { id: 'hospitals', label: 'HOSPITALS', icon: Hospital },
+                            { id: 'fleet', label: 'FLEET', icon: Truck },
                         ].map((tab) => {
                             const isActive = activeTab === tab.id;
                             const Icon = tab.icon;
@@ -230,7 +229,7 @@ export default function ResourceInventory() {
                                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                     <input
                                         type="text"
-                                        placeholder="SCAN_SUPPLY_IDENTIFIER..."
+                                        placeholder="Search supplies..."
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
@@ -241,10 +240,10 @@ export default function ResourceInventory() {
                                     <table className="w-full text-left border-collapse min-w-[800px]">
                                         <thead>
                                             <tr className="border-b border-white/5 font-mono text-white/20 text-[10px] tracking-[0.4em] uppercase">
-                                                <th className="px-8 py-6 font-normal">ASSET_IDENTIFIER</th>
-                                                <th className="px-8 py-6 font-normal">VOLUMETRIC_DATA</th>
-                                                <th className="px-8 py-6 font-normal">CURRENT_LOCALITY</th>
-                                                <th className="px-8 py-6 font-normal text-right">STATUS_VERIFICATION</th>
+                                                <th className="px-8 py-6 font-normal">Item</th>
+                                                <th className="px-8 py-6 font-normal">Quantity</th>
+                                                <th className="px-8 py-6 font-normal">Location</th>
+                                                <th className="px-8 py-6 font-normal text-right">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -257,7 +256,7 @@ export default function ResourceInventory() {
                                                             </div>
                                                             <div className="flex flex-col leading-tight">
                                                                 <span className="font-outfit font-black text-lg text-white uppercase tracking-tight">{item.name}</span>
-                                                                <span className="font-mono text-[9px] text-white/20 uppercase tracking-widest mt-1">ID_REF_{item.id}</span>
+                                                                <span className="font-mono text-[9px] text-white/20 uppercase tracking-widest mt-1">ID: {item.id}</span>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -278,11 +277,11 @@ export default function ResourceInventory() {
                                                     <td className="px-8 py-8 text-right">
                                                         {item.quantity > 500 ? (
                                                             <span className="inline-flex items-center gap-3 px-4 py-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 font-mono text-[9px] font-bold tracking-[0.2em] uppercase">
-                                                                <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" /> OPTIMAL_RESERVE
+                                                                <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" /> Adequate
                                                             </span>
                                                         ) : (
                                                             <span className="inline-flex items-center gap-3 px-4 py-2 bg-red-500/10 border border-red-500/20 text-red-400 font-mono text-[9px] font-bold tracking-[0.2em] uppercase">
-                                                                <AlertCircle className="w-3.5 h-3.5" /> CRITICAL_LOW
+                                                                <AlertCircle className="w-3.5 h-3.5" /> Low Stock
                                                             </span>
                                                         )}
                                                     </td>
@@ -290,7 +289,7 @@ export default function ResourceInventory() {
                                             )) : (
                                                 <tr>
                                                     <td colSpan="4" className="px-8 py-20 text-center text-white/10 font-mono text-[11px] tracking-[0.5em] uppercase">
-                                                        SCAN_ZERO_RESULTS // ATTEMPT_RE_IDENTIFICATION
+                                                        No supplies found
                                                     </td>
                                                 </tr>
                                             )}
@@ -304,7 +303,7 @@ export default function ResourceInventory() {
                                 <div className="bg-white/5 border border-white/5 backdrop-blur-3xl p-10 h-full">
                                     <div className="flex items-center gap-3 mb-10">
                                         <div className="w-2 h-2 bg-[#00FFCC] rounded-full animate-pulse shadow-[0_0_10px_#00FFCC]" />
-                                        <h3 className="font-outfit font-black text-2xl tracking-tighter text-white uppercase">LIVE_DISPATCH_TELEM</h3>
+                                        <h3 className="font-outfit font-black text-2xl tracking-tighter text-white uppercase">Live Dispatches</h3>
                                     </div>
 
                                     <div className="space-y-8">
@@ -343,7 +342,7 @@ export default function ResourceInventory() {
                                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="SCAN_MEDICAL_NODES..."
+                                    placeholder="Search hospitals..."
                                     value={hospitalSearch}
                                     onChange={(e) => setHospitalSearch(e.target.value)}
                                     className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
@@ -386,7 +385,7 @@ export default function ResourceInventory() {
 
                                             <div className="grid grid-cols-2 gap-6 mb-8 relative z-10">
                                                 <div className="bg-white/[0.03] p-6 border border-white/5">
-                                                    <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold">NODE_CAPACITY</p>
+                                                    <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold">Available Beds</p>
                                                     <div className="flex items-baseline gap-2">
                                                         <span className="font-outfit font-black text-4xl leading-none tracking-tighter" style={{ color: statusColor }}>
                                                             {hosp.bedsAvailable}
@@ -400,7 +399,7 @@ export default function ResourceInventory() {
 
                                                 <div className="bg-white/[0.03] p-6 border border-white/5">
                                                     <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold flex items-center gap-3">
-                                                        <Zap className="w-3.5 h-3.5 text-blue-400" /> CORTEX_INV
+                                                        <Zap className="w-3.5 h-3.5 text-blue-400" /> Medicine Stock
                                                     </p>
                                                     <div className="space-y-2">
                                                         <div className="flex justify-between items-center">
@@ -416,13 +415,13 @@ export default function ResourceInventory() {
                                             </div>
 
                                             <button className={`w-full py-5 font-outfit font-black text-xs uppercase tracking-[0.3em] transition-all group-hover:scale-[1.02] ${isFull ? 'bg-white/5 border border-red-500/20 text-red-500' : 'bg-[#00FFCC] text-black shadow-[0_0_30px_rgba(0,255,204,0.1)]'}`}>
-                                                {isFull ? 'SCAN_FOR_ALTERNATIVES' : 'INITIALIZE_ROUTING'}
+                                                {isFull ? 'Find Alternatives' : 'Set Routing'}
                                             </button>
                                         </div>
                                     );
                                 }) : (
                                     <div className="col-span-full py-20 text-center text-white/10 font-mono tracking-[0.5em] uppercase text-sm">
-                                        SCAN_ERROR // NODE_NOT_FOUND
+                                        No hospitals found
                                     </div>
                                 )}
                             </div>
@@ -436,7 +435,7 @@ export default function ResourceInventory() {
                                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="SCAN_LOGISTICS_VEHICLES..."
+                                    placeholder="Search fleet..."
                                     value={fleetSearch}
                                     onChange={(e) => setFleetSearch(e.target.value)}
                                     className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
@@ -471,33 +470,33 @@ export default function ResourceInventory() {
                                             <div className="space-y-6 p-8 bg-white/[0.02] border border-white/5" style={{ minHeight: 160 }}>
                                                 <div>
                                                     <p className="text-[9px] font-mono text-white/20 uppercase tracking-[0.3em] mb-3 font-bold flex items-center gap-3">
-                                                        <MapPin className="w-3.5 h-3.5 text-blue-400" /> LOCALITY_POINT
+                                                        <MapPin className="w-3.5 h-3.5 text-blue-400" /> Current Location
                                                     </p>
                                                     <p className="font-mono text-sm font-black tracking-widest text-white uppercase">{unit.location}</p>
                                                 </div>
 
                                                 <div className="pt-6 border-t border-white/[0.03] flex justify-between items-end">
                                                     <div className="flex flex-col gap-2">
-                                                       <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.2em] font-bold">TELEM_PARA</span>
+                                                       <span className="text-[8px] font-mono text-white/20 uppercase tracking-[0.2em] font-bold">Status</span>
                                                        <div className="flex items-center gap-2">
                                                           <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                                                          <span className="text-[10px] font-mono text-blue-500 uppercase font-black">{isEnRoute ? 'TRANSMITTING' : 'IDLE'}</span>
+                                                          <span className="text-[10px] font-mono text-blue-500 uppercase font-black">{isEnRoute ? 'Moving' : 'Idle'}</span>
                                                        </div>
                                                     </div>
                                                     {isEnRoute ? (
                                                        <div className="flex flex-col items-end gap-1">
-                                                          <span className="text-[9px] font-mono text-white/20 uppercase font-bold pr-1">EST_TELEM</span>
+                                                          <span className="text-[9px] font-mono text-white/20 uppercase font-bold pr-1">ETA</span>
                                                           <span className="font-outfit font-black text-3xl tracking-tighter text-blue-400 leading-none">{unit.eta}</span>
                                                        </div>
                                                     ) : (
-                                                       <span className="font-mono text-[10px] text-white/20 font-bold uppercase tracking-widest italic">{isMaint ? 'OFFLINE' : 'STANDBY'}</span>
+                                                       <span className="font-mono text-[10px] text-white/20 font-bold uppercase tracking-widest italic">{isMaint ? 'Maintenance' : 'Available'}</span>
                                                     )}
                                                 </div>
                                             </div>
 
                                             {!isMaint && !isEnRoute && (
                                                 <button className="w-full mt-8 bg-white/5 border border-white/10 hover:border-[#00FFCC] hover:text-[#00FFCC] py-5 font-outfit font-black text-xs uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-4">
-                                                    <Send className="w-4 h-4" /> AUTHORIZE_DISPATCH
+                                                    <Send className="w-4 h-4" /> Dispatch Unit
                                                 </button>
                                             )}
                                         </div>

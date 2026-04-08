@@ -192,9 +192,9 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
                             <Radio size={14} className="text-red-500 animate-pulse" />
-                            <span className="font-mono text-[10px] text-red-500 uppercase tracking-[0.5em] font-black">PRIORITY_ONE_BROADCAST</span>
+                            <span className="font-mono text-[10px] text-red-500 uppercase tracking-[0.5em] font-black">Create New Alert</span>
                         </div>
-                        <h2 className="font-outfit text-4xl font-black text-white tracking-tighter uppercase leading-none">INITIALIZE_ALERTS</h2>
+                        <h2 className="font-outfit text-4xl font-black text-white tracking-tighter uppercase leading-none">New Alert</h2>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/5 transition-all text-white/40 hover:text-white">
                         <X size={24} />
@@ -204,66 +204,66 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                 {/* Body */}
                 <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     <div className="space-y-3">
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">INCIDENT_TITLE*</label>
+                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Alert Title*</label>
                         <input 
                             required
                             type="text"
                             value={formData.title}
                             onChange={e => setFormData({...formData, title: e.target.value})}
-                            placeholder="Brief_Incident_Summary..."
+                            placeholder="Brief incident summary..."
                             className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all placeholder:text-white/5"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-8">
                         <div className="space-y-3">
-                            <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">ALERT_TYPE*</label>
+                            <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Type*</label>
                             <select 
                                 value={formData.type}
                                 onChange={e => setFormData({...formData, type: e.target.value})}
                                 className="w-full bg-[#0E1015] border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all"
                             >
-                                <option value="Fire">Fire_Protocol</option>
-                                <option value="Flood">Flood_Protocol</option>
-                                <option value="Medical">Medical_Protocol</option>
-                                <option value="Accident">Accident_Protocol</option>
-                                <option value="Terror">Security_Protocol</option>
+                                <option value="Fire">Fire</option>
+                                <option value="Flood">Flood</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Accident">Accident</option>
+                                <option value="Terror">Security</option>
                             </select>
                         </div>
                         <div className="space-y-3">
-                            <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">SEVERITY_INDEX*</label>
+                            <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Severity*</label>
                             <select 
                                 value={formData.severity}
                                 onChange={e => setFormData({...formData, severity: e.target.value})}
                                 className="w-full bg-[#0E1015] border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all"
                             >
-                                <option value="Critical" className="text-red-500">Tier_1_Critical</option>
-                                <option value="Warning" className="text-amber-500">Tier_2_Warning</option>
-                                <option value="Low" className="text-blue-500">Tier_3_Low</option>
+                                <option value="Critical" className="text-red-500">Critical</option>
+                                <option value="Warning" className="text-amber-500">Warning</option>
+                                <option value="Low" className="text-blue-500">Low</option>
                             </select>
                         </div>
                     </div>
 
                     <div className="space-y-3">
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">LOCALITY_COORDINATS*</label>
+                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Location*</label>
                         <input 
                             required
                             type="text"
                             value={formData.location}
                             onChange={e => setFormData({...formData, location: e.target.value})}
-                            placeholder="Sector_Region_ID..."
+                            placeholder="Location or area..."
                             className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all placeholder:text-white/5"
                         />
                     </div>
 
                     <div className="space-y-3">
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">SITUATION_REPORT*</label>
+                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Description*</label>
                         <textarea 
                             required
                             rows="4"
                             value={formData.description}
                             onChange={e => setFormData({...formData, description: e.target.value})}
-                            placeholder="Detailed_Intel_Report..."
+                            placeholder="Describe the incident in detail..."
                             className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all resize-none placeholder:text-white/5"
                         />
                     </div>
@@ -274,14 +274,14 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                             onClick={onClose}
                             className="px-8 py-4 font-mono text-[10px] text-white/20 hover:text-white font-black uppercase tracking-widest transition-all"
                         >
-                            ABORT_MISSION
+                            Cancel
                         </button>
                         <button 
                             type="submit"
                             disabled={isSubmitting}
                             className="px-12 py-4 bg-red-600 text-white font-mono text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(239,68,68,0.2)] disabled:opacity-50 disabled:grayscale"
                         >
-                            {isSubmitting ? 'AUTHORIZING_CHANNELS...' : 'AUTHORIZE_BROADCAST'}
+                            {isSubmitting ? 'Creating...' : 'Create Alert'}
                         </button>
                     </div>
                 </form>
@@ -331,7 +331,7 @@ function AlertsContent() {
         setAlerts([newAlert, ...alerts]);
         setSelectedAlert(newAlert);
         if (addToast) {
-            addToast('EMERGENCY_BROADCAST_AUTHORIZED_GLOBAL', 'priority');
+            addToast('Alert created successfully', 'priority');
         }
     };
 
@@ -367,32 +367,32 @@ function AlertsContent() {
                         <div className="space-y-2">
                             <div className="flex items-center gap-3">
                                 <Shield size={14} className="text-red-500" />
-                                <span className="text-[10px] font-mono font-bold tracking-[0.4em] text-red-500 uppercase">TACTICAL_ALERTS_PANEL</span>
+                                <span className="text-[10px] font-mono font-bold tracking-[0.4em] text-red-500 uppercase">Alerts Management</span>
                             </div>
                             <h1 className="font-outfit text-4xl font-black tracking-tighter uppercase text-white leading-none">
-                                EMERGENCY<span className="text-white/20">://</span>ALERTS
+                                ALERTS
                             </h1>
                         </div>
                         
                         <div className="flex flex-wrap gap-4 mt-8 md:mt-0">
                             <button className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-mono text-[9px] font-black tracking-widest uppercase">
-                                Export_Logs
+                                Export
                             </button>
                             <button 
                                 onClick={() => setIsBroadcastOpen(true)}
                                 className="px-8 py-2.5 bg-red-600 text-white hover:brightness-110 transition-all font-mono text-[9px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(239,68,68,0.2)]"
                             >
-                                Broadcast_Priority_1
+                                New Alert
                             </button>
                         </div>
                     </div>
 
                     {/* ── KPI GRID ── */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-fade-in">
-                        <StatCard label="Active_Events" value={alerts.length} icon={Bell} color="#ef4444" />
-                        <StatCard label="Critical_Threats" value={alerts.filter(a => a.severity === 'Critical').length} icon={ShieldAlert} color="#ef4444" />
-                        <StatCard label="Deployed_Assets" value="28" icon={Truck} color="#3b82f6" />
-                        <StatCard label="Resolved_Daily" value="116" icon={CheckCircle2} color="#10b981" />
+                        <StatCard label="Active Incidents" value={alerts.length} icon={Bell} color="#ef4444" />
+                        <StatCard label="Critical" value={alerts.filter(a => a.severity === 'Critical').length} icon={ShieldAlert} color="#ef4444" />
+                        <StatCard label="In Progress" value="28" icon={Truck} color="#3b82f6" />
+                        <StatCard label="Resolved" value="116" icon={CheckCircle2} color="#10b981" />
                     </div>
 
                     {/* ── OPERATIONS WORKSPACE ── */}
