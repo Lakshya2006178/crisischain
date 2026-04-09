@@ -180,20 +180,12 @@ export default function ResourceInventory() {
                     <div className="mb-12 animate-fade-in">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="h-[1px] w-8 bg-[#00FFCC]/40" />
-<<<<<<< HEAD
                             <span className="text-[10px] font-mono tracking-[0.6em] text-[#00FFCC] uppercase">Resource_Inventory_Summary</span>
                         </div>
                         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
                            <h1 className="font-outfit text-5xl lg:text-7xl font-black tracking-tighter uppercase leading-none">
                              RESOURCE<br />
                              <span className="bg-gradient-to-r from-[#00FFCC] via-white to-white/40 bg-clip-text text-transparent italic">HUB</span>
-=======
-                            <span className="text-[10px] font-mono tracking-[0.6em] text-[#00FFCC] uppercase">Resources</span>
-                        </div>
-                        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-                           <h1 className="font-outfit text-5xl lg:text-7xl font-black tracking-tighter uppercase leading-none">
-                             <span className="bg-gradient-to-r from-[#00FFCC] via-white to-white/40 bg-clip-text text-transparent italic">LOGISTICS_HUB</span>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                            </h1>
                            
                            {activeTab === 'supplies' && (
@@ -210,15 +202,9 @@ export default function ResourceInventory() {
                     {/* Tab Navigation */}
                     <div className="flex gap-4 mb-12 overflow-x-auto no-scrollbar pb-2">
                         {[
-<<<<<<< HEAD
                             { id: 'supplies', label: 'STOCK_OVERVIEW', icon: Package },
                             { id: 'hospitals', label: 'FACILITY_CAPACITY', icon: Hospital },
                             { id: 'fleet', label: 'LOGISTICS_FLEET', icon: Truck },
-=======
-                            { id: 'supplies', label: 'SUPPLIES', icon: Package },
-                            { id: 'hospitals', label: 'HOSPITALS', icon: Hospital },
-                            { id: 'fleet', label: 'FLEET', icon: Truck },
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                         ].map((tab) => {
                             const isActive = activeTab === tab.id;
                             const Icon = tab.icon;
@@ -244,11 +230,7 @@ export default function ResourceInventory() {
                                     <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                     <input
                                         type="text"
-<<<<<<< HEAD
                                         placeholder="SEARCH_INVENTORY..."
-=======
-                                        placeholder="Search supplies..."
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                                         value={searchQuery}
                                         onChange={(e) => setSearchQuery(e.target.value)}
                                         className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"

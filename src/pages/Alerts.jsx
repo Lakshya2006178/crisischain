@@ -304,22 +304,14 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                             onClick={onClose}
                             className="px-8 py-4 font-mono text-[10px] text-white/20 hover:text-white font-black uppercase tracking-widest transition-all"
                         >
-<<<<<<< HEAD
                             CANCEL
-=======
-                            Cancel
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                         </button>
                         <button 
                             type="submit"
                             disabled={isSubmitting}
                             className="px-12 py-4 bg-red-600 text-white font-mono text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(239,68,68,0.2)] disabled:opacity-50 disabled:grayscale"
                         >
-<<<<<<< HEAD
                             {isSubmitting ? 'SENDING ALERT...' : 'SEND ALERT'}
-=======
-                            {isSubmitting ? 'Creating...' : 'Create Alert'}
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                         </button>
                     </div>
                 </form>
