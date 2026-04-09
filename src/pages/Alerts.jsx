@@ -192,15 +192,9 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-3">
                             <Radio size={14} className="text-red-500 animate-pulse" />
-<<<<<<< HEAD
                             <span className="font-mono text-[10px] text-red-500 uppercase tracking-[0.5em] font-black">EMERGENCY ANNOUNCEMENT</span>
                         </div>
                         <h2 className="font-outfit text-4xl font-black text-white tracking-tighter uppercase leading-none">SEND NEW ALERT</h2>
-=======
-                            <span className="font-mono text-[10px] text-red-500 uppercase tracking-[0.5em] font-black">Create New Alert</span>
-                        </div>
-                        <h2 className="font-outfit text-4xl font-black text-white tracking-tighter uppercase leading-none">New Alert</h2>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-white/5 transition-all text-white/40 hover:text-white">
                         <X size={24} />
@@ -210,21 +204,13 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                 {/* Body */}
                 <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     <div className="space-y-3">
-<<<<<<< HEAD
                         <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">EVENT NAME*</label>
-=======
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Alert Title*</label>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                         <input 
                             required
                             type="text"
                             value={formData.title}
                             onChange={e => setFormData({...formData, title: e.target.value})}
-<<<<<<< HEAD
                             placeholder="Example: Large Street Fire..."
-=======
-                            placeholder="Brief incident summary..."
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                             className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all placeholder:text-white/5"
                         />
                     </div>
@@ -259,41 +245,25 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                     </div>
 
                     <div className="space-y-3">
-<<<<<<< HEAD
                         <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">LOCATION*</label>
-=======
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Location*</label>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                         <input 
                             required
                             type="text"
                             value={formData.location}
                             onChange={e => setFormData({...formData, location: e.target.value})}
-<<<<<<< HEAD
                             placeholder="Enter address or area..."
-=======
-                            placeholder="Location or area..."
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                             className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all placeholder:text-white/5"
                         />
                     </div>
 
                     <div className="space-y-3">
-<<<<<<< HEAD
                         <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">DETAILS*</label>
-=======
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Description*</label>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                         <textarea 
                             required
                             rows="4"
                             value={formData.description}
                             onChange={e => setFormData({...formData, description: e.target.value})}
-<<<<<<< HEAD
                             placeholder="Describe what happened..."
-=======
-                            placeholder="Describe the incident in detail..."
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                             className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all resize-none placeholder:text-white/5"
                         />
                     </div>
@@ -395,11 +365,7 @@ function AlertsContent() {
                         <div className="flex flex-col gap-4">
                             <div className="flex items-center gap-3">
                                 <Shield size={14} className="text-red-500" />
-<<<<<<< HEAD
                                 <span className="text-[10px] font-mono font-bold tracking-[0.4em] text-red-500 uppercase">LIVE EMERGENCY FEED</span>
-=======
-                                <span className="text-[10px] font-mono font-bold tracking-[0.4em] text-red-500 uppercase">Alerts Management</span>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                             </div>
                             <h1 className="font-outfit text-4xl font-black tracking-tighter uppercase text-white leading-none">
                                 ALERTS
@@ -408,38 +374,23 @@ function AlertsContent() {
                         
                         <div className="flex flex-wrap gap-4 mt-8 md:mt-0">
                             <button className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-mono text-[9px] font-black tracking-widest uppercase">
-<<<<<<< HEAD
                                 Export Logs
-=======
-                                Export
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                             </button>
                             <button 
                                 onClick={() => setIsBroadcastOpen(true)}
                                 className="px-8 py-2.5 bg-red-600 text-white hover:brightness-110 transition-all font-mono text-[9px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(239,68,68,0.2)]"
                             >
-<<<<<<< HEAD
                                 Send Emergency Alert
-=======
-                                New Alert
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                             </button>
                         </div>
                     </div>
 
                     {/* ── KPI GRID ── */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-fade-in">
-<<<<<<< HEAD
                         <StatCard label="Active Alerts" value={alerts.length} icon={Bell} color="#ef4444" />
                         <StatCard label="High Danger" value={alerts.filter(a => a.severity === 'Critical').length} icon={ShieldAlert} color="#ef4444" />
                         <StatCard label="Teams Sent" value="28" icon={Truck} color="#3b82f6" />
                         <StatCard label="Resolved Today" value="116" icon={CheckCircle2} color="#10b981" />
-=======
-                        <StatCard label="Active Incidents" value={alerts.length} icon={Bell} color="#ef4444" />
-                        <StatCard label="Critical" value={alerts.filter(a => a.severity === 'Critical').length} icon={ShieldAlert} color="#ef4444" />
-                        <StatCard label="In Progress" value="28" icon={Truck} color="#3b82f6" />
-                        <StatCard label="Resolved" value="116" icon={CheckCircle2} color="#10b981" />
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                     </div>
 
                     {/* ── OPERATIONS WORKSPACE ── */}

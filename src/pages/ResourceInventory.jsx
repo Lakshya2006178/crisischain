@@ -241,17 +241,10 @@ export default function ResourceInventory() {
                                     <table className="w-full text-left border-collapse min-w-[800px]">
                                         <thead>
                                             <tr className="border-b border-white/5 font-mono text-white/20 text-[10px] tracking-[0.4em] uppercase">
-<<<<<<< HEAD
                                                 <th className="px-8 py-6 font-normal">ITEM_NAME / ID</th>
                                                 <th className="px-8 py-6 font-normal">QUANTITY</th>
                                                 <th className="px-8 py-6 font-normal">LOCATION</th>
                                                 <th className="px-8 py-6 font-normal text-right">STATUS</th>
-=======
-                                                <th className="px-8 py-6 font-normal">Item</th>
-                                                <th className="px-8 py-6 font-normal">Quantity</th>
-                                                <th className="px-8 py-6 font-normal">Location</th>
-                                                <th className="px-8 py-6 font-normal text-right">Status</th>
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -350,11 +343,7 @@ export default function ResourceInventory() {
                                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                                 <input
                                     type="text"
-<<<<<<< HEAD
                                     placeholder="SEARCH_HOSPITALS..."
-=======
-                                    placeholder="Search hospitals..."
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                                     value={hospitalSearch}
                                     onChange={(e) => setHospitalSearch(e.target.value)}
                                     className="w-full bg-white/5 border border-white/5 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/20 transition-all text-white placeholder:text-white/10 uppercase"
@@ -411,11 +400,7 @@ export default function ResourceInventory() {
 
                                                 <div className="bg-white/[0.03] p-6 border border-white/5">
                                                     <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold flex items-center gap-3">
-<<<<<<< HEAD
                                                         <Zap className="w-3.5 h-3.5 text-blue-400" /> EMERGENCY_STOCK
-=======
-                                                        <Zap className="w-3.5 h-3.5 text-blue-400" /> Medicine Stock
->>>>>>> bcb417338944d3ed203734f0ed613ded36b4887b
                                                     </p>
                                                     <div className="space-y-2">
                                                         <div className="flex justify-between items-center">
