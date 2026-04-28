@@ -9,18 +9,8 @@ import {
   EyeOff, 
   ArrowRight, 
   AlertTriangle,
-  Zap,
-  Activity,
-  ChevronLeft,
-  Globe,
-  Terminal
+  ChevronLeft
 } from 'lucide-react';
-
-const LIVE_STATS = [
-  { label: 'ACTIVE INCIDENTS', value: '24', color: '#ef4444' },
-  { label: 'RESPONDERS ONLINE', value: '312', color: '#00F0FF' },
-  { label: 'LIVES PROTECTED', value: '10K+', color: '#10b981' },
-];
 
 export default function LoginPage() {
   const nav = useNavigate();
@@ -31,15 +21,9 @@ export default function LoginPage() {
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const handleMouseMove = (e) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   const handleSubmit = async (e) => {
@@ -49,179 +33,132 @@ export default function LoginPage() {
     if (!password) { setError('Please enter your password.'); return; }
     setLoading(true);
     try {
-      await login({ email, password });
-      setLoading(false); 
+      await login(email, password);
+      setLoading(false);
       nav('/dashboard');
     } catch (err) {
       setLoading(false);
-      setError(err.response?.data?.error || 'Authentication Failed. Integrity Check Error.');
+      setError(err.response?.data?.error || err.message || 'Authentication Failed. Please try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#08080A] text-[#E5E5E7] font-inter overflow-y-auto flex selection:bg-[#00FFCC] selection:text-black">
+    <div className="min-h-screen bg-[#0B1220] text-gray-200 font-inter flex flex-col md:flex-row">
       
-      {/* ── AMBIENT MESH BACKGROUND ── */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div 
-          className="absolute w-[800px] h-[800px] rounded-full blur-[160px] opacity-[0.1] bg-blue-500 transition-transform duration-1000 ease-out"
-          style={{ 
-            transform: `translate(${mousePos.x - 400}px, ${mousePos.y - 400}px)`,
-          }}
-        />
-        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full blur-[140px] opacity-[0.1] bg-blue-600 animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[700px] h-[700px] rounded-full blur-[180px] opacity-[0.05] bg-red-900" />
-        <div className="absolute inset-0 opacity-[0.03] contrast-150 brightness-150 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-      </div>
-
-      {/* ── LEFT PANEL: TACTICAL INFO ── */}
-      <div className="hidden lg:flex w-[40%] flex-col justify-center px-16 relative z-10 border-r border-white/5 bg-black/20 backdrop-blur-sm">
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
-        
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-4 group mb-16">
-          <div className="w-12 h-12 bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center group-hover:border-[#00FFCC]/40 transition-all duration-500">
-            <Shield className="w-6 h-6 text-[#00FFCC] group-hover:scale-110 transition-transform" />
-          </div>
-          <div className="flex flex-col gap-0 leading-none">
-            <span className="font-outfit font-black text-2xl tracking-tighter uppercase">CRISISCHAIN</span>
-            <span className="text-[10px] font-mono text-blue-400 tracking-[0.4em] opacity-60 uppercase">Responder Network v5.4</span>
-          </div>
+      {/* ── LEFT PANEL: BRANDING ── */}
+      <div className="hidden md:flex w-1/3 bg-[#111827] border-r border-[#1F2937] flex-col p-12">
+        <Link to="/" className="flex items-center gap-3 mb-auto">
+          <Shield className="w-8 h-8 text-teal-500" />
+          <span className="font-poppins font-bold text-2xl tracking-wide text-gray-100 uppercase">CrisisChain</span>
         </Link>
-
-        {/* Tactical Heading */}
-        <div className="mb-12">
-          <div className="flex items-center gap-4 mb-6 animate-fade-in">
-            <div className="h-[1px] w-8 bg-[#00FFCC]/40" />
-            <span className="text-[9px] font-mono tracking-[0.5em] text-[#00FFCC] uppercase">Auth_Session_Secure</span>
-          </div>
-          <h1 className="font-outfit text-6xl font-black leading-[0.9] tracking-tighter mb-8 uppercase">
-            COMMAND<br />
-            <span className="bg-gradient-to-r from-[#00FFCC] via-white to-white/40 bg-clip-text text-transparent italic">CENTER_ACCESS</span>
+        
+        <div className="mb-auto">
+          <h1 className="font-poppins text-4xl font-bold text-gray-100 mb-6">
+            Responder <br/> Access Portal
           </h1>
-          <p className="text-white/40 text-lg font-light leading-relaxed max-w-sm">
-            Access the centralized crisis management dashboard to coordinate real-time response efforts.
+          <p className="text-gray-400 text-lg leading-relaxed max-w-sm">
+            Sign in to coordinate emergency responses, manage resources, and access live situational data.
           </p>
         </div>
-
-        {/* Live Stats */}
-        <div className="grid grid-cols-1 gap-4 mb-12">
-          {LIVE_STATS.map(({label, value, color}) => (
-            <div key={label} className="p-6 bg-white/5 border border-white/5 backdrop-blur-xl flex flex-col items-start gap-1 group hover:border-[#00FFCC]/20 transition-all">
-              <span className="text-[10px] font-mono text-white/20 tracking-widest uppercase">{label}</span>
-              <span className="text-4xl font-outfit font-black tracking-tighter text-white group-hover:text-[#00FFCC] transition-colors">{value}</span>
-            </div>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-4 text-white/20">
-          <Activity className="w-4 h-4 text-blue-500 animate-pulse" />
-          <span className="text-[10px] font-mono tracking-widest uppercase">System_Status: Operational</span>
+        
+        <div className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+          Secure Connection Established
         </div>
       </div>
 
       {/* ── RIGHT PANEL: LOGIN FORM ── */}
-      <div className="flex-1 flex items-start lg:items-center justify-center p-6 md:p-12 relative z-10 pt-24 lg:pt-8 min-h-screen">
-        <div className="max-w-[480px] w-full animate-slide-up">
+      <div className="flex-1 flex items-center justify-center p-6 md:p-12 relative z-10">
+        <div className="max-w-[440px] w-full">
           
-          <div className="mb-12">
-            <Link to="/" className="lg:hidden flex items-center gap-2 text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest mb-8">
-              <ChevronLeft className="w-4 h-4" /> Back to Intelligence
+          <div className="mb-10">
+            <Link to="/" className="md:hidden flex items-center gap-2 text-sm text-teal-500 font-semibold mb-8">
+              <ChevronLeft className="w-4 h-4" /> Back to Home
             </Link>
-            <span className="text-[9px] font-mono text-blue-400 tracking-[0.6em] uppercase block mb-4">Login Portal</span>
-            <h2 className="font-outfit text-5xl font-black tracking-tighter uppercase leading-none mb-4">
-              WELCOME_BACK
+            <h2 className="font-poppins text-3xl font-bold text-gray-100 mb-3">
+              Sign In
             </h2>
-            <p className="text-white/40 font-light">Access your operational dashboard to manage ongoing incidents.</p>
+            <p className="text-gray-400">Welcome back. Enter your credentials to access the command center.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-4">
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Email Address</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input 
+                    type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@organization.org"
+                    className="w-full bg-[#111827] border border-[#1F2937] rounded px-12 py-3 text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all font-inter text-sm"
+                  />
                 </div>
-                <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="BUSINESS_EMAIL"
-                  className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00FFCC]/40 focus:bg-white/[0.08] transition-all font-mono text-sm tracking-widest"
-                />
               </div>
 
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
+              <div>
+                <label className="block text-sm font-semibold text-gray-300 mb-2">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-500" />
+                  </div>
+                  <input 
+                    type={showPw ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-[#111827] border border-[#1F2937] rounded px-12 py-3 text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all font-inter text-sm"
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowPw(!showPw)}
+                    className="absolute inset-y-0 right-4 flex items-center text-gray-500 hover:text-gray-300 transition-colors"
+                  >
+                    {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                 </div>
-                <input 
-                  type={showPw ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="PASSWORD"
-                  className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00FFCC]/40 focus:bg-white/[0.08] transition-all font-mono text-sm tracking-widest"
-                />
-                <button 
-                  type="button"
-                  onClick={() => setShowPw(!showPw)}
-                  className="absolute inset-y-0 right-5 flex items-center text-white/20 hover:text-white transition-colors"
-                >
-                  {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
               </div>
             </div>
 
             {error && (
-              <div className="p-4 bg-red-500/10 border border-red-500/20 flex items-center gap-4 animate-fade-in">
+              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-md flex items-center gap-3">
                 <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                <p className="text-xs font-mono text-red-400 uppercase tracking-widest">{error}</p>
+                <p className="text-sm text-red-400">{error}</p>
               </div>
             )}
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-3 cursor-pointer group">
-                <div className={`w-5 h-5 border flex items-center justify-center transition-all ${remember ? 'border-[#00FFCC] bg-[#00FFCC]/10' : 'border-white/10 bg-white/5 group-hover:border-white/20'}`}>
-                  {remember && <div className="w-2 h-2 bg-[#00FFCC]" />}
-                </div>
-                <input type="checkbox" className="hidden" checked={remember} onChange={() => setRemember(!remember)} />
-                <span className="text-[10px] font-mono text-white/40 uppercase tracking-widest">Keep me signed in</span>
+            <div className="flex items-center justify-between pt-2">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  className="rounded border-[#374151] bg-[#111827] text-teal-500 focus:ring-teal-500/50 focus:ring-offset-[#0B1220]" 
+                  checked={remember} 
+                  onChange={() => setRemember(!remember)} 
+                />
+                <span className="text-sm text-gray-400 font-medium">Remember me</span>
               </label>
-              <button type="button" className="text-[10px] font-mono text-blue-400 hover:text-[#00FFCC] transition-colors uppercase tracking-widest">
-                Forgot_Passcode?
+              <button type="button" className="text-sm font-semibold text-teal-500 hover:text-teal-400 transition-colors">
+                Forgot password?
               </button>
             </div>
 
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full group relative overflow-hidden px-10 py-6 bg-white/5 border border-[#00FFCC]/20 hover:bg-[#00FFCC] transition-all duration-700 disabled:opacity-50"
+              className="w-full mt-4 flex items-center justify-center gap-2 px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white font-poppins font-semibold rounded transition-colors disabled:opacity-50"
             >
-              <div className="relative z-10 flex items-center justify-center gap-4">
-                <span className={`text-xl font-outfit font-black uppercase tracking-widest transition-colors duration-700 ${loading ? 'text-white/40' : 'group-hover:text-black text-[#00FFCC]'}`}>
-                  {loading ? 'AUTHENTICATING...' : 'ENTER LOGIN'}
-                </span>
-                {!loading && <ArrowRight className="w-6 h-6 text-[#00FFCC] group-hover:text-black transition-colors" />}
-              </div>
-              <div className="absolute inset-0 bg-white translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-700 ease-in-out hidden" />
+              {loading ? 'Signing in...' : 'Sign In'}
+              {!loading && <ArrowRight className="w-5 h-5" />}
             </button>
           </form>
 
-          <div className="mt-12 pt-12 border-t border-white/5">
-             <div className="grid grid-cols-3 gap-6 mb-12">
-                {['GOOGLE', 'GOV_ID', 'AGENCY_PORT'].map(method => (
-                  <button key={method} className="py-4 bg-white/5 border border-white/5 hover:border-white/20 transition-all text-[8px] font-mono text-white/40 tracking-widest uppercase">
-                    {method}
-                  </button>
-                ))}
-             </div>
-
-             <p className="text-center text-[10px] font-mono text-white/30 uppercase tracking-[0.2em]">
-               New responder? <Link to="/register" className="text-[#00FFCC] hover:underline">Create Account</Link>
-             </p>
+          <div className="mt-8 text-center text-sm text-gray-500">
+            Don't have an account? <Link to="/register" className="text-teal-500 font-semibold hover:text-teal-400">Request Access</Link>
           </div>
         </div>
       </div>
-
     </div>
   );
 }

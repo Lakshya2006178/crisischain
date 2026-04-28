@@ -1,33 +1,79 @@
-import axios from 'axios';
+import { supabase } from '../lib/supabaseClient';
 
-const API = axios.create({ baseURL: 'http://localhost:5000/api' });
+export const login = async (formData) => {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: formData.email,
+    password: formData.password,
+  });
+  if (error) throw error;
+  return { data: { token: data.session.access_token, user: data.user } };
+};
 
-// Add token to requests
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
-  }
-  return req;
-});
+export const register = async (formData) => {
+  const { data, error } = await supabase.auth.signUp({
+    email: formData.email,
+    password: formData.password,
+    options: {
+      data: { name: formData.name, role: formData.role }
+    }
+  });
+  if (error) throw error;
+  return { data: { token: data.session?.access_token, user: data.user } };
+};
 
-// Auth
-export const login = (formData) => API.post('/auth/login', formData);
-export const register = (formData) => API.post('/auth/register', formData);
+export const fetchMe = async () => {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) throw error;
+  return { data: data.user };
+};
 
-// Alerts
-export const fetchAlerts = () => API.get('/alerts');
-export const createAlert = (newAlert) => API.post('/alerts', newAlert);
-export const updateAlertStatus = (id, status) => API.patch(`/alerts/${id}`, { status });
-export const fetchStats = () => API.get('/alerts/stats');
+export const fetchAlerts = async () => {
+  const { data, error } = await supabase.from('incidents').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return { data };
+};
 
-// Resources
-export const fetchResources = () => API.get('/resources');
-export const updateResource = (id, deployed) => API.patch(`/resources/${id}`, { deployed });
+export const createAlert = async (newAlert) => {
+  const { data, error } = await supabase.from('incidents').insert([{
+    type: newAlert.type,
+    location: newAlert.location,
+    severity: newAlert.severity,
+    description: newAlert.description,
+    status: 'active',
+  }]).select();
+  if (error) throw error;
+  return { data: data[0] };
+};
 
-// Analytics
-export const fetchDistribution = () => API.get('/analytics/distribution');
-export const fetchTrends = () => API.get('/analytics/incident-trends');
-export const fetchResponseTrends = () => API.get('/analytics/response-trends');
+export const updateAlertStatus = async (id, status) => {
+  const { data, error } = await supabase.from('incidents').update({ status }).eq('id', id).select();
+  if (error) throw error;
+  return { data: data[0] };
+};
 
-export default API;
+export const fetchStats = async () => {
+  const { data, error } = await supabase.from('incidents').select('status');
+  if (error) throw error;
+  const total = data.length;
+  const active = data.filter(d => d.status === 'active').length;
+  const resolved = data.filter(d => d.status === 'resolved').length;
+  return { data: { total, active, resolved, avgResponseTime: 'N/A' } };
+};
+
+export const fetchResources = async () => {
+  const { data, error } = await supabase.from('resources').select('*');
+  if (error) throw error;
+  return { data };
+};
+
+export const updateResource = async (id, deployed) => {
+  const { data, error } = await supabase.from('resources').update({ available: deployed ? 0 : 1 }).eq('id', id).select();
+  if (error) throw error;
+  return { data: data[0] };
+};
+
+export const fetchDistribution = async () => { return { data: [] }; };
+export const fetchTrends = async () => { return { data: [] }; };
+export const fetchResponseTrends = async () => { return { data: [] }; };
+
+export default { login, register, fetchMe, fetchAlerts, createAlert, updateAlertStatus, fetchStats, fetchResources, updateResource, fetchDistribution, fetchTrends, fetchResponseTrends };

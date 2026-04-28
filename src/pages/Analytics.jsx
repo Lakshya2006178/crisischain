@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDashboard } from '../context/DashboardContext';
 import Sidebar from '../components/Sidebar';
 import TopNavbar from '../components/TopNavbar';
-import { SZ } from '../DashboardMain';
+import * as apiClient from '../api/index.js';
 import {
     Activity, TrendingUp, AlertTriangle, CheckCircle2, 
     Clock, Gauge, Globe, Zap, Database, BarChart3, 
-    PieChart as PieChartIcon, ArrowUpRight, ArrowDownRight,
-    Search, Filter, Calendar
+    ArrowUpRight, ArrowDownRight, Search, Filter, Calendar
 } from 'lucide-react';
 import {
     LineChart, Line, AreaChart, Area, BarChart, Bar,
@@ -15,25 +14,7 @@ import {
     Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 
-// ── MOCK DATA ──
-
-const INCIDENT_TREND_DATA = [
-    { name: '01 Mar', incidents: 40, resolved: 24 },
-    { name: '05 Mar', incidents: 30, resolved: 13 },
-    { name: '10 Mar', incidents: 20, resolved: 98 },
-    { name: '15 Mar', incidents: 27, resolved: 39 },
-    { name: '20 Mar', incidents: 18, resolved: 48 },
-    { name: '25 Mar', incidents: 23, resolved: 38 },
-    { name: '30 Mar', incidents: 34, resolved: 43 },
-];
-
-const INCIDENT_TYPE_DATA = [
-    { name: 'Flood', value: 400, color: '#3b82f6' },
-    { name: 'Fire', value: 300, color: '#ef4444' },
-    { name: 'Earthquake', value: 300, color: '#f59e0b' },
-    { name: 'Medical', value: 200, color: '#10b981' },
-    { name: 'Storm', value: 278, color: '#a855f7' },
-];
+// ── MOCK DATA FOR CHARTS THAT AREN'T FULLY DB DRIVEN ──
 
 const REGION_DATA = [
     { name: 'Central', count: 450, density: 85 },
@@ -48,17 +29,7 @@ const RESOURCE_UTILIZATION = [
     { label: 'Logistics Fleet', value: 64, color: '#3b82f6' },
     { label: 'Aerial Recon', value: 42, color: '#a855f7' },
     { label: 'Heavy Machinery', value: 28, color: '#f59e0b' },
-    { label: 'Communication Hubs', value: 92, color: '#00FFCC' },
-];
-
-const RESPONSE_TIME_DATA = [
-    { time: '00:00', avg: 12 },
-    { time: '04:00', avg: 15 },
-    { time: '08:00', avg: 45 },
-    { time: '12:00', avg: 85 },
-    { time: '16:00', avg: 65 },
-    { time: '20:00', avg: 35 },
-    { time: '23:59', avg: 18 },
+    { label: 'Communication Hubs', value: 92, color: '#14B8A6' },
 ];
 
 const ACTIVITY_LOG = [
@@ -74,61 +45,33 @@ const ACTIVITY_LOG = [
 function KPIField({ label, value, trend, icon: Icon, color }) {
     const isPositive = trend > 0;
     return (
-        <div className="bg-[#0E1015]/95 border border-white/5 p-6 relative overflow-hidden group hover:border-white/10 transition-all duration-300">
-            {/* Ambient Background Glow */}
-            <div className={`absolute top-0 right-0 w-24 h-24 blur-[40px] opacity-[0.03] pointer-events-none group-hover:opacity-[0.06] transition-opacity`} 
-                 style={{ backgroundColor: color }} />
-            
-            <div className="flex justify-between items-start relative z-10">
-                <div className="p-3 bg-white/5 border border-white/5 text-white/40 group-hover:text-white transition-colors">
-                    <Icon size={18} />
+        <div className="bg-[#111827] border border-[#1F2937] rounded-lg p-6 flex flex-col justify-between h-32 hover:border-[#374151] transition-all duration-300">
+            <div className="flex justify-between items-start">
+                <div className="flex items-center gap-2">
+                    <Icon size={16} className="text-gray-400" />
+                    <span className="text-sm font-semibold text-gray-400">{label}</span>
                 </div>
-                <div className={`flex items-center gap-1.5 px-2 py-1 border font-mono text-[9px] font-bold ${isPositive ? 'text-emerald-500 border-emerald-500/20 bg-emerald-500/5' : 'text-red-500 border-red-500/20 bg-red-500/5'}`}>
-                    {isPositive ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
+                <div className={`flex items-center gap-1 px-2 py-0.5 rounded text-xs font-semibold ${isPositive ? 'text-emerald-500 bg-emerald-500/10' : 'text-red-500 bg-red-500/10'}`}>
+                    {isPositive ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                     {Math.abs(trend)}%
                 </div>
             </div>
-            
-            <div className="mt-8 relative z-10">
-                <span className="block text-[9px] font-mono text-white/30 uppercase tracking-[0.3em] font-black mb-2">{label}</span>
-                <span className="text-4xl font-outfit font-black text-white tracking-tighter">{value}</span>
+            <div>
+                <span className="text-3xl font-poppins font-bold text-gray-100">{value}</span>
             </div>
-            
-            {/* Visual Progress Line Bottom */}
-            <div className="absolute bottom-0 left-0 h-[2px] bg-white/[0.03] w-full">
-                <div className="h-full transition-all duration-1000" 
-                     style={{ width: '100%', backgroundColor: `${color}40` }} />
+            <div className="mt-2 h-1 w-full bg-[#1F2937] rounded-full overflow-hidden">
+                 <div className="h-full bg-teal-500 rounded-full" style={{ width: '100%', backgroundColor: color }} />
             </div>
         </div>
     );
 }
 
-function SectionHeading({ title, subtitle, icon: Icon }) {
+function AnalyticsCard({ children, label }) {
     return (
-        <div className="flex flex-col gap-2 mb-8">
-            <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/5 border border-white/5 text-[#00FFCC]">
-                    <Icon size={14} />
-                </div>
-                <span className="text-[10px] font-mono font-bold tracking-[0.4em] text-[#00FFCC] uppercase">{subtitle}</span>
-            </div>
-            <h2 className="text-2xl font-outfit font-black text-white uppercase tracking-tight">{title}</h2>
-        </div>
-    );
-}
-
-function AnalyticsCard({ children, label, status = "REALTIME", accent = "#00FFCC" }) {
-    return (
-        <div className="bg-[#0E1015]/95 border border-white/5 p-8 flex flex-col h-full group hover:border-white/10 transition-all duration-500">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-white/5">
-                <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accent, boxShadow: `0 0 10px ${accent}` }} />
-                    <span className="font-mono text-[9px] font-black text-white/40 tracking-[0.3em] uppercase">{label}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-1 h-3 bg-white/5" />
-                    <span className="font-mono text-[8px] text-white/20 uppercase tracking-widest">{status}</span>
-                </div>
+        <div className="bg-[#111827] border border-[#1F2937] rounded-lg p-6 flex flex-col h-full hover:border-[#374151] transition-all duration-300">
+            <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-semibold text-gray-200">{label}</h3>
+                <span className="px-2 py-1 bg-[#1F2937] rounded text-xs font-medium text-gray-400">Live Data</span>
             </div>
             <div className="flex-1">
                 {children}
@@ -140,25 +83,69 @@ function AnalyticsCard({ children, label, status = "REALTIME", accent = "#00FFCC
 // ── MAIN PAGE COMPONENT ──
 
 export default function Analytics() {
-    const { isSidebarOpen } = useDashboard();
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const { isSidebarOpen, stats } = useDashboard();
+    const [isLoading, setIsLoading] = useState(true);
+
+    // Real chart data from API
+    const [incidentTrendData, setIncidentTrendData] = useState([]);
+    const [incidentTypeData, setIncidentTypeData] = useState([]);
+    const [responseTimeData, setResponseTimeData] = useState([]);
 
     useEffect(() => {
-        const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        const fetchAnalytics = async () => {
+            setIsLoading(true);
+            try {
+                const [distRes, trendsRes, responseRes] = await Promise.all([
+                    apiClient.fetchDistribution(),
+                    apiClient.fetchTrends(),
+                    apiClient.fetchResponseTrends(),
+                ]);
+
+                // Distribution: [{id: 'fire', count: 5}] -> pie chart format
+                const colorMap = { fire: '#ef4444', flood: '#3b82f6', medical: '#10b981', accident: '#f59e0b' };
+                setIncidentTypeData(
+                    (distRes.data || []).map(d => ({
+                        name: d.id ? (d.id.charAt(0).toUpperCase() + d.id.slice(1)) : 'Other',
+                        value: d.count,
+                        color: colorMap[d.id] || '#a855f7',
+                    }))
+                );
+
+                // Incident trends: [{id: '10:00', count: 3}] -> line chart format
+                setIncidentTrendData(
+                    (trendsRes.data || []).map(d => ({
+                        name: d.id,
+                        incidents: d.count,
+                        resolved: 0,
+                    }))
+                );
+
+                // Response trends: [{id: '2026-04-28', avgResponse: 12.5}]
+                setResponseTimeData(
+                    (responseRes.data || []).map(d => ({
+                        time: d.id,
+                        avg: Math.round(d.avgResponse || 0),
+                    }))
+                );
+            } catch (err) {
+                console.warn('Analytics fetch error:', err.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchAnalytics();
     }, []);
 
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="bg-[#08080A] border border-white/10 p-4 backdrop-blur-xl shadow-2xl">
-                    <p className="font-mono text-[10px] font-black text-white/40 mb-3 border-b border-white/5 pb-2 uppercase tracking-widest">{label}</p>
-                    <div className="space-y-2">
+                <div className="bg-[#0B1220] border border-[#1F2937] rounded-lg p-3 shadow-xl">
+                    <p className="text-xs font-semibold text-gray-400 mb-2 border-b border-[#1F2937] pb-1">{label}</p>
+                    <div className="space-y-1.5">
                         {payload.map((p, i) => (
-                            <div key={i} className="flex items-center gap-3">
-                                <div className="w-2 h-2" style={{ backgroundColor: p.color }} />
-                                <span className="font-mono text-[10px] text-white uppercase tracking-wider">{p.name}: <span className="font-black">{p.value}</span></span>
+                            <div key={i} className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: p.color }} />
+                                <span className="text-xs text-gray-200">{p.name}: <span className="font-bold">{p.value}</span></span>
                             </div>
                         ))}
                     </div>
@@ -169,89 +156,83 @@ export default function Analytics() {
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-[#08080A] text-[#E5E5E7] font-inter">
-            
-            {/* ── AMBIENT MESH BACKGROUND (Synced with Resource Hub) ── */}
-            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <div 
-                  className="absolute w-[1000px] h-[1000px] rounded-full blur-[200px] opacity-[0.05] bg-blue-600 transition-transform duration-1000 ease-out"
-                  style={{ transform: `translate(${mousePos.x - 500}px, ${mousePos.y - 500}px)` }}
-                />
-                <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full blur-[180px] opacity-[0.03] bg-cyan-500 animate-pulse" />
-                <div className="absolute inset-0 opacity-[0.02] contrast-150 brightness-150 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-            </div>
-
+        <div className="flex h-screen w-full bg-[#0B1220] text-gray-200 font-inter">
             <Sidebar />
             <TopNavbar />
 
             <main
-                className={`flex-1 overflow-x-hidden overflow-y-auto transition-all duration-500 relative z-10 custom-scrollbar will-change-transform ${isSidebarOpen ? 'ml-sidebar-open' : 'ml-sidebar-closed'}`}
+                className={`flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300 ${isSidebarOpen ? 'ml-[280px]' : 'ml-[80px]'}`}
                 style={{
-                    marginTop: SZ.navbarH,
-                    height: `calc(100vh - ${SZ.navbarH}px)`,
+                    marginTop: 72,
+                    height: `calc(100vh - 72px)`,
                 }}
             >
-                <div className="max-w-[1920px] mx-auto fluid-p">
+                <div className="p-6 md:p-8 max-w-7xl mx-auto">
 
                     {/* ── HEADER ── */}
-                    <div className="mb-10 lg:mb-14 flex flex-col lg:flex-row lg:items-end justify-between border-b border-white/5 pb-8 lg:pb-10">
-                        <div className="space-y-3">
-                            <div className="flex items-center gap-3">
-                                <Activity size={14} className="text-[#00FFCC]" />
-                                <span className="text-[10px] font-mono font-bold tracking-[0.5em] text-[#00FFCC] uppercase">PERFORMANCE_ANALYTICS</span>
+                    <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1 text-teal-500">
+                                <Activity size={16} />
+                                <span className="text-xs font-semibold uppercase tracking-wider">Performance Analytics</span>
                             </div>
-                            <h1 className="font-outfit text-4xl lg:text-5xl font-black tracking-tighter uppercase text-white leading-none">
-                                SYSTEM<span className="text-white/20">://</span>ANALYTICS
+                            <h1 className="font-poppins text-3xl font-bold text-gray-100">
+                                DASHBOARD
                             </h1>
                         </div>
                         
-                        <div className="flex flex-wrap gap-4 mt-8 lg:mt-0">
-                            <div className="flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-white/10 font-mono text-[9px] font-black tracking-widest uppercase">
-                                <Calendar size={12} className="text-white/40" />
-                                <span>Last_30_Days</span>
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 px-4 py-2 bg-[#111827] border border-[#1F2937] rounded text-sm text-gray-400">
+                                <Calendar size={14} />
+                                <span>Last 30 Days</span>
                             </div>
-                            <button className="flex-1 lg:flex-none px-8 py-2.5 bg-[#00FFCC] text-black hover:brightness-110 transition-all font-mono text-[9px] font-black tracking-widest uppercase shadow-[0_0_30px_rgba(0,255,204,0.15)]">
-                                EXPORT_HUD_DATA
+                            <button className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded text-sm font-semibold transition-colors">
+                                Export Data
                             </button>
                         </div>
                     </div>
 
                     {/* ── TOP KPI ROW ── */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10 lg:mb-14 animate-fade-in">
-                        <KPIField label="Total_Incidents" value="2,842" trend={12.4} icon={AlertTriangle} color="#ef4444" />
-                        <KPIField label="Active_Cases" value="482" trend={-4.2} icon={TrendingUp} color="#3b82f6" />
-                        <KPIField label="Resolved_Units" value="2,360" trend={8.1} icon={CheckCircle2} color="#10b981" />
-                        <KPIField label="Avg_Response" value="14.2m" trend={-15.8} icon={Clock} color="#a855f7" />
-                        <KPIField label="Success_Rate" value="98.2%" trend={2.4} icon={Gauge} color="#00FFCC" />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                        <KPIField label="Total Incidents" value={stats.total} trend={12.4} icon={AlertTriangle} color="#ef4444" />
+                        <KPIField label="Active Cases" value={stats.active} trend={-4.2} icon={TrendingUp} color="#3b82f6" />
+                        <KPIField label="Resolved" value={stats.resolved} trend={8.1} icon={CheckCircle2} color="#10b981" />
+                        <KPIField label="Avg Response" value={`${stats.avgResponseTime ? stats.avgResponseTime.toFixed(1) : '0.0'}m`} trend={-15.8} icon={Clock} color="#a855f7" />
+                        <KPIField label="Success Rate" value={stats.total > 0 ? `${Math.round((stats.resolved / stats.total) * 100)}%` : '0%'} trend={2.4} icon={Gauge} color="#14B8A6" />
                     </div>
 
                     {/* ── MIDDLE SECTION ── */}
-                    <div className="grid grid-cols-12 gap-8 mb-10 lg:mb-14">
+                    <div className="grid grid-cols-12 gap-6 mb-6">
                         {/* Incident Trends: Line Chart */}
-                        <div className="col-span-12 lg:col-span-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                            <AnalyticsCard label="INCIDENT_TREND_ANALYSIS" accent="#3b82f6">
-                                <div className="h-[300px] md:h-[400px] w-full">
+                        <div className="col-span-12 lg:col-span-8">
+                            <AnalyticsCard label="Incident Trend Analysis">
+                                <div className="h-[300px] w-full">
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">Loading...</div>
+                                    ) : incidentTrendData.length === 0 ? (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">No data yet</div>
+                                    ) : (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart data={INCIDENT_TREND_DATA} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                        <LineChart data={incidentTrendData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
                                             <XAxis 
                                                 dataKey="name" 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'monospace' }} 
+                                                tick={{ fill: '#9CA3AF', fontSize: 11 }} 
                                                 dy={10}
                                             />
                                             <YAxis 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'monospace' }} 
+                                                tick={{ fill: '#9CA3AF', fontSize: 11 }} 
                                             />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#374151', strokeWidth: 1 }} />
                                             <Legend 
                                                 verticalAlign="top" 
                                                 align="right" 
-                                                iconType="rect"
-                                                wrapperStyle={{ paddingBottom: '20px', fontFamily: 'monospace', fontSize: '8px', textTransform: 'uppercase', letterSpacing: '0.2em' }}
+                                                iconType="circle"
+                                                wrapperStyle={{ paddingBottom: '20px', fontSize: '12px', color: '#9CA3AF' }}
                                             />
                                             <Line 
                                                 name="Incidents"
@@ -260,7 +241,7 @@ export default function Analytics() {
                                                 stroke="#ef4444" 
                                                 strokeWidth={2} 
                                                 dot={false}
-                                                activeDot={{ r: 4, stroke: '#ef4444', strokeWidth: 2, fill: '#000' }}
+                                                activeDot={{ r: 4, stroke: '#ef4444', strokeWidth: 2, fill: '#0B1220' }}
                                             />
                                             <Line 
                                                 name="Resolved"
@@ -269,47 +250,54 @@ export default function Analytics() {
                                                 stroke="#10b981" 
                                                 strokeWidth={2} 
                                                 dot={false}
-                                                activeDot={{ r: 4, stroke: '#10b981', strokeWidth: 2, fill: '#000' }}
+                                                activeDot={{ r: 4, stroke: '#10b981', strokeWidth: 2, fill: '#0B1220' }}
                                             />
                                         </LineChart>
                                     </ResponsiveContainer>
+                                    )}
                                 </div>
                             </AnalyticsCard>
                         </div>
 
                         {/* Incident Type: Pie Chart */}
-                        <div className="col-span-12 lg:col-span-4 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                            <AnalyticsCard label="INCIDENT_CATEGORY_DIST" accent="#f59e0b">
-                                <div className="h-[300px] md:h-[400px] w-full relative flex flex-col items-center">
+                        <div className="col-span-12 lg:col-span-4">
+                            <AnalyticsCard label="Incident Categories">
+                                <div className="h-[300px] w-full relative flex flex-col items-center">
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">Loading...</div>
+                                    ) : incidentTypeData.length === 0 ? (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">No data yet</div>
+                                    ) : (
                                     <ResponsiveContainer width="100%" height="100%">
                                         <PieChart>
                                             <Pie
-                                                data={INCIDENT_TYPE_DATA}
+                                                data={incidentTypeData}
                                                 cx="50%"
                                                 cy="50%"
                                                 innerRadius={60}
                                                 outerRadius={100}
-                                                paddingAngle={8}
+                                                paddingAngle={4}
                                                 dataKey="value"
                                                 stroke="none"
                                             >
-                                                {INCIDENT_TYPE_DATA.map((entry, index) => (
+                                                {incidentTypeData.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={entry.color} />
                                                 ))}
                                             </Pie>
                                             <Tooltip content={<CustomTooltip />} />
                                         </PieChart>
                                     </ResponsiveContainer>
+                                    )}
                                     {/* Central Indicator */}
                                     <div className="absolute top-[45%] md:top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                                        <span className="font-mono text-[8px] text-white/20 uppercase tracking-widest mb-1">Total</span>
-                                        <span className="font-outfit font-black text-2xl md:text-3xl text-white leading-none">1,478</span>
+                                        <span className="text-xs text-gray-500 mb-1">Total</span>
+                                        <span className="font-poppins font-bold text-2xl text-gray-100 leading-none">{incidentTypeData.reduce((s, d) => s + d.value, 0)}</span>
                                     </div>
                                     <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2">
-                                        {INCIDENT_TYPE_DATA.map((item, i) => (
+                                        {incidentTypeData.map((item, i) => (
                                             <div key={i} className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-                                                <span className="font-mono text-[8px] text-white/40 uppercase tracking-widest">{item.name}</span>
+                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                                                <span className="text-xs text-gray-400">{item.name}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -319,33 +307,33 @@ export default function Analytics() {
                     </div>
 
                     {/* ── NEXT SECTION ── */}
-                    <div className="grid grid-cols-12 gap-8 mb-10 lg:mb-14">
+                    <div className="grid grid-cols-12 gap-6 mb-6">
                         {/* Region Analysis: Bar Chart */}
-                        <div className="col-span-12 lg:col-span-7 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                            <AnalyticsCard label="REGIONAL_LOAD_OVERVIEW" accent="#a855f7">
-                                <div className="h-[300px] md:h-[350px] w-full">
+                        <div className="col-span-12 lg:col-span-7">
+                            <AnalyticsCard label="Regional Load Overview">
+                                <div className="h-[250px] w-full">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <BarChart data={REGION_DATA} margin={{ top: 20, right: 10, left: -20, bottom: 0 }} barGap={0}>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
                                             <XAxis 
                                                 dataKey="name" 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'monospace' }} 
+                                                tick={{ fill: '#9CA3AF', fontSize: 11 }} 
                                                 dy={10}
                                             />
                                             <YAxis 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'monospace' }} 
+                                                tick={{ fill: '#9CA3AF', fontSize: 11 }} 
                                             />
-                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.02)' }} />
+                                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#1F2937' }} />
                                             <Bar 
                                                 name="Callouts"
                                                 dataKey="count" 
                                                 fill="#3b82f6" 
-                                                radius={[2, 2, 0, 0]} 
-                                                barSize={30}
+                                                radius={[4, 4, 0, 0]} 
+                                                barSize={32}
                                             >
                                                 {REGION_DATA.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#3b82f6' : '#6366f1'} />
@@ -358,171 +346,121 @@ export default function Analytics() {
                         </div>
 
                         {/* Resource Utilization: Progress Bars */}
-                        <div className="col-span-12 lg:col-span-5 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-                            <AnalyticsCard label="RESOURCE_ALLOCATION" accent="#10b981">
-                                <div className="space-y-6 md:space-y-8 py-2 md:py-4">
+                        <div className="col-span-12 lg:col-span-5">
+                            <AnalyticsCard label="Resource Allocation">
+                                <div className="space-y-4 py-2">
                                     {RESOURCE_UTILIZATION.map((item, i) => (
-                                        <div key={i} className="space-y-2 md:space-y-3">
+                                        <div key={i} className="space-y-1.5">
                                             <div className="flex justify-between items-end">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-1 h-3 bg-white/10" />
-                                                    <span className="font-mono text-[9px] md:text-[10px] font-bold text-white/60 uppercase tracking-widest">{item.label}</span>
-                                                </div>
-                                                <span className="font-outfit font-black text-base md:text-lg text-white" style={{ color: item.value > 80 ? '#ef4444' : '#fff' }}>{item.value}%</span>
+                                                <span className="text-xs font-semibold text-gray-300">{item.label}</span>
+                                                <span className="text-sm font-bold" style={{ color: item.value > 80 ? '#ef4444' : '#fff' }}>{item.value}%</span>
                                             </div>
-                                            <div className="h-1.5 md:h-2 bg-white/5 border border-white/5 w-full relative overflow-hidden">
+                                            <div className="h-1.5 bg-[#1F2937] rounded-full w-full overflow-hidden">
                                                 <div 
-                                                    className="h-full transition-all duration-1000 ease-out relative"
+                                                    className="h-full rounded-full transition-all duration-1000 ease-out"
                                                     style={{ width: `${item.value}%`, backgroundColor: item.color }}
-                                                >
-                                                    <div className="absolute top-0 right-0 w-8 h-full bg-white/20 animate-pulse" />
-                                                </div>
+                                                />
                                             </div>
                                         </div>
                                     ))}
-                                    <div className="pt-4 md:pt-6 border-t border-white/5 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <Database size={10} className="text-white/20" />
-                                            <span className="font-mono text-[7px] md:text-[8px] text-white/20 uppercase tracking-[0.2em]">Overall_Utilization</span>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                            <span className="font-mono text-[8px] md:text-[9px] text-emerald-500 font-black uppercase tracking-widest italic">Stable</span>
-                                        </div>
-                                    </div>
                                 </div>
                             </AnalyticsCard>
                         </div>
                     </div>
 
                     {/* ── RESPONSE TIME SECTION ── */}
-                    <div className="grid grid-cols-12 gap-8 mb-10 lg:mb-14">
-                        <div className="col-span-12 animate-slide-up" style={{ animationDelay: '0.5s' }}>
-                            <AnalyticsCard label="RESPONSE_TIME_DIST" accent="#a855f7">
-                                <div className="h-[250px] md:h-[300px] w-full">
+                    <div className="grid grid-cols-12 gap-6 mb-6">
+                        <div className="col-span-12">
+                            <AnalyticsCard label="Response Time Distribution">
+                                <div className="h-[250px] w-full">
+                                    {isLoading ? (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">Loading...</div>
+                                    ) : responseTimeData.length === 0 ? (
+                                        <div className="flex items-center justify-center h-full text-gray-500 text-sm">No response data yet</div>
+                                    ) : (
                                     <ResponsiveContainer width="100%" height="100%">
-                                        <AreaChart data={RESPONSE_TIME_DATA} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                                        <AreaChart data={responseTimeData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
                                             <defs>
                                                 <linearGradient id="areaColor" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3} />
-                                                    <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
+                                                    <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
                                                 </linearGradient>
                                             </defs>
-                                            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" vertical={false} />
                                             <XAxis 
                                                 dataKey="time" 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'monospace' }} 
+                                                tick={{ fill: '#9CA3AF', fontSize: 11 }} 
                                                 dy={10}
                                             />
                                             <YAxis 
                                                 axisLine={false} 
                                                 tickLine={false} 
-                                                tick={{ fill: 'rgba(255,255,255,0.2)', fontSize: 8, fontFamily: 'monospace' }} 
+                                                tick={{ fill: '#9CA3AF', fontSize: 11 }} 
                                             />
                                             <Tooltip content={<CustomTooltip />} />
                                             <Area 
                                                 name="Avg Resp"
                                                 type="monotone" 
                                                 dataKey="avg" 
-                                                stroke="#a855f7" 
+                                                stroke="#8b5cf6" 
                                                 fillOpacity={1} 
                                                 fill="url(#areaColor)" 
                                                 strokeWidth={2}
                                             />
                                         </AreaChart>
-                                    </ResponsiveContainer>
+                                     </ResponsiveContainer>
+                                    )}
                                 </div>
                             </AnalyticsCard>
                         </div>
                     </div>
 
                     {/* ── BOTTOM ACTIVITY LOG ── */}
-                    <div className="col-span-12 animate-slide-up" style={{ animationDelay: '0.6s' }}>
-                        <div className="bg-[#0E1015]/95 border border-white/5 p-6 md:p-8 group hover:border-white/10 transition-all duration-500">
-                             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 md:mb-10 pb-4 border-b border-white/5 gap-4">
-                                <div className="flex flex-col gap-2">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                        <span className="font-mono text-[9px] font-black text-white/40 tracking-[0.3em] uppercase">SYSTEM_ACTIVITY_LOG</span>
-                                    </div>
-                                    <h3 className="font-outfit font-black text-xl text-white uppercase tracking-tight">RECENT_EVENT_LOG</h3>
-                                </div>
-                                <div className="flex gap-4">
-                                     <button className="flex-1 md:flex-none p-2.5 bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all flex justify-center">
-                                        <Filter size={14} />
-                                     </button>
-                                     <button className="flex-1 md:flex-none p-2.5 bg-white/5 border border-white/10 text-white/40 hover:text-white transition-all flex justify-center">
-                                        <Search size={14} />
-                                     </button>
-                                </div>
-                             </div>
-
-                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-                                 {ACTIVITY_LOG.map((log) => {
-                                     const levelColors = {
-                                         'Critical': 'text-red-500 border-red-500/20 bg-red-500/5',
-                                         'Warning': 'text-amber-500 border-amber-500/20 bg-amber-500/5',
-                                         'Success': 'text-emerald-500 border-emerald-500/20 bg-emerald-500/5',
-                                         'Info': 'text-blue-500 border-blue-500/20 bg-blue-500/5',
-                                         'System': 'text-purple-500 border-purple-500/20 bg-purple-500/5',
-                                     };
-                                     return (
-                                         <div key={log.id} className="p-5 md:p-6 bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all flex flex-col gap-4 group/item">
-                                             <div className="flex justify-between items-start">
-                                                 <span className={`px-2 py-0.5 font-mono text-[8px] font-black uppercase tracking-widest border ${levelColors[log.level]}`}>
-                                                     {log.level}
-                                                 </span>
-                                                 <span className="font-mono text-[8px] text-white/10 group-hover/item:text-white/30 transition-colors uppercase font-bold tracking-[0.2em]">{log.time}</span>
-                                             </div>
-                                             <div>
-                                                 <span className="block font-outfit font-black text-base md:text-lg text-white uppercase tracking-tight leading-none mb-1">{log.event}</span>
-                                                 <span className="font-mono text-[8px] md:text-[9px] text-white/20 uppercase tracking-widest flex items-center gap-2">
-                                                     <Globe size={10} className="text-blue-500/40" /> {log.sector}
-                                                 </span>
-                                             </div>
-                                         </div>
-                                     );
-                                 })}
-                             </div>
-                        </div>
-                    </div>
-
-                    {/* ── FOOTER METADATA ── */}
-                    <div className="mt-20 flex flex-col md:flex-row justify-between items-center gap-8 border-t border-white/5 pt-10 pb-10">
-                         <div className="flex gap-10 text-[9px] font-mono text-white/10 uppercase tracking-[0.5em] font-black">
-                            <span className="flex items-center gap-3 shadow-[0_0_10px_rgba(34,197,94,0.1)]"><div className="w-1 h-1 bg-emerald-500 rounded-full" />UPTIME: 99.998%</span>
-                            <span className="flex items-center gap-3"><Zap size={12} />CORE_STABLE</span>
+                    <div className="bg-[#111827] border border-[#1F2937] rounded-lg p-6">
+                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-4 border-b border-[#1F2937] gap-4">
+                            <h3 className="text-sm font-semibold text-gray-200">System Activity Log</h3>
+                            <div className="flex gap-2">
+                                 <button className="p-2 bg-[#1F2937] rounded text-gray-400 hover:text-gray-200 transition-colors">
+                                    <Filter size={16} />
+                                 </button>
+                                 <button className="p-2 bg-[#1F2937] rounded text-gray-400 hover:text-gray-200 transition-colors">
+                                    <Search size={16} />
+                                 </button>
+                            </div>
                          </div>
-                         <div className="text-[9px] font-mono text-white/5 uppercase tracking-[0.8em] font-black">
-                            CRISIS_ANALYTICS // TACTICAL_INTERFACE // V2.0.1_STABLE
+
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                             {ACTIVITY_LOG.map((log) => {
+                                 const levelColors = {
+                                     'Critical': 'text-red-500 bg-red-500/10',
+                                     'Warning': 'text-amber-500 bg-amber-500/10',
+                                     'Success': 'text-emerald-500 bg-emerald-500/10',
+                                     'Info': 'text-blue-500 bg-blue-500/10',
+                                     'System': 'text-purple-500 bg-purple-500/10',
+                                 };
+                                 return (
+                                     <div key={log.id} className="p-4 bg-[#0B1220] border border-[#1F2937] rounded-lg flex flex-col gap-3">
+                                         <div className="flex justify-between items-center">
+                                             <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${levelColors[log.level]}`}>
+                                                 {log.level}
+                                             </span>
+                                             <span className="text-[10px] text-gray-500 font-medium">{log.time}</span>
+                                         </div>
+                                         <div>
+                                             <span className="block font-poppins font-semibold text-sm text-gray-200 mb-1">{log.event}</span>
+                                             <span className="text-[10px] text-gray-500 flex items-center gap-1.5">
+                                                 <Globe size={12} className="text-gray-400" /> {log.sector}
+                                             </span>
+                                         </div>
+                                     </div>
+                                 );
+                             })}
                          </div>
                     </div>
                 </div>
             </main>
-
-            <style dangerouslySetInnerHTML={{ __html: `
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); }
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                
-                @keyframes fade-in {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-fade-in { animation: fade-in 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
-                
-                @keyframes slide-up {
-                    from { opacity: 0; transform: translateY(30px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-                .animate-slide-up { 
-                    opacity: 0;
-                    animation: slide-up 1s cubic-bezier(0.23, 1, 0.32, 1) forwards; 
-                }
-            `}} />
         </div>
     );
 }

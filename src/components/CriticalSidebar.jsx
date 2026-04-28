@@ -9,14 +9,14 @@ const CriticalSidebar = ({ alerts, isOpen, setIsOpen }) => {
       {/* Drawer Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[28] lg:hidden"
+          className="fixed inset-0 bg-black/40  z-[28] lg:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar Content */}
       <div className={`
-        fixed right-0 top-0 h-full w-80 bg-[#161C30]/95 backdrop-blur-xl border-l border-slate-700/50 
+        fixed right-0 top-0 h-full w-80 bg-[#161C30]/95  border-l border-slate-700/50 
         shadow-2xl z-[30] transition-transform duration-300 ease-in-out flex flex-col
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
       `}>

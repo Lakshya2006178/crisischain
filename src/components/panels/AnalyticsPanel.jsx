@@ -19,31 +19,31 @@ export default function AnalyticsPanel() {
   const openPath = `M 0 40 ${points}`;
 
   return (
-    <div className="flex flex-col h-full w-full bg-[#0A0B0E]/20 relative overflow-hidden backdrop-blur-3xl group">
+    <div className="flex flex-col h-full w-full bg-[#0A0B0E]/20 relative overflow-hidden  group">
       
       {/* Proper HUD Header */}
-      <div className="flex items-center justify-between px-8 py-5 border-b border-white/5 bg-white/[0.01]">
+      <div className="flex items-center justify-between px-8 py-5 border-b border-[#1F2937] bg-white/[0.01]">
         <div className="flex items-center gap-4">
             <div className="w-8 h-8 border border-amber-500/20 bg-amber-500/5 flex items-center justify-center">
                 <BarChart3 className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
             </div>
             <div>
-                <h4 className="font-outfit font-black text-sm tracking-tight text-white uppercase leading-none mb-1">SYSTEM ANALYTICS</h4>
+                <h4 className="font-poppins font-black text-sm tracking-tight text-white uppercase leading-none mb-1">SYSTEM ANALYTICS</h4>
                 <div className="flex items-center gap-2">
                    <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
-                   <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/20 uppercase">LIVE SYNC ACTIVE</span>
+                   <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-[#6B7280] uppercase">LIVE SYNC ACTIVE</span>
                 </div>
             </div>
         </div>
         <div className="flex gap-2">
-           {[1,2,3].map(i => <div key={i} className="w-1 h-3 bg-white/5" />)}
+           {[1,2,3].map(i => <div key={i} className="w-1 h-3 bg-[#1F2937]" />)}
         </div>
       </div>
 
       <div className="flex-1 flex flex-col gap-5 p-5 md:p-8 overflow-y-auto custom-scrollbar">
         
         {/* Tactical Bar Distribution */}
-        <div className="flex flex-col gap-5 bg-white/[0.01] border border-white/5 p-5 hover:border-white/10 transition-all duration-300 group/dist">
+        <div className="flex flex-col gap-5 bg-white/[0.01] border border-[#1F2937] p-5 hover:border-[#374151] transition-all duration-300 group/dist">
           <div className="flex items-center justify-between">
              <span className="font-mono text-[9px] font-black tracking-widest text-white/30 uppercase">REPORTS BY REGION</span>
              <Globe size={11} className="text-white/10" />
@@ -57,17 +57,17 @@ export default function AnalyticsPanel() {
                    <div className="w-full transition-all duration-700 group-hover/bar:brightness-150"
                         style={{ height:`${b.val}%`, background: 'rgba(245, 158, 11, 0.7)' }}/>
                 </div>
-                <span className="font-mono text-[7px] font-bold tracking-[0.1em] text-white/20 uppercase truncate w-full text-center">{b.label}</span>
+                <span className="font-mono text-[7px] font-bold tracking-[0.1em] text-[#6B7280] uppercase truncate w-full text-center">{b.label}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Predictive Trend Line Line Chart */}
-        <div className="flex flex-col gap-5 bg-white/[0.01] border border-white/5 p-5 hover:border-white/10 transition-all duration-300 group/trend">
+        <div className="flex flex-col gap-5 bg-white/[0.01] border border-[#1F2937] p-5 hover:border-[#374151] transition-all duration-300 group/trend">
           <div className="flex items-center justify-between">
              <span className="font-mono text-[9px] font-black tracking-widest text-white/30 uppercase">TREND OVER TIME</span>
-             <TrendingUp size={11} className="text-[#00FFCC]/20" />
+             <TrendingUp size={11} className="text-[#14B8A6]/20" />
           </div>
           
           <div className="h-32 relative flex items-end pt-6 pb-2">
@@ -97,8 +97,8 @@ export default function AnalyticsPanel() {
                 />
              </svg>
              
-             <div className="absolute top-0 right-0 p-1 bg-black/60 border border-white/10 font-mono text-[8px] font-black">
-                <span className="text-[#00FFCC]">95.4%</span>
+             <div className="absolute top-0 right-0 p-1 bg-black/60 border border-[#374151] font-mono text-[8px] font-black">
+                <span className="text-[#14B8A6]">95.4%</span>
              </div>
           </div>
           
@@ -110,14 +110,14 @@ export default function AnalyticsPanel() {
       </div>
 
       {/* Analytics Footer HUD */}
-      <div className="px-8 py-4 border-t border-white/5 bg-white/[0.01] flex items-center justify-between">
+      <div className="px-8 py-4 border-t border-[#1F2937] bg-white/[0.01] flex items-center justify-between">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-               <Gauge size={10} className="text-white/20" />
+               <Gauge size={10} className="text-[#6B7280]" />
                <span className="font-mono text-[8px] font-bold text-white/30 uppercase tracking-[0.2em]">CAPACITY UTILIZATION: 42%</span>
             </div>
             <div className="flex items-center gap-2">
-               <Target size={10} className="text-white/20" />
+               <Target size={10} className="text-[#6B7280]" />
                <span className="font-mono text-[8px] font-bold text-white/30 uppercase tracking-[0.2em]">ACCURACY: 98%</span>
             </div>
          </div>

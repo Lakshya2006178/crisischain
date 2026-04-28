@@ -15,8 +15,8 @@ export default function WorkflowPanel() {
         <div className="flex h-full w-full items-stretch divide-x divide-white/5 overflow-x-auto custom-scrollbar">
             {/* Header Label */}
             <div className="flex-shrink-0 flex flex-col justify-center px-8 bg-white/[0.02]">
-                <div className="h-1 w-8 bg-[#00FFCC] mb-4" />
-                <p className="font-mono text-[10px] text-white/40 tracking-[0.5em] uppercase vertical-text">
+                <div className="h-1 w-8 bg-[#14B8A6] mb-4" />
+                <p className="font-mono text-[10px] text-[#9CA3AF] tracking-[0.5em] uppercase vertical-text">
                     STATUS
                 </p>
             </div>
@@ -35,40 +35,40 @@ export default function WorkflowPanel() {
                                 onClick={() => { if (isActive && step.id < 4) advanceWorkflow(); }}
                                 className={`
                                     group/step relative flex flex-col justify-center gap-4 px-10 py-8 text-left transition-all duration-700 w-[280px] h-full
-                                    ${isActive ? 'bg-[#00FFCC]/[0.03] shadow-[inset_0_0_40px_rgba(0,255,204,0.02)]' : 'hover:bg-white/[0.02]'}
+                                    ${isActive ? 'bg-[#14B8A6]/[0.03] shadow-[inset_0_0_40px_rgba(0,255,204,0.02)]' : 'hover:bg-white/[0.02]'}
                                     ${isDimmed ? 'opacity-30 grayscale' : ''}
                                 `}
                             >
                                 {/* Step Indicator */}
                                 <div className="absolute top-4 left-10 flex items-center gap-2">
-                                    <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#00FFCC] animate-pulse shadow-[0_0_8px_#00FFCC]' : isCompleted ? 'bg-white/40' : 'bg-white/10'}`} />
-                                    <span className="font-mono text-[9px] text-white/20 tracking-widest uppercase">STEP 0{step.id}</span>
+                                    <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[#14B8A6] animate-pulse shadow-[0_0_8px_#00FFCC]' : isCompleted ? 'bg-white/40' : 'bg-white/10'}`} />
+                                    <span className="font-mono text-[9px] text-[#6B7280] tracking-widest uppercase">STEP 0{step.id}</span>
                                 </div>
 
                                 {/* Icon & Title */}
                                 <div className="flex items-start gap-5">
                                     <div className={`
                                         flex-shrink-0 w-12 h-12 flex items-center justify-center border transition-all duration-500
-                                        ${isActive ? 'bg-[#00FFCC]/10 border-[#00FFCC]/40 text-[#00FFCC]' : isCompleted ? 'bg-white/5 border-white/10 text-white/60' : 'bg-transparent border-white/5 text-white/20'}
+                                        ${isActive ? 'bg-[#14B8A6]/10 border-[#14B8A6]/40 text-[#14B8A6]' : isCompleted ? 'bg-[#1F2937] border-[#374151] text-[#D1D5DB]' : 'bg-transparent border-[#1F2937] text-[#6B7280]'}
                                     `}>
                                         <Icon className="w-6 h-6" />
                                     </div>
                                     <div className="flex-1 min-w-0 pt-1">
-                                        <h4 className={`font-outfit font-black text-lg tracking-tight uppercase leading-none mb-1 ${isActive ? 'text-white' : 'text-white/40'}`}>
+                                        <h4 className={`font-poppins font-black text-lg tracking-tight uppercase leading-none mb-1 ${isActive ? 'text-white' : 'text-[#9CA3AF]'}`}>
                                             {step.title}
                                         </h4>
-                                        <p className={`font-mono text-[9px] font-bold tracking-[0.2em] mb-3 ${isActive ? 'text-[#00FFCC]' : 'text-white/20'}`}>
+                                        <p className={`font-mono text-[9px] font-bold tracking-[0.2em] mb-3 ${isActive ? 'text-[#14B8A6]' : 'text-[#6B7280]'}`}>
                                             {step.sub}
                                         </p>
                                     </div>
                                 </div>
 
-                                <p className="text-[10px] leading-relaxed text-white/40 font-inter uppercase italic group-hover/step:text-white/60 transition-colors">
+                                <p className="text-[10px] leading-relaxed text-[#9CA3AF] font-inter uppercase italic group-hover/step:text-[#D1D5DB] transition-colors">
                                     {step.desc}
                                 </p>
 
                                 {isActive && (
-                                    <div className="absolute bottom-0 left-0 h-1 bg-[#00FFCC] animate-progress-glow" style={{ width: '40%' }} />
+                                    <div className="absolute bottom-0 left-0 h-1 bg-[#14B8A6] animate-progress-glow" style={{ width: '40%' }} />
                                 )}
                             </button>
 

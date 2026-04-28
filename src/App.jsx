@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardProvider } from './context/DashboardContext';
 
@@ -15,11 +15,20 @@ import Settings from './pages/Settings';
 
 function SuspenseFallback() {
   return (
-    <div className="h-screen w-screen bg-[#08080A] flex flex-col items-center justify-center gap-4">
-      <div className="w-12 h-12 border-t-2 border-[#00FFCC] rounded-full animate-spin" />
-      <span className="font-mono text-[9px] text-[#00FFCC] animate-pulse uppercase tracking-[0.4em]">SYNCING_CORTEX...</span>
+    <div className="h-screen w-screen bg-[#0B1220] flex flex-col items-center justify-center gap-4">
+      <div className="w-12 h-12 border-t-2 border-[#14B8A6] rounded-full animate-spin" />
+      <span className="font-mono text-[9px] text-[#14B8A6] animate-pulse uppercase tracking-[0.4em]">SYNCING_CORTEX...</span>
     </div>
   );
+}
+
+// ProtectedRoute: redirects to /login if no JWT token in localStorage
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('crisischain_token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
 }
 
 function App() {
@@ -28,15 +37,19 @@ function App() {
       <DashboardProvider>
         <Suspense fallback={<SuspenseFallback />}>
           <Routes>
+            {/* Public routes */}
             <Route path="/" element={<LandingPage />} />
-            <Route path="/dashboard" element={<DashboardMain />} />
-            <Route path="/resources" element={<ResourceInventory />} />
-            <Route path="/login"    element={<LoginPage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<SignUpPage />} />
-            <Route path="/report"   element={<ReportIncident />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/alerts"    element={<Alerts />} />
-            <Route path="/settings"  element={<Settings />} />
+            <Route path="/report" element={<ReportIncident />} />
+
+            {/* Protected routes — require JWT */}
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardMain /></ProtectedRoute>} />
+            <Route path="/resources" element={<ProtectedRoute><ResourceInventory /></ProtectedRoute>} />
+            <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+            <Route path="/alerts" element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Suspense>
