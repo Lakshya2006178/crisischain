@@ -20,7 +20,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-const ROLES = ['Civilian / Victim', 'First Responder', 'NGO / Aid Worker', 'Government Official', 'Media / Press'];
+const ROLES = ['Civilian / Victim', 'First Responder', 'Hospital representative'];
 const FEATURES = [
   { icon: Globe, label: 'GLOBAL COVERAGE', desc: 'Secure real-time observation across all geographical and atmospheric sectors.' },
   { icon: Zap, label: 'INSTANT RESPONSE', desc: 'AI-driven assessment protocols ensure immediate resource deployment for critical incidents.' },
@@ -43,7 +43,7 @@ const STR_LABEL = ['', 'WEAK SECURITY', 'MODERATE PROTECTION', 'STRONG SECURITY'
 export default function SignUpPage() {
   const nav = useNavigate();
   const { signup } = useDashboard();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', org: '', role: '', password: '', confirm: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', aadhar: '', org: '', role: '', password: '', confirm: '' });
   const [showPw, setShowPw] = useState(false);
   const [showCf, setShowCf] = useState(false);
   const [agreed, setAgreed] = useState(false);
@@ -66,6 +66,7 @@ export default function SignUpPage() {
     if (!form.name.trim()) e.name = 'Full name is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) e.email = 'Valid email required';
     if (!/^\+?[\d\s\-]{8,}$/.test(form.phone)) e.phone = 'Valid phone required';
+    if (!form.aadhar.trim() || !/^\d{12}$/.test(form.aadhar.trim())) e.aadhar = 'Valid 12-digit Aadhar required';
     if (!form.role) e.role = 'Please select your role';
     if (form.password.length < 8) e.password = 'Min. 8 characters required';
     if (form.password !== form.confirm) e.confirm = 'Passwords do not match';
@@ -89,6 +90,7 @@ export default function SignUpPage() {
       await signup({
         name: form.name,
         email: form.email,
+        aadhar: form.aadhar,
         password: form.password,
         role: systemRole
       });
@@ -212,25 +214,47 @@ export default function SignUpPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Organization</label>
+                <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">Indian Aadhar No.</label>
                 <div className="relative group">
-                  <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
-                  <input className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/40 transition-all text-white placeholder:text-white/10" placeholder="AGENCY NAME" value={form.org} onChange={e => set('org', e.target.value)} />
+                  <Shield className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
+                  <input className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/40 transition-all text-white placeholder:text-white/10" placeholder="12-DIGIT AADHAR" value={form.aadhar} onChange={e => set('aadhar', e.target.value)} />
                 </div>
+                {errors.aadhar && <p className="text-[9px] font-mono text-red-500 uppercase tracking-widest ml-1">{errors.aadhar}</p>}
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">System Role</label>
-              <div className="relative group">
-                <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
-                <select className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/40 transition-all text-white appearance-none cursor-pointer" value={form.role} onChange={e => set('role', e.target.value)}>
-                   <option value="" className="bg-[#08080A]">CHOOSE ROLE</option>
-                   {ROLES.map(r => <option key={r} value={r} className="bg-[#08080A] uppercase">{r}</option>)}
-                </select>
-                <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">▼</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-mono text-white/40 uppercase tracking-widest ml-1">System Role</label>
+                <div className="relative group">
+                  <Briefcase className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
+                  <select className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/40 transition-all text-white appearance-none cursor-pointer" value={form.role} onChange={e => {
+                    set('role', e.target.value);
+                    if (e.target.value !== 'First Responder' && e.target.value !== 'Hospital representative') {
+                      set('org', '');
+                    }
+                  }}>
+                     <option value="" className="bg-[#08080A]">CHOOSE ROLE</option>
+                     {ROLES.map(r => <option key={r} value={r} className="bg-[#08080A] uppercase">{r}</option>)}
+                  </select>
+                  <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">▼</div>
+                </div>
+                {errors.role && <p className="text-[9px] font-mono text-red-500 uppercase tracking-widest ml-1">{errors.role}</p>}
               </div>
-              {errors.role && <p className="text-[9px] font-mono text-red-500 uppercase tracking-widest ml-1">{errors.role}</p>}
+
+              <div className="space-y-2">
+                <label className={`text-[10px] font-mono uppercase tracking-widest ml-1 ${form.role === 'First Responder' || form.role === 'Hospital representative' ? 'text-white/40' : 'text-white/20'}`}>Organization</label>
+                <div className="relative group">
+                  <Building2 className={`absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 transition-colors ${form.role === 'First Responder' || form.role === 'Hospital representative' ? 'text-white/20 group-focus-within:text-[#00FFCC]' : 'text-white/10'}`} />
+                  <input 
+                    disabled={form.role !== 'First Responder' && form.role !== 'Hospital representative'}
+                    className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 font-mono text-sm tracking-widest focus:outline-none focus:border-[#00FFCC]/40 transition-all text-white placeholder:text-white/10 disabled:opacity-50 disabled:cursor-not-allowed" 
+                    placeholder="AGENCY NAME" 
+                    value={form.org} 
+                    onChange={e => set('org', e.target.value)} 
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

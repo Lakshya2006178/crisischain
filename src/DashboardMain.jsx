@@ -109,12 +109,11 @@ export default function DashboardMain() {
       
       <SystemGridOverlay mousePos={mousePos} />
 
-      <Sidebar />
-      <TopNavbar />
+      <TopNavbar fullWidth />
 
       {/* ── PROPER DASHBOARD GRID ── */}
       <main
-        className={`flex-1 overflow-y-auto overflow-x-hidden transition-all duration-500 relative z-10 custom-scrollbar will-change-transform ${isSidebarOpen ? 'ml-sidebar-open' : 'ml-sidebar-closed'}`}
+        className="flex-1 overflow-y-auto overflow-x-hidden transition-all duration-500 relative z-10 custom-scrollbar will-change-transform w-full"
         style={{
           marginTop: SZ.navbarH,
           height: `calc(100vh - ${SZ.navbarH}px)`,
@@ -154,11 +153,11 @@ export default function DashboardMain() {
           <div className="grid grid-cols-12 gap-6 lg:gap-14">
 
             {/* Workflow: Sticky Top Strip */}
-             <div className="col-span-12 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+             {/* <div className="col-span-12 animate-slide-up" style={{ animationDelay: '0.1s' }}>
               <PanelContainer label="RESPONSE STATUS" accent="#00FFCC">
                 <WorkflowPanel />
               </PanelContainer>
-            </div>
+            </div> */}
 
             {/* Left Column: Alerts & Comms */}
             <div className="col-span-12 lg:col-span-4 flex flex-col gap-8">

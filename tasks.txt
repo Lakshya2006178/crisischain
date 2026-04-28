@@ -1,0 +1,13 @@
+fix the pages (like authorities etc.)
+live map recognition of disasters
+authorities should be alerted with emergencies
+
+mutiple alerts= major disasters logic
+
+find the nearest shelters for disasters and hospitals for accidents
+
+add db if possible 
+
+automatically find the hospitals based on users geolocation
+
+fix the login page and try to add aadhar based authentication and give a token or hash or something easy for users to login

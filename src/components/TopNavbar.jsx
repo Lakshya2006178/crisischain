@@ -7,11 +7,11 @@ const W_CLOSED = 80;
 const W_OPEN   = 300;
 const H_NAV    = 80;
 
-export default function TopNavbar() {
+export default function TopNavbar({ fullWidth }) {
     const [time, setTime] = useState(new Date());
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isUserOpen, setIsUserOpen] = useState(false);
-    const { isSidebarOpen, toggleSidebar, addToast, alerts } = useDashboard();
+    const { isSidebarOpen, toggleSidebar, addToast, alerts, user, logout } = useDashboard();
     const navigate = useNavigate();
     const notifRef = useRef(null);
     const userRef = useRef(null);
@@ -43,6 +43,7 @@ export default function TopNavbar() {
 
     const handleLogout = () => {
         addToast('Logging out...', 'info');
+        logout(); // Actual logout that wipes cookies & localStorage
         setTimeout(() => {
             navigate('/');
         }, 800);
@@ -50,12 +51,13 @@ export default function TopNavbar() {
 
     return (
         <header
-            className={`fixed top-0 right-0 z-40 flex items-center transition-all duration-500 border-b border-white/5 px-4 md:px-10 gap-6 md:gap-12 bg-black/90 backdrop-blur-md will-change-transform ${isSidebarOpen ? 'left-sidebar-open' : 'left-sidebar-closed'}`}
+            className={`fixed top-0 right-0 z-40 flex items-center transition-all duration-500 border-b border-white/5 px-4 md:px-10 gap-6 md:gap-12 bg-black/90 backdrop-blur-md will-change-transform ${fullWidth ? 'left-0' : (isSidebarOpen ? 'left-sidebar-open' : 'left-sidebar-closed')}`}
             style={{
                 height: H_NAV,
             }}
         >
             {/* Command Trigger Toggle */}
+            {!fullWidth && (
             <button
                 onClick={toggleSidebar}
                 className="group flex flex-col gap-2 w-12 h-12 items-center justify-center bg-white/5 hover:bg-red-600 border border-white/5 hover:border-transparent transition-all duration-500"
@@ -64,6 +66,7 @@ export default function TopNavbar() {
                 <div className={`h-[1px] bg-white group-hover:bg-white transition-all duration-500 ${isSidebarOpen ? 'w-4' : 'w-7'}`} />
                 <div className={`h-[1px] bg-white group-hover:bg-white transition-all duration-500 ${isSidebarOpen ? 'w-6' : 'w-4 -translate-x-1'}`} />
             </button>
+            )}
 
             {/* Omni-Search */}
             <div className="flex-1 max-w-2xl relative group/search">
@@ -176,7 +179,7 @@ export default function TopNavbar() {
                             <User className={`w-5 h-5 transition-colors ${isUserOpen ? 'text-white font-black' : 'text-white/20 group-hover:text-red-500'}`} />
                         </div>
                          <div className="hidden sm:flex flex-col items-start leading-tight">
-                            <span className={`text-[11px] font-outfit font-black uppercase tracking-wider transition-colors ${isUserOpen ? 'text-white' : 'text-white'}`}>Alex Johnson</span>
+                            <span className={`text-[11px] font-outfit font-black uppercase tracking-wider transition-colors ${isUserOpen ? 'text-white' : 'text-white'}`}>{user?.name || 'Unknown User'}</span>
                             <div className="flex items-center gap-3 mt-1">
                                 <div className={`w-1.5 h-1.5 rounded-full shadow-[0_0_8px_#10b981] ${isUserOpen ? 'bg-white' : 'bg-emerald-500'}`} />
                                 <span className={`text-[9px] font-mono font-bold tracking-[0.3em] uppercase transition-colors ${isUserOpen ? 'text-white/60' : 'text-emerald-500'}`}>Authenticated</span>

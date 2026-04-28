@@ -65,37 +65,48 @@ export function DashboardProvider({ children }) {
         return 'Activity';
     };
 
-    const login = async (formData) => {
-        // SIMULATED LOGIN FOR NO-BACKEND MODE
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockUser = { id: 'mock-1', name: 'Commander Apex', email: formData.email, role: 'admin' };
-                localStorage.setItem('user', JSON.stringify(mockUser));
-                localStorage.setItem('token', 'mock_token_123');
-                setUser(mockUser);
-                addToast('Session Initialized: Welcome Back', 'success');
-                resolve(mockUser);
-            }, 300);
-        });
+    const login = async (formData, isAdmin = false) => {
+        try {
+            const { data } = await api.login(formData);
+            if (isAdmin && data.user.role !== 'admin') {
+                throw new Error("Admin access denied.");
+            }
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+            setUser(data.user);
+            addToast('Session Initialized: Welcome Back', 'success');
+            return data.user;
+        } catch (error) {
+            console.error(error);
+            const msg = error.response?.data?.error || error.message || 'Login failed';
+            addToast(msg, 'error');
+            throw error;
+        }
     };
 
     const signup = async (formData) => {
-        // SIMULATED SIGNUP FOR NO-BACKEND MODE
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                const mockUser = { id: 'mock-2', name: formData.name, email: formData.email, role: formData.role || 'citizen' };
-                localStorage.setItem('user', JSON.stringify(mockUser));
-                localStorage.setItem('token', 'mock_token_123');
-                setUser(mockUser);
-                addToast('Registration Successful', 'success');
-                resolve(mockUser);
-            }, 300);
-        });
+        try {
+            const { data } = await api.register(formData);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('token', data.token);
+            setUser(data.user);
+            addToast('Registration Successful', 'success');
+            return data.user;
+        } catch (error) {
+            console.error(error);
+            const msg = error.response?.data?.error || error.message || 'Signup failed';
+            addToast(msg, 'error');
+            throw error;
+        }
     };
 
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        // Also clear all cookies for the current domain
+        document.cookie.split(";").forEach((c) => { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
         setUser(null);
         addToast('Session Terminated', 'info');
     };

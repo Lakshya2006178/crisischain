@@ -11,7 +11,6 @@ const W_OPEN   = 300;
 const H_TOP    = 80;
 
 const NAV = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { id: 'alerts',    icon: AlertTriangle,   label: 'Emergency Alerts',    path: '/alerts' },
     { id: 'resources', icon: Database,         label: 'Resources', path: '/resources' },
     { id: 'analytics', icon: Activity,         label: 'Analytics',  path: '/analytics' },
@@ -21,11 +20,12 @@ const NAV = [
 export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isSidebarOpen, toggleSidebar, addToast } = useDashboard();
+    const { isSidebarOpen, toggleSidebar, addToast, user, logout } = useDashboard();
     const w = isSidebarOpen ? W_OPEN : W_CLOSED;
 
     const handleLogout = () => {
         addToast('Logging out...', 'info');
+        logout();
         setTimeout(() => {
             navigate('/');
         }, 800);
@@ -143,17 +143,17 @@ export default function Sidebar() {
                 {/* User Profile Card */}
                 <div className={`p-6 bg-white/[0.03] border border-white/5 relative group/user cursor-pointer overflow-hidden ${!isSidebarOpen && 'lg:p-0 lg:border-none lg:bg-transparent lg:flex lg:justify-center'}`}>
                    <div className="absolute inset-0 bg-gradient-to-tr from-[#00FFCC]/5 to-transparent opacity-0 group-hover/user:opacity-100 transition-opacity" />
-                   <div className="flex items-center gap-6 relative z-10 w-full">
+                    <div className="flex items-center gap-6 relative z-10 w-full">
                       <div className="w-12 h-12 bg-black border border-white/10 flex items-center justify-center font-outfit font-black text-2xl text-white group-hover/user:border-[#00FFCC]/40 transition-all">
-                         C
+                         {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
                       </div>
                       {isSidebarOpen ? (
                          <div className="flex items-center justify-between flex-1">
                             <div className="flex flex-col gap-1 leading-none">
-                                <span className="text-[13px] font-outfit font-black text-white uppercase tracking-wider">Alex Johnson</span>
+                                <span className="text-[13px] font-outfit font-black text-white uppercase tracking-wider">{user?.name || 'Unknown User'}</span>
                                 <div className="flex items-center gap-2">
                                     <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
-                                    <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Role: Admin</span>
+                                    <span className="text-[9px] font-mono text-white/20 uppercase tracking-[0.2em]">Role: {user?.role || 'Responder'}</span>
                                 </div>
                             </div>
                             <button 

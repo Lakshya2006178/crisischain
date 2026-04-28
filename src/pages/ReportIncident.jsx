@@ -42,7 +42,7 @@ const SEVERITIES = [
 export default function ReportIncident() {
   const nav = useNavigate();
   const fileRef = useRef();
-  const [form, setForm] = useState({ name: '', phone: '', location: '', disasterType: '', severity: '', description: '' });
+  const [form, setForm] = useState({ location: '', disasterType: '', severity: '', description: '' });
   const [files, setFiles] = useState([]);
   const [drag, setDrag] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -70,9 +70,26 @@ export default function ReportIncident() {
     if (!navigator.geolocation) { set('location', 'Geolocation not supported'); return; }
     setLocLoading(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const { latitude: lat, longitude: lng } = pos.coords;
-        set('location', `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        let placeName = '';
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+          const data = await res.json();
+          if (data && data.display_name) {
+            // Take the most relevant parts of the address for brevity
+            const parts = data.display_name.split(', ');
+            placeName = parts.slice(0, 3).join(', ');
+          }
+        } catch (error) {
+          console.error("Reverse geocoding failed", error);
+        }
+        
+        if (placeName) {
+          set('location', `${placeName} (${lat.toFixed(5)}, ${lng.toFixed(5)})`);
+        } else {
+          set('location', `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
+        }
         setLocLoading(false);
       },
       () => { set('location', 'Unable to retrieve location'); setLocLoading(false); }
@@ -81,8 +98,6 @@ export default function ReportIncident() {
 
   const validate = () => {
     const e = {};
-    if (!form.name.trim()) e.name = 'Reporter name is required';
-    if (!/^\+?[\d\s\-]{8,}$/.test(form.phone)) e.phone = 'Valid phone number required';
     if (!form.location.trim()) e.location = 'Location / address is required';
     if (!form.disasterType) e.disasterType = 'Please select a disaster type';
     if (!form.severity) e.severity = 'Please select severity level';
@@ -133,7 +148,7 @@ export default function ReportIncident() {
           <button onClick={() => nav('/dashboard')} className="px-10 py-5 bg-[#00FFCC] text-black font-outfit font-black uppercase tracking-widest hover:brightness-110 transition-all">
             View Updates
           </button>
-          <button onClick={() => { setSuccess(false); setForm({ name: '', phone: '', location: '', disasterType: '', severity: '', description: '' }); setFiles([]); }} className="px-10 py-5 bg-white/5 border border-white/10 text-white font-outfit font-black uppercase tracking-widest hover:bg-white/10 transition-all">
+          <button onClick={() => { setSuccess(false); setForm({ location: '', disasterType: '', severity: '', description: '' }); setFiles([]); }} className="px-10 py-5 bg-white/5 border border-white/10 text-white font-outfit font-black uppercase tracking-widest hover:bg-white/10 transition-all">
             Report Another Emergency
           </button>
         </div>
@@ -194,36 +209,10 @@ export default function ReportIncident() {
 
           <form onSubmit={handleSubmit} className="space-y-12">
             
-            {/* Section 1: Reporter */}
+            {/* Section 1: Geo-location */}
             <div className="space-y-8">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">01_CONTACTINFO</span>
-                <div className="h-[1px] flex-1 bg-white/5" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="text-[9px] font-mono text-white/40 uppercase tracking-widest ml-1">Your Name*</label>
-                  <div className="relative group">
-                    <User className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-red-500 transition-colors" />
-                    <input className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none transition-all placeholder:text-white/10" placeholder="ENTER YOUR NAME" value={form.name} onChange={e => set('name', e.target.value)} />
-                  </div>
-                  {errors.name && <p className="text-[9px] font-mono text-red-500 uppercase tracking-widest ml-1">{errors.name}</p>}
-                </div>
-                <div className="space-y-3">
-                  <label className="text-[9px] font-mono text-white/40 uppercase tracking-widest ml-1">Phone Number*</label>
-                  <div className="relative group">
-                    <Phone className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-red-500 transition-colors" />
-                    <input className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-16 py-6 font-mono text-sm tracking-widest focus:outline-none transition-all placeholder:text-white/10" placeholder="PHONE NUMBER" value={form.phone} onChange={e => set('phone', e.target.value)} />
-                  </div>
-                  {errors.phone && <p className="text-[9px] font-mono text-red-500 uppercase tracking-widest ml-1">{errors.phone}</p>}
-                </div>
-              </div>
-            </div>
-
-            {/* Section 2: Geo-location */}
-            <div className="space-y-8">
-              <div className="flex items-center gap-4">
-                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">02_INCIDENT_LOCATION</span>
+                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">01_INCIDENT_LOCATION</span>
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
               <div className="space-y-3">
@@ -240,10 +229,10 @@ export default function ReportIncident() {
               </div>
             </div>
 
-            {/* Section 3: Event Intel */}
+            {/* Section 2: Event Intel */}
             <div className="space-y-8">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">03_EVENT_DETAILS</span>
+                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">02_EVENT_DETAILS</span>
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -284,10 +273,10 @@ export default function ReportIncident() {
               </div>
             </div>
 
-            {/* Section 4: Visuals */}
+            {/* Section 3: Visuals */}
             <div className="space-y-8">
               <div className="flex items-center gap-4">
-                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">04_EVIDENCE_UPLOAD</span>
+                <span className="text-[10px] font-mono text-[#00FFCC] uppercase tracking-widest">03_EVIDENCE_UPLOAD</span>
                 <div className="h-[1px] flex-1 bg-white/5" />
               </div>
               <div className={`relative p-12 bg-white/5 border-2 border-dashed transition-all group ${drag ? 'border-red-500 bg-red-500/5' : 'border-white/5 hover:border-white/10'}`}>

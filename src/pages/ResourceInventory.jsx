@@ -34,31 +34,53 @@ function ToastContainer({ toasts }) {
 }
 
 // MiniMap visual for Hospital cards
-const MiniMap = ({ isFull, isNear }) => {
+const MiniMap = ({ isFull, isNear, name }) => {
     const colorClass = isFull ? "text-red-500 border-red-500" : isNear ? "text-yellow-500 border-yellow-500" : "text-[#00FFCC] border-[#00FFCC]";
     const bgColor = isFull ? "bg-red-500" : isNear ? "bg-yellow-500" : "bg-[#00FFCC]";
     const pulseColor = isFull ? "border-red-500" : isNear ? "border-yellow-500" : "border-[#00FFCC]";
     const strokeHex = isFull ? "#ef4444" : isNear ? "#eab308" : "#00FFCC";
 
+    const hospitalMapUrls = {
+        'KMC Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d89409.20010188918!2d74.76266016798641!3d12.864473489530893!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba35a4993ec4925%3A0xf7e8eff2463b0352!2sKMC%20Hospital%20Mangaluru!5e0!3m2!1sen!2sin!4v1775760943203!5m2!1sen!2sin',
+        'Nitte Gajria Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3883.994456940208!2d75.01262507522131!3d13.225664309256933!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbb565b412ead03%3A0x3839509d5330bc3c!2sNitte%20Gajria%20Hospital!5e0!3m2!1sen!2sin!4v1775761094453!5m2!1sen!2sin',
+        'Government Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31076.9030041291!2d74.90696630606598!3d13.18679130000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbca9bf5c9c8fb3%3A0x291d1b1d7251f9e5!2sGovernment%20hospital!5e0!3m2!1sen!2sin!4v1775761152125!5m2!1sen!2sin',
+        'Dr.T.M.A. Pai Rotary Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3884.029250511082!2d74.9757000752213!3d13.223480209305636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbb562e3379f8e5%3A0x2cb05b81270b6f4d!2sDr.T.M.A.%20Pai%20Rotary%20Hospital!5e0!3m2!1sen!2sin!4v1775761216332!5m2!1sen!2sin'
+    };
+
+    const mapSrc = name && hospitalMapUrls[name];
+
     return (
         <div className="relative w-full h-24 bg-black/40 rounded-xl overflow-hidden border border-white/5 mb-5 flex items-center justify-center">
-            {/* Map Grid/Topography Mock */}
-            <svg viewBox="0 0 100 40" className="absolute w-full h-full opacity-20" preserveAspectRatio="none">
-                <path d="M0,20 Q15,5 25,20 T50,20 T75,5 T100,20" fill="none" stroke={strokeHex} strokeWidth="0.8" />
-                <path d="M-10,30 Q10,15 25,30 T50,30 T75,15 T110,30" fill="none" stroke={strokeHex} strokeWidth="0.4" />
-                <path d="M0,10 Q25,-5 50,10 T100,10" fill="none" stroke={strokeHex} strokeWidth="0.3" strokeDasharray="2 2" />
-                <line x1="30" y1="0" x2="30" y2="40" stroke={strokeHex} strokeWidth="0.5" strokeDasharray="1 2" />
-                <line x1="70" y1="0" x2="70" y2="40" stroke={strokeHex} strokeWidth="0.5" strokeDasharray="1 2" />
-            </svg>
+            {mapSrc ? (
+                <iframe 
+                    src={mapSrc} 
+                    className="absolute inset-0 w-full h-full opacity-80 pointer-events-none"
+                    style={{ border: 0 }} 
+                    allowFullScreen="" 
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                />
+            ) : (
+                <>
+                    {/* Map Grid/Topography Mock */}
+                    <svg viewBox="0 0 100 40" className="absolute w-full h-full opacity-20" preserveAspectRatio="none">
+                        <path d="M0,20 Q15,5 25,20 T50,20 T75,5 T100,20" fill="none" stroke={strokeHex} strokeWidth="0.8" />
+                        <path d="M-10,30 Q10,15 25,30 T50,30 T75,15 T110,30" fill="none" stroke={strokeHex} strokeWidth="0.4" />
+                        <path d="M0,10 Q25,-5 50,10 T100,10" fill="none" stroke={strokeHex} strokeWidth="0.3" strokeDasharray="2 2" />
+                        <line x1="30" y1="0" x2="30" y2="40" stroke={strokeHex} strokeWidth="0.5" strokeDasharray="1 2" />
+                        <line x1="70" y1="0" x2="70" y2="40" stroke={strokeHex} strokeWidth="0.5" strokeDasharray="1 2" />
+                    </svg>
 
-            {/* Pulsating Map Pin (Red if full) */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <div className={`w-3 h-3 rounded-full ${bgColor} shadow-[0_0_8px_currentColor] ${colorClass}`} />
-                <div className={`absolute -inset-2 rounded-full border ${pulseColor} animate-ping opacity-60`} style={{ animationDuration: '1.5s' }} />
-            </div>
+                    {/* Pulsating Map Pin (Red if full) */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <div className={`w-3 h-3 rounded-full ${bgColor} shadow-[0_0_8px_currentColor] ${colorClass}`} />
+                        <div className={`absolute -inset-2 rounded-full border ${pulseColor} animate-ping opacity-60`} style={{ animationDuration: '1.5s' }} />
+                    </div>
+                </>
+            )}
 
             {/* Label Overlay */}
-            <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm border border-white/5">
+            <div className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/80 backdrop-blur-sm border border-white/5 z-10 pointer-events-none">
                 <span className="font-mono text-[8px] font-bold tracking-[0.2em] text-white/40 uppercase">
                     Location Data
                 </span>
@@ -94,10 +116,10 @@ export default function ResourceInventory() {
 
     // Hospital State
     const [hospitals] = useState([
-        { id: 1, name: 'City Central Hospital', distance: '1.2 km', bedsTotal: 200, bedsAvailable: 0, status: 'Full', medicines: { critical: 40, general: 120 } },
-        { id: 2, name: 'Northside Medical Center', distance: '3.5 km', bedsTotal: 150, bedsAvailable: 45, status: 'Available', medicines: { critical: 80, general: 300 } },
-        { id: 3, name: 'St. Jude Emergency', distance: '4.1 km', bedsTotal: 80, bedsAvailable: 5, status: 'Near Capacity', medicines: { critical: 10, general: 50 } },
-        { id: 4, name: 'Field Care Unit A', distance: '0.8 km', bedsTotal: 40, bedsAvailable: 30, status: 'Available', medicines: { critical: 20, general: 80 } },
+        { id: 1, name: 'Nitte Gajria Hospital', distance: '1.2 km', bedsTotal: 200, bedsAvailable: 0, status: 'Full', medicines: { critical: 10, general: 30 } },
+        { id: 2, name: 'Dr.T.M.A. Pai Rotary Hospital', distance: '3.5 km', bedsTotal: 150, bedsAvailable: 45, status: 'Available', medicines: { critical: 25, general: 75 } },
+        { id: 3, name: 'KMC Hospital', distance: '4.1 km', bedsTotal: 80, bedsAvailable: 5, status: 'Near Capacity', medicines: { critical: 30, general: 80 } },
+        { id: 4, name: 'Government Hospital', distance: '0.8 km', bedsTotal: 40, bedsAvailable: 30, status: 'Available', medicines: { critical: 15, general: 50 } },
     ]);
     const [hospitalSearch, setHospitalSearch] = useState('');
 
@@ -363,7 +385,7 @@ export default function ResourceInventory() {
                                             {/* Pulsing state ring */}
                                             <div className="absolute top-[-40px] right-[-40px] w-32 h-32 border border-white/[0.02] rounded-full group-hover:scale-110 transition-transform" />
 
-                                            <MiniMap isFull={isFull} isNear={isNear} />
+                                            <MiniMap isFull={isFull} isNear={isNear} name={hosp.name} />
 
                                             <div className="absolute top-8 right-8 z-10 flex flex-col items-end gap-2">
                                                 <span className="px-4 py-1.5 bg-black/60 backdrop-blur border text-[9px] font-mono font-black uppercase tracking-[0.2em]"
@@ -400,15 +422,15 @@ export default function ResourceInventory() {
 
                                                 <div className="bg-white/[0.03] p-6 border border-white/5">
                                                     <p className="text-[9px] font-mono text-white/30 uppercase tracking-[0.2em] mb-4 font-bold flex items-center gap-3">
-                                                        <Zap className="w-3.5 h-3.5 text-blue-400" /> EMERGENCY_STOCK
+                                                        <Zap className="w-3.5 h-3.5 text-blue-400" /> AVAILABLE_DOCTORS
                                                     </p>
                                                     <div className="space-y-2">
                                                         <div className="flex justify-between items-center">
-                                                            <span className="text-[9px] font-mono font-bold text-white/20 uppercase tracking-widest">CRITICAL</span>
+                                                            <span className="text-[9px] font-mono font-bold text-white/20 uppercase tracking-widest">SURGEONS</span>
                                                             <span className="font-outfit font-black text-lg text-white leading-none">{hosp.medicines.critical}</span>
                                                         </div>
                                                         <div className="flex justify-between items-center">
-                                                            <span className="text-[9px] font-mono font-bold text-white/20 uppercase tracking-widest">GENERAL</span>
+                                                            <span className="text-[9px] font-mono font-bold text-white/20 uppercase tracking-widest">GENERAL DOCTORS</span>
                                                             <span className="font-outfit font-black text-lg text-white leading-none">{hosp.medicines.general}</span>
                                                         </div>
                                                     </div>

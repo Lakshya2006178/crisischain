@@ -28,10 +28,13 @@ import {
   Marker,
   Line
 } from "react-simple-maps";
+import { useDashboard } from '../context/DashboardContext';
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const LandingPage = () => {
+  const { user } = useDashboard();
+  const userName = user?.name || null;
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -39,8 +42,8 @@ const LandingPage = () => {
   const [hoveredMarker, setHoveredMarker] = useState(null);
   const [isZoomed, setIsZoomed] = useState(true); // Default to big globe
   const [incidents, setIncidents] = useState([
-    { coords: [-74.006, 40.7128], type: 'CRITICAL', label: 'Cyclone – Coastal Zone 4', time: '2 min ago', color: '#ef4444' },
-    { coords: [139.6917, 35.6895], type: 'DISPATCHED', label: 'Fire – Industrial Sector B', time: '5 min ago', color: '#3b82f6' },
+    { coords: [-74.006, 40.7128], type: 'CRITICAL', label: 'Cyclone - Coastal Zone 4', time: '2 min ago', color: '#ef4444' },
+    { coords: [139.6917, 35.6895], type: 'DISPATCHED', label: 'Fire - Industrial Sector B', time: '5 min ago', color: '#3b82f6' },
     { coords: [31.2357, 30.0444], type: 'LIVE', label: 'Flood – River Valley', time: '1 min ago', color: '#ef4444' },
     { coords: [-43.1729, -22.9068], type: 'CRITICAL', label: 'Tectonic Alert – Sector G', time: '12 min ago', color: '#ef4444' },
     { coords: [77.2090, 28.6139], type: 'MONITORING', label: 'Heatwave – Central Hub', time: 'Just now', color: '#3b82f6' },
@@ -77,7 +80,7 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-[#08080A] text-[#E5E5E7] font-inter overflow-x-hidden selection:bg-[#00FFCC] selection:text-black">
-      
+
       {/* ── AMBIENT MESH BACKGROUND ── */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         <div 
@@ -125,10 +128,17 @@ const LandingPage = () => {
                  <div className="w-1 h-12 bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
                  REPORT EMERGENCY
                </Link>
-                <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
-                  <div className="w-12 h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-                  LOGIN
-                </Link>
+                {userName ? (
+                  <Link to={user.role === 'admin' ? "/dashboard" : "/alerts"} onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
+                    <div className="w-12 h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+                    PORTAL
+                  </Link>
+                ) : (
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
+                    <div className="w-12 h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
+                    LOGIN
+                  </Link>
+                )}
            </div>
 
            <div className="p-8 border-t border-white/5 flex flex-col gap-4">
@@ -183,7 +193,15 @@ const LandingPage = () => {
             </div>
             <div className="h-4 w-[1px] bg-white/10 mx-2" />
             <Link to="/report" className="text-red-500 hover:text-red-400 transition-colors uppercase">REPORT EMERGENCY</Link>
-            <Link to="/login" className="px-6 py-2 border border-blue-500/30 hover:bg-blue-500/10 bg-white/5 backdrop-blur-xl transition-all text-blue-400 hover:text-white uppercase tracking-widest">LOGIN</Link>
+            {userName ? (
+              <Link to={user.role === 'admin' ? "/dashboard" : "/alerts"} className="px-6 py-2 border border-blue-500/30 hover:bg-blue-500/10 bg-white/5 backdrop-blur-xl transition-all text-[#00FFCC] hover:text-white uppercase tracking-widest">
+                PORTAL
+              </Link>
+            ) : (
+              <Link to="/login" className="px-6 py-2 border border-blue-500/30 hover:bg-blue-500/10 bg-white/5 backdrop-blur-xl transition-all text-blue-400 hover:text-white uppercase tracking-widest">
+                LOGIN / REGISTER
+              </Link>
+            )}
           </div>
 
           <button 
@@ -222,14 +240,6 @@ const LandingPage = () => {
                   <div className="flex flex-col items-start text-left">
                     <span className="text-[8px] font-mono text-white/60 uppercase">CRITICAL PRIORITY</span>
                     <span className="text-xl font-outfit font-black uppercase tracking-tight">🚨 Report Emergency</span>
-                  </div>
-                </Link>
-
-                <Link to="/login" className="px-10 py-5 bg-blue-600/10 border border-blue-500/40 hover:bg-blue-600/20 transition-all duration-500 flex items-center gap-4">
-                  <Shield className="w-6 h-6 text-blue-500" />
-                  <div className="flex flex-col items-start text-left">
-                    <span className="text-[8px] font-mono text-white/60 uppercase">Responder Portal</span>
-                    <span className="text-xl font-outfit font-black uppercase tracking-tight text-blue-400">Login</span>
                   </div>
                 </Link>
             </div>
@@ -434,9 +444,15 @@ const LandingPage = () => {
           <h2 className="font-outfit text-6xl md:text-[120px] font-black leading-[0.8] mb-16 tracking-tighter uppercase grayscale opacity-30 group hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
             A SAFER<br />FUTURE<br />FOR ALL
           </h2>
-          <Link to="/register" className="inline-block px-16 py-8 bg-white/5 backdrop-blur-3xl border border-[#00FFCC]/20 text-[#00FFCC] font-outfit font-black text-2xl uppercase tracking-widest hover:bg-[#00FFCC] hover:text-black hover:border-transparent transition-all duration-700 shadow-[0_0_60px_rgba(0,255,204,0.1)]">
-            GET STARTED
-          </Link>
+          {userName ? (
+            <Link to={user.role === 'admin' ? "/dashboard" : "/alerts"} className="inline-block px-16 py-8 bg-white/5 backdrop-blur-3xl border border-[#00FFCC]/20 text-[#00FFCC] font-outfit font-black text-2xl uppercase tracking-widest hover:bg-[#00FFCC] hover:text-black hover:border-transparent transition-all duration-700 shadow-[0_0_60px_rgba(0,255,204,0.1)]">
+              ACCESS PORTAL
+            </Link>
+          ) : (
+            <Link to="/register" className="inline-block px-16 py-8 bg-white/5 backdrop-blur-3xl border border-[#00FFCC]/20 text-[#00FFCC] font-outfit font-black text-2xl uppercase tracking-widest hover:bg-[#00FFCC] hover:text-black hover:border-transparent transition-all duration-700 shadow-[0_0_60px_rgba(0,255,204,0.1)]">
+              GET STARTED
+            </Link>
+          )}
         </div>
       </section>
 
@@ -460,15 +476,13 @@ const LandingPage = () => {
               <div className="text-[9px] font-mono text-white/40 tracking-widest uppercase mb-4">Operations</div>
               <ul className="space-y-4 text-xs font-bold uppercase tracking-widest text-white/60">
                 <li><Link to="/alerts" className="hover:text-[#00FFCC] transition-colors">Alert Feed</Link></li>
-                <li><Link to="/dashboard" className="hover:text-[#00FFCC] transition-colors">Dashboard</Link></li>
-                <li><Link to="/dashboard" className="hover:text-[#00FFCC] transition-colors">Live View</Link></li>
               </ul>
             </div>
 
             <div className="space-y-6">
               <div className="text-[9px] font-mono text-white/40 tracking-widest uppercase mb-4">Command</div>
               <ul className="space-y-4 text-xs font-bold uppercase tracking-widest text-white/60">
-                <li><Link to="/login" className="hover:text-[#00FFCC] transition-colors">Login</Link></li>
+                {!userName && <li><Link to="/login" className="hover:text-[#00FFCC] transition-colors">Login</Link></li>}
                 <li className="hover:text-[#00FFCC] cursor-pointer transition-colors">Legal</li>
                 <li className="hover:text-[#00FFCC] cursor-pointer transition-colors">Partners</li>
               </ul>

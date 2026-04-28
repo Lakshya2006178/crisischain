@@ -143,7 +143,7 @@ const ConfirmationModal = ({ isOpen, title, message, onConfirm, onCancel }) => {
 // ── MAIN CONTENT ──
 
 function SettingsContent() {
-    const { isSidebarOpen, addToast } = useDashboard();
+    const { isSidebarOpen, addToast, logout } = useDashboard();
     const navigate = useNavigate();
     
     // States
@@ -166,6 +166,7 @@ function SettingsContent() {
 
     const handleLogout = () => {
         addToast('Terminating session...', 'info');
+        logout();
         setTimeout(() => {
             navigate('/');
         }, 800);

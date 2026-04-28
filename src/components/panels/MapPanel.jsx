@@ -1,13 +1,7 @@
+
 import { useDashboard } from '../../context/DashboardContext';
 import { Map as MapIcon, Crosshair, Navigation, Target, Zap, Globe } from 'lucide-react';
 
-const markers = [
-    { id: 1, top: '25%', left: '30%', type: 'critical', pulse: true },
-    { id: 2, top: '45%', left: '60%', type: 'active', pulse: false },
-    { id: 3, top: '70%', left: '25%', type: 'safe', pulse: false },
-    { id: 4, top: '60%', left: '75%', type: 'critical', pulse: true },
-    { id: 5, top: '35%', left: '80%', type: 'warning', pulse: true },
-];
 
 export default function MapPanel() {
     const { addToast } = useDashboard();
@@ -60,38 +54,15 @@ export default function MapPanel() {
                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-blue-500/20 rounded-full animate-radar-spin-reverse" />
                 </div>
 
-                {/* Topographic Lines */}
-                <svg className="absolute inset-0 w-full h-full opacity-[0.05] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0,150 Q150,250 300,150 T600,150 T900,150" fill="none" stroke="#fff" strokeWidth="2" />
-                    <circle cx="20%" cy="30%" r="50" fill="none" stroke="#fff" strokeWidth="1" />
-                    <circle cx="70%" cy="60%" r="80" fill="none" stroke="#fff" strokeWidth="1" />
-                </svg>
-
-                {/* Markers */}
-                {markers.map(marker => (
-                    <div
-                        key={marker.id}
-                        className="absolute -translate-x-1/2 -translate-y-1/2 group/marker z-10"
-                        style={{ top: marker.top, left: marker.left }}
-                    >
-                        <div className="relative flex items-center justify-center">
-                            {marker.pulse && (
-                                <div className={`absolute w-12 h-12 rounded-full animate-[ping_4s_linear_infinite] opacity-30 ${marker.type === 'critical' ? 'bg-red-500' : 'bg-blue-400'}`} />
-                            )}
-
-                            <div className={`w-3 h-3 transition-all duration-700 group-hover/marker:scale-[3] ${marker.type === 'critical' ? 'bg-red-500' : marker.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-400'}`} />
-                            
-                            {/* Marker Metadata HUD */}
-                            <div className="absolute top-8 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/80 backdrop-blur-xl border border-white/10 opacity-0 group-hover/marker:opacity-100 transition-all duration-500 whitespace-nowrap z-20 pointer-events-none">
-                                <div className="flex items-center gap-3 mb-1">
-                                    <div className={`w-1.5 h-1.5 rounded-full ${marker.type === 'critical' ? 'bg-red-500 animate-pulse' : 'bg-blue-400'}`} />
-                                    <span className="font-mono text-[9px] font-black text-white uppercase tracking-widest">{marker.type === 'critical' ? 'EVENT_ALPHA' : 'EVENT_STABLE'}</span>
-                                </div>
-                                <div className="font-mono text-[8px] text-white/40 tracking-[0.2em]">LAT_SYNC: {marker.top} | LNG_SYNC: {marker.left}</div>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                {/* Google Maps Iframe */}
+                <iframe 
+                    src="https://www.google.com/maps/d/embed?mid=1Mj9QOlcinm0HwwdzOKtpsutReTqaIXI&ehbc=2E312F" 
+                    className="absolute inset-0 w-full h-full opacity-80" 
+                    style={{ border: 0 }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    title="Live Disaster Response Map"
+                />
 
                 {/* Legend HUD */}
                 <div className="absolute bottom-10 right-10 flex flex-col gap-4 p-8 bg-black/60 backdrop-blur-2xl border border-white/5 opacity-40 hover:opacity-100 transition-opacity">
