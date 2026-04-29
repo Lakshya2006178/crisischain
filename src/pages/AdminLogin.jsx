@@ -14,7 +14,7 @@ import {
 export default function AdminLogin() {
   const nav = useNavigate();
   const { login } = useDashboard();
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [aadhar, setAadhar] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -28,10 +28,10 @@ export default function AdminLogin() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email.trim() || !aadhar.trim() || !password) { setError('Credentials required.'); return; }
+    if (!name.trim() || !aadhar.trim() || !password) { setError('Credentials required.'); return; }
     setLoading(true);
     try {
-      await login({ email, aadhar, password }, true);
+      await login({ name, aadhar, password }, true);
       setLoading(false); 
       nav('/dashboard');
     } catch (err) {
@@ -58,10 +58,10 @@ export default function AdminLogin() {
                 <Mail className="h-5 w-5 text-white/20 group-focus-within:text-red-500 transition-colors" />
               </div>
               <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="ADMIN_EMAIL"
+                type="text" 
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="ADMIN_USERNAME"
                 className="w-full bg-black/50 border border-white/10 px-14 py-5 text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all font-mono text-sm tracking-widest"
               />
             </div>

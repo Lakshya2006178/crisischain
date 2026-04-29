@@ -210,9 +210,6 @@ export default function Analytics() {
                                 <Calendar size={12} className="text-white/40" />
                                 <span>Last_30_Days</span>
                             </div>
-                            <button className="flex-1 lg:flex-none px-8 py-2.5 bg-[#00FFCC] text-black hover:brightness-110 transition-all font-mono text-[9px] font-black tracking-widest uppercase shadow-[0_0_30px_rgba(0,255,204,0.15)]">
-                                EXPORT_HUD_DATA
-                            </button>
                         </div>
                     </div>
 

@@ -61,7 +61,7 @@ function AppContent() {
         <Route path="/report"   element={<ProtectedRoute><ReportIncident /></ProtectedRoute>} />
         <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/alerts"    element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
-        <Route path="/settings"  element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+        {/* <Route path="/settings"  element={<ProtectedRoute><Settings /></ProtectedRoute>} /> */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

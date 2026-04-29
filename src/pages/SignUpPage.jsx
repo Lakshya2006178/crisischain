@@ -88,8 +88,9 @@ export default function SignUpPage() {
       if (form.role === 'Government Official') systemRole = 'admin';
 
       await signup({
-        name: form.name,
+        full_name: form.name,
         email: form.email,
+        phone_number: form.phone,
         aadhar: form.aadhar,
         password: form.password,
         role: systemRole

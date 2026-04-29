@@ -25,7 +25,7 @@ const LIVE_STATS = [
 export default function LoginPage() {
   const nav = useNavigate();
   const { login } = useDashboard();
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [aadhar, setAadhar] = useState('');
   const [password, setPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -46,12 +46,12 @@ export default function LoginPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email.trim()) { setError('Please enter your email address.'); return; }
+    if (!name.trim()) { setError('Please enter your name.'); return; }
     if (!aadhar.trim() || !/^\d{12}$/.test(aadhar.trim())) { setError('Valid 12-digit Aadhar required.'); return; }
     if (!password) { setError('Please enter your password.'); return; }
     setLoading(true);
     try {
-      await login({ email, aadhar, password });
+      await login({ name, aadhar, password });
       setLoading(false); 
       nav('/alerts');
     } catch (err) {
@@ -144,10 +144,10 @@ export default function LoginPage() {
                   <Mail className="h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
                 </div>
                 <input 
-                  type="email" 
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="BUSINESS_EMAIL"
+                  type="text" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="USERNAME"
                   className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 text-white placeholder:text-white/20 focus:outline-none focus:border-[#00FFCC]/40 focus:bg-white/[0.08] transition-all font-mono text-sm tracking-widest"
                 />
               </div>

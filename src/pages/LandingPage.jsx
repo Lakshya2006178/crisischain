@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Shield, 
   Activity, 
@@ -18,9 +18,13 @@ import {
   Layers,
   Crosshair,
   Terminal,
-  Compass
+  Compass,
+  User,
+  ChevronDown,
+  Settings,
+  LogOut
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   ComposableMap, 
   Geographies, 
@@ -33,10 +37,13 @@ import { useDashboard } from '../context/DashboardContext';
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 const LandingPage = () => {
-  const { user } = useDashboard();
+  const { user, logout } = useDashboard();
   const userName = user?.name || null;
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isUserOpen, setIsUserOpen] = useState(false);
+  const userRef = useRef(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [rotation, setRotation] = useState(0);
   const [hoveredMarker, setHoveredMarker] = useState(null);
@@ -62,6 +69,12 @@ const LandingPage = () => {
     const handleMouseMove = (e) => {
       setMousePos({ x: e.clientX, y: e.clientY });
     };
+
+    const handleClickOutside = (event) => {
+        if (userRef.current && !userRef.current.contains(event.target)) {
+            setIsUserOpen(false);
+        }
+    };
     
     // Optimized Auto-rotation loop (slower on mobile)
     const isMobile = window.innerWidth < 1024;
@@ -71,12 +84,21 @@ const LandingPage = () => {
 
     window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousedown', handleClickOutside);
       clearInterval(rotateInterval);
     };
   }, []);
+
+  const handleLogout = () => {
+      logout();
+      setTimeout(() => {
+          navigate('/');
+      }, 500);
+  };
 
   return (
     <div className="min-h-screen bg-[#08080A] text-[#E5E5E7] font-inter overflow-x-hidden selection:bg-[#00FFCC] selection:text-black">
@@ -116,14 +138,14 @@ const LandingPage = () => {
             </div>
            
             <div className="flex flex-col gap-8 flex-1 justify-center">
-               <button onClick={() => scrollToSection('intel')} className="text-3xl font-outfit font-black uppercase tracking-tighter text-white flex items-center gap-6 group">
+               <Link to="/alerts" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-white flex items-center gap-6 group">
                  <div className="w-1 h-12 bg-[#00FFCC] scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
-                 OUR MISSION
-               </button>
-               <button onClick={() => scrollToSection('nodes')} className="text-3xl font-outfit font-black uppercase tracking-tighter text-white flex items-center gap-6 group">
+                 ALERTS
+               </Link>
+               <Link to="/resources" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-white flex items-center gap-6 group">
                  <div className="w-1 h-12 bg-[#00FFCC] scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
-                 GLOBAL COVERAGE
-               </button>
+                 RESOURCE HUB
+               </Link>
                <Link to="/report" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-red-500 flex items-center gap-6 group">
                  <div className="w-1 h-12 bg-red-500 scale-y-0 group-hover:scale-y-100 transition-transform origin-top" />
                  REPORT EMERGENCY
@@ -131,7 +153,12 @@ const LandingPage = () => {
                 {userName ? (
                   <Link to={user.role === 'admin' ? "/dashboard" : "/alerts"} onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
                     <div className="w-12 h-1 bg-blue-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
-                    PORTAL
+                    <div className="flex flex-col items-start gap-1">
+                      <span className="text-sm font-mono text-white/50 tracking-widest flex items-center gap-2">
+                        <User className="w-4 h-4" /> {userName}
+                      </span>
+                      <span>PORTAL</span>
+                    </div>
                   </Link>
                 ) : (
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="text-3xl font-outfit font-black uppercase tracking-tighter text-blue-400 flex items-center gap-6 group">
@@ -168,18 +195,18 @@ const LandingPage = () => {
           </div>
 
           <div className="hidden lg:flex items-center gap-10 text-[9px] font-mono uppercase tracking-[0.4em] font-bold text-white/40">
-            <button 
-              onClick={() => scrollToSection('intel')} 
+            <Link 
+              to="/alerts" 
               className="hover:text-[#00FFCC] transition-colors cursor-pointer uppercase"
             >
-              MISSION
-            </button>
-            <button 
-              onClick={() => scrollToSection('nodes')} 
+              ALERTS
+            </Link>
+            <Link 
+              to="/resources" 
               className="hover:text-[#00FFCC] transition-colors cursor-pointer uppercase"
             >
-              COVERAGE
-            </button>
+              RESOURCE HUB
+            </Link>
             <button 
               onClick={() => scrollToSection('join')} 
               className="hover:text-[#00FFCC] transition-colors cursor-pointer uppercase"
@@ -194,9 +221,48 @@ const LandingPage = () => {
             <div className="h-4 w-[1px] bg-white/10 mx-2" />
             <Link to="/report" className="text-red-500 hover:text-red-400 transition-colors uppercase">REPORT EMERGENCY</Link>
             {userName ? (
-              <Link to={user.role === 'admin' ? "/dashboard" : "/alerts"} className="px-6 py-2 border border-blue-500/30 hover:bg-blue-500/10 bg-white/5 backdrop-blur-xl transition-all text-[#00FFCC] hover:text-white uppercase tracking-widest">
-                PORTAL
-              </Link>
+              <div className="relative z-[100]" ref={userRef}>
+                <button 
+                    onClick={() => setIsUserOpen(!isUserOpen)}
+                    className={`flex items-center gap-4 lg:gap-6 border transition-all duration-700 px-4 py-2 lg:px-6 lg:py-3 group relative overflow-hidden backdrop-blur-xl ${isUserOpen ? 'bg-red-600/90 border-transparent' : 'bg-white/[0.03] border-white/5 hover:border-white/20'}`}
+                >
+                    {!isUserOpen && <div className="absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />}
+                    <div className={`w-8 h-8 lg:w-10 lg:h-10 bg-black border flex items-center justify-center transition-all duration-500 ${isUserOpen ? 'border-white/40' : 'border-white/10 group-hover:border-blue-500/40'}`}>
+                        <User className={`w-4 h-4 lg:w-5 lg:h-5 transition-colors ${isUserOpen ? 'text-white font-black' : 'text-white/20 group-hover:text-blue-500'}`} />
+                    </div>
+                     <div className="hidden sm:flex flex-col items-start leading-tight">
+                        <span className={`text-[10px] lg:text-[11px] font-outfit font-black uppercase tracking-wider transition-colors truncate max-w-[120px] ${isUserOpen ? 'text-white' : 'text-[#E5E5E7]'}`}>{userName}</span>
+                        <div className="flex items-center gap-2 lg:gap-3 mt-1">
+                            <div className={`w-1.5 h-1.5 rounded-full shadow-[0_0_8px_#10b981] ${isUserOpen ? 'bg-white' : 'bg-emerald-500'}`} />
+                            <span className={`text-[8px] lg:text-[9px] font-mono font-bold tracking-[0.3em] uppercase transition-colors ${isUserOpen ? 'text-white/60' : 'text-emerald-500'}`}>Authenticated</span>
+                        </div>
+                    </div>
+                    <ChevronDown size={14} className={`transition-transform duration-500 ${isUserOpen ? 'rotate-180 text-white' : 'text-white/50 group-hover:text-white'}`} />
+                </button>
+
+                {/* USER DROPDOWN */}
+                {isUserOpen && (
+                    <div className="absolute right-0 top-full mt-2 w-[240px] lg:w-full min-w-[200px] bg-[#0E1015]/95 backdrop-blur-2xl border border-white/10 shadow-[0_30px_70px_rgba(0,0,0,0.8)] z-[200] animate-fade-in overflow-hidden">
+                         <Link to={user.role === 'admin' ? "/dashboard" : "/alerts"} className="flex flex-col items-center justify-center gap-2 p-6 border-b border-white/5 group/portal hover:bg-blue-500/10 transition-all cursor-pointer">
+                            <Compass size={24} className="text-blue-500 group-hover/portal:scale-110 transition-transform" />
+                            <span className="font-outfit text-[12px] font-black text-blue-400 group-hover/portal:text-blue-300 uppercase tracking-widest mt-2">Enter Portal</span>
+                         </Link>
+                         <Link to="/settings" className="flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors border-b border-white/5 group/link">
+                            <Settings size={14} className="text-white/20 group-hover/link:text-white transition-colors" />
+                            <span className="font-mono text-[9px] font-black text-white/40 group-hover/link:text-white uppercase tracking-widest">Settings</span>
+                         </Link>
+                         <button 
+                            onClick={handleLogout}
+                            className="w-full flex items-center justify-between px-6 py-4 hover:bg-red-600/10 transition-colors group/logout"
+                         >
+                            <div className="flex items-center gap-4">
+                              <LogOut size={14} className="text-red-500" />
+                              <span className="font-mono text-[9px] font-black text-red-500 uppercase tracking-widest">Logout</span>
+                            </div>
+                         </button>
+                    </div>
+                )}
+              </div>
             ) : (
               <Link to="/login" className="px-6 py-2 border border-blue-500/30 hover:bg-blue-500/10 bg-white/5 backdrop-blur-xl transition-all text-blue-400 hover:text-white uppercase tracking-widest">
                 LOGIN / REGISTER

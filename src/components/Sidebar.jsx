@@ -2,7 +2,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useDashboard } from '../context/DashboardContext';
 import {
     LayoutDashboard, AlertTriangle, Activity,
-    Database, Settings, Shield,
+    Database, Settings, Shield, PlusSquare,
     Terminal, Lock, Radio, ChevronRight, Zap, LogOut
 } from 'lucide-react';
 
@@ -12,7 +12,7 @@ const H_TOP    = 80;
 
 const NAV = [
     { id: 'alerts',    icon: AlertTriangle,   label: 'Emergency Alerts',    path: '/alerts' },
-    { id: 'resources', icon: Database,         label: 'Resources', path: '/resources' },
+    { id: 'resources', icon: PlusSquare,         label: 'Resource Hub', path: '/resources' },
     { id: 'analytics', icon: Activity,         label: 'Analytics',  path: '/analytics' },
     { id: 'settings',  icon: Settings,         label: 'Settings',     path: '/settings' },
 ];
