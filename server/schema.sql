@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
     email         VARCHAR(255) NOT NULL,
     phone_number  VARCHAR(15)  NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role          ENUM('citizen','responder','admin') NOT NULL DEFAULT 'citizen',
+    role          ENUM('citizen','responder','hospital','admin') NOT NULL DEFAULT 'citizen',
     is_verified   TINYINT(1)   NOT NULL DEFAULT 0,
     verified_at   TIMESTAMP    NULL,
     is_active     TINYINT(1)   NOT NULL DEFAULT 1,

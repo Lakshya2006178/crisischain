@@ -7,6 +7,15 @@ import pool from '../db.js';
 const hashAadhar = (raw) =>
   crypto.createHash('sha256').update(raw.trim()).digest('hex');
 
+// Map login-form display names → DB ENUM values
+const ROLE_MAP = {
+  'Civilian / Victim':        'citizen',
+  'First Responder':          'responder',
+  'Hospital representative':  'hospital',
+  'admin':                    'admin',
+};
+const mapRole = (role) => ROLE_MAP[role] || 'citizen';
+
 // ─── REGISTER ────────────────────────────────────────────────
 export const register = async (req, res) => {
   const conn = await pool.getConnection();
@@ -32,7 +41,7 @@ export const register = async (req, res) => {
     }
 
     const password_hash = await bcrypt.hash(password, 10);
-    const userRole = role || 'citizen';
+    const userRole = mapRole(role);
 
     await conn.execute(
       `INSERT INTO users (aadhar_id, full_name, email, phone_number, password_hash, role)
@@ -62,10 +71,10 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   const conn = await pool.getConnection();
   try {
-    const { name, aadhar, password } = req.body;
+    const { name, aadhar, password, role } = req.body;
 
-    if (!name || !aadhar || !password) {
-      return res.status(400).json({ error: 'Name, Aadhar and password are required.' });
+    if (!name || !aadhar || !password || !role) {
+      return res.status(400).json({ error: 'Name, Aadhar, role and password are required.' });
     }
     if (!/^\d{12}$/.test(aadhar.trim())) {
       return res.status(400).json({ error: 'Aadhar must be exactly 12 digits.' });
@@ -83,6 +92,13 @@ export const login = async (req, res) => {
     }
 
     const user = rows[0];
+
+    // Verify submitted role matches the account's stored role
+    const submittedRole = mapRole(role);
+    if (user.role !== submittedRole) {
+      return res.status(403).json({ error: `This account is not registered as "${role}". Please select the correct role.` });
+    }
+
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
       return res.status(401).json({ error: 'Invalid credentials.' });
