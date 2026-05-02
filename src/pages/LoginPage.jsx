@@ -13,8 +13,12 @@ import {
   Activity,
   ChevronLeft,
   Globe,
-  Terminal
+  Terminal,
+  Briefcase
 } from 'lucide-react';
+
+const ROLES = ['Civilian / Victim', 'First Responder', 'Hospital representative'];
+
 
 const LIVE_STATS = [
   { label: 'ACTIVE INCIDENTS', value: '24', color: '#ef4444' },
@@ -28,6 +32,7 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [aadhar, setAadhar] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [showPw, setShowPw] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -48,10 +53,11 @@ export default function LoginPage() {
     setError('');
     if (!name.trim()) { setError('Please enter your name.'); return; }
     if (!aadhar.trim() || !/^\d{12}$/.test(aadhar.trim())) { setError('Valid 12-digit Aadhar required.'); return; }
+    if (!role) { setError('Please select your role.'); return; }
     if (!password) { setError('Please enter your password.'); return; }
     setLoading(true);
     try {
-      await login({ name, aadhar, password });
+      await login({ name, aadhar, password, role });
       setLoading(false); 
       nav('/alerts');
     } catch (err) {
@@ -183,6 +189,24 @@ export default function LoginPage() {
                 >
                   {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+              </div>
+
+              {/* Role Dropdown */}
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                  <Briefcase className="h-5 w-5 text-white/20 group-focus-within:text-[#00FFCC] transition-colors" />
+                </div>
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full bg-white/5 border border-white/5 backdrop-blur-xl px-14 py-5 text-white focus:outline-none focus:border-[#00FFCC]/40 focus:bg-white/[0.08] transition-all font-mono text-sm tracking-widest appearance-none cursor-pointer"
+                >
+                  <option value="" className="bg-[#08080A]">CHOOSE ROLE</option>
+                  {ROLES.map(r => (
+                    <option key={r} value={r} className="bg-[#08080A] uppercase">{r.toUpperCase()}</option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-5 flex items-center pointer-events-none text-white/20">▼</div>
               </div>
             </div>
 

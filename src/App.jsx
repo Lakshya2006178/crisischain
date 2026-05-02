@@ -13,6 +13,8 @@ import Analytics from './pages/Analytics';
 import Alerts from './pages/Alerts';
 import Settings from './pages/Settings';
 import AdminLogin from './pages/AdminLogin';
+import ResponderOrg from './pages/ResponderOrg';
+import HospitalResources from './pages/HospitalResources';
 
 function SuspenseFallback() {
   return (
@@ -39,6 +41,14 @@ function AdminProtectedRoute({ children }) {
   return children;
 }
 
+// Restricts a route to users whose role is in the allowed list
+function RoleRoute({ children, allowed }) {
+  const { user } = useDashboard();
+  if (!user) return <Navigate to="/login" replace />;
+  if (!allowed.includes(user.role)) return <Navigate to="/alerts" replace />;
+  return children;
+}
+
 function GuestRoute({ children }) {
   const { user } = useDashboard();
   if (user) {
@@ -61,7 +71,8 @@ function AppContent() {
         <Route path="/report"   element={<ProtectedRoute><ReportIncident /></ProtectedRoute>} />
         <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
         <Route path="/alerts"    element={<ProtectedRoute><Alerts /></ProtectedRoute>} />
-        {/* <Route path="/settings"  element={<ProtectedRoute><Settings /></ProtectedRoute>} /> */}
+        <Route path="/org" element={<RoleRoute allowed={['responder','admin']}><ResponderOrg /></RoleRoute>} />
+        <Route path="/hospital-resources" element={<RoleRoute allowed={['hospital','admin']}><HospitalResources /></RoleRoute>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

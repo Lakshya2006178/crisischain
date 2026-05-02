@@ -7,6 +7,27 @@ const DashboardContext = createContext();
 export function DashboardProvider({ children }) {
     // --- STATE INITIALIZATION ---
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')) || null);
+    const [userLocation, setUserLocation] = useState(
+        JSON.parse(localStorage.getItem('userLocation')) || null
+    );
+
+    // Silently request GPS; store in state + localStorage
+    const captureLocation = () => {
+        if (!navigator.geolocation) return;
+        navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+                const loc = { lat: coords.latitude, lng: coords.longitude };
+                setUserLocation(loc);
+                localStorage.setItem('userLocation', JSON.stringify(loc));
+            },
+            () => {} // silent fail — user may deny, that's fine
+        );
+    };
+
+    // If already logged in on page load, re-capture location
+    useEffect(() => {
+        if (user) captureLocation();
+    }, []);
     const [alerts, setAlerts] = useState([
         { id: 1, type: 'fire', location: 'San Francisco, CA', severity: 'high', description: 'Structural fire reported in Sector 4.', time: '2m ago', iconName: 'Flame', critical: true, status: 'Active' },
         { id: 2, type: 'flood', location: 'Miami, FL', severity: 'medium', description: 'Rising water levels in coastal areas.', time: '10m ago', iconName: 'Droplets', critical: false, status: 'Pending' },
@@ -74,6 +95,7 @@ export function DashboardProvider({ children }) {
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('token', data.token);
             setUser(data.user);
+            captureLocation(); // Capture GPS at login
             addToast('Session Initialized: Welcome Back', 'success');
             return data.user;
         } catch (error) {
@@ -90,6 +112,7 @@ export function DashboardProvider({ children }) {
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('token', data.token);
             setUser(data.user);
+            captureLocation(); // Capture GPS on registration
             addToast('Registration Successful', 'success');
             return data.user;
         } catch (error) {
@@ -103,11 +126,12 @@ export function DashboardProvider({ children }) {
     const logout = () => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        // Also clear all cookies for the current domain
+        localStorage.removeItem('userLocation');
         document.cookie.split(";").forEach((c) => { 
             document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
         });
         setUser(null);
+        setUserLocation(null);
         addToast('Session Terminated', 'info');
     };
 
@@ -175,7 +199,8 @@ export function DashboardProvider({ children }) {
             user, alerts, actions, messages, resources, stats, workflowId, toasts,
             isSidebarOpen, isMobileMenuOpen, toggleSidebar, closeSidebar, toggleMobileMenu,
             login, signup, logout, addMessage, addAlert, updateStatus, advanceWorkflow,
-            getIcon, searchQuery, setSearchQuery, addToast, refreshData
+            getIcon, searchQuery, setSearchQuery, addToast, refreshData,
+            userLocation, captureLocation
         }}>
             {children}
         </DashboardContext.Provider>

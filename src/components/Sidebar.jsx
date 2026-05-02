@@ -3,25 +3,44 @@ import { useDashboard } from '../context/DashboardContext';
 import {
     LayoutDashboard, AlertTriangle, Activity,
     Database, Settings, Shield, PlusSquare,
-    Terminal, Lock, Radio, ChevronRight, Zap, LogOut
+    Terminal, Lock, Radio, ChevronRight, Zap, LogOut,
+    Truck, Building2, ClipboardList
 } from 'lucide-react';
 
 const W_CLOSED = 80;
 const W_OPEN   = 300;
 const H_TOP    = 80;
 
-const NAV = [
-    { id: 'alerts',    icon: AlertTriangle,   label: 'Emergency Alerts',    path: '/alerts' },
-    { id: 'resources', icon: PlusSquare,         label: 'Resource Hub', path: '/resources' },
-    { id: 'analytics', icon: Activity,         label: 'Analytics',  path: '/analytics' },
-    { id: 'settings',  icon: Settings,         label: 'Settings',     path: '/settings' },
+const ALL_NAV = [
+    { id: 'alerts',             icon: AlertTriangle, label: 'Emergency Alerts',    path: '/alerts',             roles: ['citizen','responder','hospital','admin'] },
+    { id: 'resources',          icon: PlusSquare,    label: 'Resource Hub',         path: '/resources',          roles: ['citizen','responder','hospital','admin'] },
+    { id: 'report',             icon: ClipboardList, label: 'Report Incident',      path: '/report',             roles: ['citizen','admin'] },
+    { id: 'org',                icon: Truck,         label: 'Org Management',       path: '/org',                roles: ['responder','admin'] },
+    { id: 'hospital-resources', icon: Building2,     label: 'Hospital Resources',   path: '/hospital-resources', roles: ['hospital','admin'] },
+    { id: 'analytics',          icon: Activity,      label: 'Analytics',            path: '/analytics',          roles: ['admin'] },
+    { id: 'dashboard',          icon: LayoutDashboard,label: 'Admin Dashboard',     path: '/dashboard',          roles: ['admin'] },
 ];
+
+const getRoleKey = (role) => {
+    if (!role) return 'citizen';
+    // DB-stored values (returned by backend JWT)
+    if (role === 'responder') return 'responder';
+    if (role === 'hospital')  return 'hospital';
+    if (role === 'admin')     return 'admin';
+    // Display-name fallbacks (legacy / edge cases)
+    if (role === 'First Responder')         return 'responder';
+    if (role === 'Hospital representative') return 'hospital';
+    return 'citizen';
+};
 
 export default function Sidebar() {
     const navigate = useNavigate();
     const location = useLocation();
     const { isSidebarOpen, toggleSidebar, addToast, user, logout } = useDashboard();
     const w = isSidebarOpen ? W_OPEN : W_CLOSED;
+
+    const roleKey = getRoleKey(user?.role);
+    const NAV = ALL_NAV.filter(n => n.roles.includes(roleKey));
 
     const handleLogout = () => {
         addToast('Logging out...', 'info');
