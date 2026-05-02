@@ -84,11 +84,12 @@ INSERT IGNORE INTO incident_type (type_name, icon_name) VALUES
 -- ============================================================
 CREATE TABLE IF NOT EXISTS incident (
     incident_id     CHAR(36)      NOT NULL,
-    aadhar_id       CHAR(64)      NOT NULL,
+    aadhar_id       CHAR(64)      NULL,                  -- nullable: anonymous / guest reports
     type_id         SMALLINT      NOT NULL,
     description     TEXT          NULL,
-    latitude        DECIMAL(9,6)  NOT NULL,
-    longitude       DECIMAL(9,6)  NOT NULL,
+    location_text   VARCHAR(500)  NULL,                  -- human-readable address from form / reverse geocoding
+    latitude        DECIMAL(9,6)  NULL,
+    longitude       DECIMAL(9,6)  NULL,
     incident_status ENUM('Reported','Assigned','InProgress','Resolved','Closed')
                                   NOT NULL DEFAULT 'Reported',
     priority_level  ENUM('Low','Medium','High','Critical')
@@ -100,9 +101,6 @@ CREATE TABLE IF NOT EXISTS incident (
     PRIMARY KEY (incident_id),
     KEY idx_incident_user   (aadhar_id),
     KEY idx_incident_status (incident_status),
-    CONSTRAINT fk_incident_user
-        FOREIGN KEY (aadhar_id) REFERENCES users(aadhar_id)
-        ON DELETE RESTRICT ON UPDATE CASCADE,
     CONSTRAINT fk_incident_type
         FOREIGN KEY (type_id)   REFERENCES incident_type(type_id)
         ON DELETE RESTRICT ON UPDATE CASCADE

@@ -59,14 +59,28 @@ export function DashboardProvider({ children }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-    // --- FETCH DATA (MAPPED TO MOCK FOR NOW) ---
+    // Live alerts from backend
+    const [liveAlerts, setLiveAlerts] = useState([]);
+
+    const fetchLiveAlerts = async () => {
+        try {
+            const { data } = await api.fetchAlerts();
+            setLiveAlerts(data);
+        } catch (err) {
+            console.warn('Could not fetch live alerts:', err.message);
+        }
+    };
+
+    // --- FETCH DATA ---
     const refreshData = async () => {
-        // Skipping real API calls as requested to bypass backend dependency
-        // In a real app, this would be: await api.fetchAlerts()...
+        await fetchLiveAlerts();
     };
 
     useEffect(() => {
-        // No-op for now to keep the UI stable without server connection
+        if (user) {
+            fetchLiveAlerts();
+            captureLocation();
+        }
     }, []);
 
     // --- HELPERS ---
@@ -149,18 +163,17 @@ export function DashboardProvider({ children }) {
     };
 
     const addAlert = async (alertData) => {
-        const newAlert = {
-            ...alertData,
-            id: Date.now(),
-            time: 'Just now',
-            iconName: getIconName(alertData.type),
-            critical: alertData.severity === 'high' || alertData.severity === 'critical',
-            status: 'Active'
-        };
-        setAlerts(prev => [newAlert, ...prev]);
-        setStats(prev => ({ ...prev, total: prev.total + 1, active: prev.active + 1 }));
-        addToast(`Emergency Logged Locally: ${alertData.type}`, newAlert.critical ? 'error' : 'info');
-        return newAlert;
+        try {
+            const { data } = await api.createAlert(alertData);
+            // Prepend the new incident to the live feed immediately
+            setLiveAlerts(prev => [data, ...prev]);
+            addToast('Emergency reported successfully', 'success');
+            return data;
+        } catch (err) {
+            const msg = err.response?.data?.error || 'Failed to submit report';
+            addToast(msg, 'error');
+            throw err;
+        }
     };
 
     const updateStatus = async (id, status) => {
@@ -200,7 +213,8 @@ export function DashboardProvider({ children }) {
             isSidebarOpen, isMobileMenuOpen, toggleSidebar, closeSidebar, toggleMobileMenu,
             login, signup, logout, addMessage, addAlert, updateStatus, advanceWorkflow,
             getIcon, searchQuery, setSearchQuery, addToast, refreshData,
-            userLocation, captureLocation
+            userLocation, captureLocation,
+            liveAlerts, fetchLiveAlerts
         }}>
             {children}
         </DashboardContext.Provider>

@@ -3,38 +3,72 @@ import pool from '../db.js';
 
 const uuid = () => crypto.randomUUID();
 
-// Ensure an incident_type row exists for the given name and return its type_id
-const getOrCreateTypeId = async (conn, typeName) => {
-  const name = (typeName || 'other').toLowerCase();
+// Map form type strings to existing incident_type rows (case-insensitive partial match)
+const resolveTypeId = async (conn, typeName) => {
+  if (!typeName) return 1; // Default: Fire fallback
   const [rows] = await conn.execute(
-    'SELECT type_id FROM incident_type WHERE LOWER(type_name) = ? LIMIT 1', [name]
+    'SELECT type_id FROM incident_type WHERE LOWER(type_name) LIKE ? LIMIT 1',
+    [`%${typeName.toLowerCase()}%`]
   );
   if (rows.length > 0) return rows[0].type_id;
 
-  // Create it on the fly
-  const type_id = uuid();
-  await conn.execute(
-    'INSERT INTO incident_type (type_id, type_name, icon_name) VALUES (?, ?, ?)',
-    [type_id, typeName, 'AlertTriangle']
-  );
-  return type_id;
+  // Fallback mapping for common form values
+  const map = {
+    flood: 2, cyclone: 5, wildfire: 1, earthquake: 5,
+    collapse: 6, chemical: 7, hazmat: 7, medical: 3, accident: 4, other: 4,
+  };
+  return map[typeName.toLowerCase()] || 4;
 };
 
-// Map form severity strings to DB ENUM values
+// Map form severity strings → DB ENUM values
 const mapSeverity = (s) => {
   if (!s) return 'Medium';
   const l = s.toLowerCase();
-  if (l === 'critical' || l === 'high') return 'High';
+  if (l === 'critical') return 'Critical';
+  if (l === 'high')     return 'High';
   if (l === 'medium' || l === 'moderate') return 'Medium';
   return 'Low';
+};
+
+// Convert DB row into the shape the Alerts.jsx frontend expects
+const formatIncident = (row) => {
+  const typeIconMap = {
+    Fire: 'Flame', Flood: 'Droplets', 'Medical Emergency': 'HeartPulse',
+    'Road Accident': 'AlertTriangle', 'Natural Disaster': 'Wind',
+    'Structural Collapse': 'Shield', 'Hazardous Material': 'Radiation',
+  };
+  const severityColor = { Critical: '#ef4444', High: '#ef4444', Medium: '#f59e0b', Low: '#3b82f6' };
+
+  return {
+    id:          row.incident_id,
+    incident_id: row.incident_id,
+    type:        row.type_name,
+    title:       `${row.type_name} — ${row.location_text || 'Unknown Location'}`,
+    location:    row.location_text || `${row.latitude}, ${row.longitude}`,
+    severity:    row.priority_level,
+    status:      row.incident_status,
+    description: row.description || '',
+    time:        formatRelativeTime(row.created_at),
+    timestamp:   row.created_at,
+    iconName:    row.icon_name || typeIconMap[row.type_name] || 'AlertTriangle',
+    color:       severityColor[row.priority_level] || '#f59e0b',
+    coordinates: row.latitude ? `${row.latitude}, ${row.longitude}` : 'N/A',
+    resources:   'Dispatch Pending',
+  };
+};
+
+const formatRelativeTime = (ts) => {
+  if (!ts) return 'Just now';
+  const diff = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
+  if (diff < 60)  return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  return `${Math.floor(diff / 3600)}h ago`;
 };
 
 // ─── CREATE INCIDENT ─────────────────────────────────────────
 export const createAlert = async (req, res) => {
   const conn = await pool.getConnection();
   try {
-    // Accept either the old schema (type_id, latitude, longitude)
-    // OR the form schema (type, location, severity, description)
     const {
       aadhar_id,
       type_id: rawTypeId,
@@ -47,17 +81,15 @@ export const createAlert = async (req, res) => {
       longitude,
     } = req.body;
 
-    // Resolve reporter — use aadhar_id from body, or from JWT token
     const reporterId = aadhar_id || req.user?.aadhar_id || null;
 
-    // Resolve type_id
-    let type_id = rawTypeId;
-    if (!type_id) {
-      type_id = await getOrCreateTypeId(conn, type || 'Other');
-    }
+    // Resolve type_id: use supplied int, or look up by name
+    const type_id = rawTypeId
+      ? parseInt(rawTypeId)
+      : await resolveTypeId(conn, type);
 
-    const incident_id = uuid();
     const priority = priority_level || mapSeverity(severity);
+    const incident_id = uuid();
 
     await conn.execute(
       `INSERT INTO incident
@@ -68,21 +100,20 @@ export const createAlert = async (req, res) => {
         reporterId,
         type_id,
         description || null,
-        location || null,
-        latitude  || null,
-        longitude || null,
+        location    || null,
+        latitude    || null,
+        longitude   || null,
         priority,
       ]
     );
 
-    // Append to the immutable report log
+    // Immutable audit log entry
     await conn.execute(
       `INSERT INTO incident_report_log (log_id, incident_id, log_type, new_value, notes, is_system)
-       VALUES (?, ?, 'SystemEvent', 'Reported', 'Incident created.', 1)`,
+       VALUES (?, ?, 'SystemEvent', 'Reported', 'Incident created via report form.', 1)`,
       [uuid(), incident_id]
     );
 
-    // Return the full row with type info for the frontend
     const [[incident]] = await conn.execute(
       `SELECT i.*, it.type_name, it.icon_name
        FROM incident i
@@ -91,7 +122,7 @@ export const createAlert = async (req, res) => {
       [incident_id]
     );
 
-    res.status(201).json(incident);
+    res.status(201).json(formatIncident(incident));
   } catch (err) {
     console.error('createAlert error:', err.message);
     res.status(500).json({ error: err.message });
@@ -110,7 +141,7 @@ export const getAlerts = async (req, res) => {
        JOIN incident_type it ON i.type_id = it.type_id
        ORDER BY i.created_at DESC`
     );
-    res.json(rows);
+    res.json(rows.map(formatIncident));
   } catch (err) {
     res.status(500).json({ error: err.message });
   } finally {

@@ -7,7 +7,7 @@ import {
     Clock, MapPin, ShieldAlert, ChevronRight,
     Search, Filter, Calendar, Zap, Bell,
     CheckCircle2, Truck, Info, Navigation,
-    Database, Globe, HeartPulse, Send, Satellite, Shield, X, Radio
+    Database, Globe, HeartPulse, Send, Satellite, Shield, X, Radio, Wind, Radiation, Loader2
 } from 'lucide-react';
 
 // ── ERROR BOUNDARY ──
@@ -40,55 +40,13 @@ const LOCAL_SZ = {
   navbarH:       72,
 };
 
-const MOCK_ALERTS = [
-    {
-        id: 'AL-9284',
-        type: 'Fire',
-        title: 'Industrial Fire',
-        location: 'suratkal',
-        severity: 'Critical',
-        time: '2 mins ago',
-        status: 'Active',
-        description: 'Multiple  anomalies detected in the primary chemical storage unit. Risk of chemical leak is high. Immediate exclusion zone required.',
-        timestamp: '2026-03-31 22:15:42',
-        coordinates: '34.0522° N, 118.2437° W',
-        resources: '3 Fire Teams dispatched',
-        Icon: Flame,
-        color: '#ef4444'
-    },
-   
+// Map DB iconName strings to actual icon components
+const ICON_MAP = {
+    Flame, Droplets, HeartPulse, AlertTriangle, Wind,
+    Radiation, Activity, Shield, Truck, Globe,
+};
+const resolveIcon = (iconName) => ICON_MAP[iconName] || AlertTriangle;
 
-    {
-        id: 'AL-9287',
-        type: 'Accident',
-        title: ' Velocity Collision',
-        location: 'NH-66',
-        severity: 'Low',
-        time: '25 mins ago',
-        status: 'Resolved',
-        description: 'Multi-vehicle collision blocking three lanes. No hazardous material leaked. Cleanup in progress.',
-        timestamp: '2026-03-31 21:52:18',
-        coordinates: '34.0987° N, 118.3214° W',
-        resources: 'Highway Patrol, Towing Unit',
-        Icon: Truck,
-        color: '#f59e0b'
-    },
-    {
-        id: 'AL-9288',
-        type: 'Fire',
-        title: 'Gas blast',
-        location: 'kudroli',
-        severity: 'Critical',
-        time: '45 mins ago',
-        status: 'Active',
-        description: 'Rapidly spreading gas blast due to high wind speeds. Residents in evacuation zone 4 must leave immediately.',
-        timestamp: '2026-03-31 21:32:05',
-        coordinates: '34.1567° N, 118.4123° W',
-        resources: 'Aerial Support, Fire Group 12',
-        Icon: Flame,
-        color: '#ef4444'
-    }
-];
 
 // ── CUSTOM COMPONENTS ──
 
@@ -235,39 +193,30 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
 }
 
 function AlertsContent() {
-    const { isSidebarOpen, addToast, alerts: contextAlerts, updateAlertStatus, refreshData } = useDashboard();
+    const { isSidebarOpen, addToast, liveAlerts, fetchLiveAlerts } = useDashboard();
     const [selectedAlert, setSelectedAlert] = useState(null);
     const [filterType, setFilterType] = useState('All');
     const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    // Map DB alert to display-friendly format
-    const mapAlert = (a) => {
-        const iconMap = { fire: Flame, flood: Droplets, medical: HeartPulse, accident: Truck };
-        const colorMap = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' };
-        const severityLabelMap = { high: 'Critical', medium: 'Warning', low: 'Low' };
-        return {
-            ...a,
-            id: a.id,
-            type: a.type ? (a.type.charAt(0).toUpperCase() + a.type.slice(1)) : 'Other',
-            title: a.description ? a.description.slice(0, 40) + (a.description.length > 40 ? '...' : '') : 'Alert',
-            severity: severityLabelMap[a.severity] || a.severity,
-            status: a.status ? (a.status.charAt(0).toUpperCase() + a.status.slice(1)) : 'Active',
-            time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString() : 'Just now',
-            timestamp: a.createdAt ? new Date(a.createdAt).toLocaleString() : '',
-            coordinates: 'N/A',
-            resources: a.assignedTo || 'Dispatch Pending',
-            Icon: iconMap[a.type] || AlertTriangle,
-            color: colorMap[a.severity] || '#ef4444',
-        };
-    };
+    // Enrich each alert with resolved icon component
+    const alerts = useMemo(() => (liveAlerts || []).map(a => ({
+        ...a,
+        Icon: resolveIcon(a.iconName),
+        color: a.color || (a.severity === 'Critical' || a.severity === 'High' ? '#ef4444' : a.severity === 'Medium' ? '#f59e0b' : '#3b82f6'),
+    })), [liveAlerts]);
 
-    const alerts = useMemo(() => (contextAlerts || []).map(mapAlert), [contextAlerts]);
-
+    // Initial load + 15-second polling for live updates
     useEffect(() => {
-        if (alerts.length > 0 && !selectedAlert) {
-            setSelectedAlert(alerts[0]);
-        }
+        const load = async () => { setLoading(true); await fetchLiveAlerts(); setLoading(false); };
+        load();
+        const interval = setInterval(fetchLiveAlerts, 15000);
+        return () => clearInterval(interval);
+    }, []);
+
+    // Auto-select first alert once list arrives
+    useEffect(() => {
+        if (alerts.length > 0 && !selectedAlert) setSelectedAlert(alerts[0]);
     }, [alerts]);
 
     const handleUpdateStatus = async (id, newStatus) => {
@@ -389,10 +338,15 @@ function AlertsContent() {
                             </div>
 
                             <div className="flex-1 overflow-y-auto p-3 space-y-2">
-                                {filteredAlerts.length === 0 ? (
-                                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                                        <Bell size={24} className="mb-2 opacity-50" />
-                                        <p className="text-sm">No alerts found</p>
+                                {loading ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-white/20 gap-3">
+                                        <Loader2 size={24} className="animate-spin" />
+                                        <p className="font-mono text-[9px] uppercase tracking-widest">Loading incidents...</p>
+                                    </div>
+                                ) : filteredAlerts.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-white/10 gap-3">
+                                        <Bell size={24} className="opacity-40" />
+                                        <p className="font-mono text-[9px] uppercase tracking-widest">No alerts found</p>
                                     </div>
                                 ) : (
                                     filteredAlerts.map((alert) => (
