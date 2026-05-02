@@ -1,16 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 :root {
-  --obsidian-bg: #050505;
-  --obsidian-surface: #0E0E0F;
-  --obsidian-surface-high: #161617;
-  --obsidian-surface-highest: #1f1f20;
-  --cyan-accent: #00F0FF;
-  --emergency-red: #FF3B30;
-  --text-primary: #f5f5f5;
-  --text-secondary: #94a3b8;
-  --border-ghost: rgba(255, 255, 255, 0.08);
+  --obsidian-bg: #0B1220;
+  --obsidian-surface: #111827;
+  --border-ghost: #1F2937;
+  
+  --primary-accent: #14B8A6;
+  --primary-accent-hover: #0D9488;
+  
+  --emergency-red: #EF4444;
+  --warning-yellow: #F59E0B;
+  --success-green: #22C55E;
+  
+  --text-primary: #E5E7EB;
+  --text-secondary: #9CA3AF;
 }
 
 @layer base {
@@ -27,42 +31,32 @@
 }
 
 /* ── Typography ── */
-.font-bebas   { font-family: 'Bebas Neue', sans-serif; }
 .font-inter   { font-family: 'Inter', sans-serif; }
-.font-outfit  { font-family: 'Outfit', sans-serif; }
+.font-poppins { font-family: 'Poppins', sans-serif; }
 .font-mono    { font-family: 'JetBrains Mono', monospace; }
 
 .heading-tactical {
-  font-family: 'Outfit', sans-serif;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-/* ── HUD Elements ── */
+/* ── HUD Elements (Realistic) ── */
 .hud-border {
   border: 1px solid var(--border-ghost);
 }
 
 .hud-glass {
-  background: rgba(19, 19, 20, 0.7);
-  backdrop-filter: blur(12px);
+  background: var(--obsidian-surface);
   border: 1px solid var(--border-ghost);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
-}
-
-.glow-text-cyan {
-  text-shadow: 0 0 8px rgba(0, 240, 255, 0.5);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* ─── Custom scrollbar ─────────────────────────────── */
-::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
-::-webkit-scrollbar-thumb  { background: rgba(0, 240, 255, 0.2); border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0, 240, 255, 0.4); }
+::-webkit-scrollbar-thumb  { background: #374151; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #4B5563; }
 
 /* ─── Animations ───────────────────────────────────── */
 @keyframes fadeIn {
@@ -70,37 +64,31 @@
   to   { opacity: 1; }
 }
 @keyframes slideUp {
-  from { opacity:0; transform:translateY(16px); }
+  from { opacity:0; transform:translateY(8px); }
   to   { opacity:1; transform:translateY(0);    }
 }
-@keyframes pulseGlow {
-  0% { opacity: 0.4; }
-  50% { opacity: 1; }
-  100% { opacity: 0.4; }
-}
 
-.animate-pulse-glow { animation: pulseGlow 2s infinite ease-in-out; }
-.animate-fade-in  { animation: fadeIn  .5s ease-out both; }
-.animate-slide-up { animation: slideUp .5s ease-out both; }
+.animate-fade-in  { animation: fadeIn  .3s ease-out both; }
+.animate-slide-up { animation: slideUp .4s ease-out both; }
 
 /* ── Dashboard Tactical Elements ── */
 .db-card {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px);
+  background: var(--obsidian-surface);
   border: 1px solid var(--border-ghost);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: border-color 0.2s ease;
 }
 
 .db-card:hover {
-  border-color: rgba(0, 240, 255, 0.15);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: #374151;
 }
 
 .db-card-header {
-  padding: 1.25rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--border-ghost);
   display: flex;
   align-items: center;
@@ -108,30 +96,23 @@
 }
 
 .db-card-header h2 {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 800;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
   font-size: 0.875rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
   color: var(--text-primary);
 }
 
-.stroke-text {
-  -webkit-text-stroke: 1px rgba(255,255,255,0.4);
-  color: transparent;
-}
-
 /* ── Responsive Layout Logic ── */
-.w-sidebar-open { width: 300px; }
-.ml-sidebar-open { margin-left: 300px; }
-.left-sidebar-open { left: 300px; }
+.w-sidebar-open { width: 260px; }
+.ml-sidebar-open { margin-left: 260px; }
+.left-sidebar-open { left: 260px; }
 
-.w-sidebar-closed { width: 80px; }
-.ml-sidebar-closed { margin-left: 80px; }
-.left-sidebar-closed { left: 80px; }
+.w-sidebar-closed { width: 72px; }
+.ml-sidebar-closed { margin-left: 72px; }
+.left-sidebar-closed { left: 72px; }
 
 @media (max-width: 1024px) {
-  .w-sidebar-open { width: 100%; max-width: 320px; }
+  .w-sidebar-open { width: 100%; max-width: 280px; }
   .ml-sidebar-open { margin-left: 0; }
   .left-sidebar-open { left: 0; }
 
@@ -140,32 +121,17 @@
   .left-sidebar-closed { left: 0; }
 }
 
-/* ── Performance Critical Optimizations ── */
-.backdrop-blur-3xl, .backdrop-blur-2xl, .backdrop-blur-xl, .backdrop-blur-md {
-  backdrop-filter: blur(24px); /* Fallback */
-  -webkit-backdrop-filter: blur(24px);
-}
-
-/* Disable expensive filters on mobile to fix scroll lag */
-@media (max-width: 768px) {
-  .backdrop-blur-3xl, .backdrop-blur-2xl, .backdrop-blur-xl, .backdrop-blur-md {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background-color: rgba(10, 10, 12, 0.95) !important;
-  }
-}
-
 .will-change-transform {
   will-change: transform;
 }
 
-/* Fluid Terminal Padding */
+/* Fluid Padding */
 .fluid-p {
   padding: 1.5rem;
 }
 @media (min-width: 768px) {
-  .fluid-p { padding: 2.5rem; }
+  .fluid-p { padding: 2rem; }
 }
 @media (min-width: 1024px) {
-  .fluid-p { padding: 4rem; }
+  .fluid-p { padding: 2.5rem; }
 }

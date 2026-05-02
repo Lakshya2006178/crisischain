@@ -138,7 +138,7 @@ const DisasterMapAnimation = () => {
         <div className="w-5 h-5 rounded-full bg-blue-600 border-2 border-blue-400 shadow-[0_0_20px_rgba(59,130,246,1)] flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
           <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
         </div>
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-blue-900/80 text-blue-200 text-[9px] px-1.5 py-0.5 rounded border border-blue-500/50 backdrop-blur-sm">
+        <div className="absolute top-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-blue-900/80 text-blue-200 text-[9px] px-1.5 py-0.5 rounded border border-blue-500/50 ">
           HQ_ALPHA
         </div>
       </div>
@@ -161,12 +161,12 @@ const DisasterMapAnimation = () => {
               className={`absolute inset-0 rounded-full ${incident.pulseColor} animate-ping opacity-75`}
             ></div>
             {/* Center dot */}
-            <div className="absolute inset-1 bg-white/50 rounded-full"></div>
+            <div className="absolute inset-1 bg-[#1F2937]0 rounded-full"></div>
           </div>
 
           {/* Hover Tooltip Overlay */}
           <div
-            className={`absolute bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-800/90 text-white text-xs px-2 py-1 rounded border border-gray-600 backdrop-blur-md shadow-xl transition-all duration-300 pointer-events-none ${hoveredNode === incident.id ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
+            className={`absolute bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap bg-gray-800/90 text-white text-xs px-2 py-1 rounded border border-gray-600  shadow-xl transition-all duration-300 pointer-events-none ${hoveredNode === incident.id ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"}`}
           >
             <div className="font-bold">{incident.label}</div>
             <div
@@ -181,7 +181,7 @@ const DisasterMapAnimation = () => {
 
       {/* Floating Info Panels */}
       <div className="absolute top-4 left-4 z-20">
-        <div className="bg-gray-800/80 backdrop-blur-sm border border-gray-700 p-2 rounded-lg shadow-lg">
+        <div className="bg-gray-800/80  border border-gray-700 p-2 rounded-lg shadow-lg">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
             <span className="text-xs font-mono text-gray-300">
@@ -192,7 +192,7 @@ const DisasterMapAnimation = () => {
       </div>
 
       <div className="absolute bottom-4 right-4 z-20">
-        <div className="bg-gray-800/80 backdrop-blur-sm border border-gray-700 p-2 rounded-lg shadow-lg">
+        <div className="bg-gray-800/80  border border-gray-700 p-2 rounded-lg shadow-lg">
           <div className="flex items-center space-x-2">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
             <span className="text-xs font-mono text-gray-300">

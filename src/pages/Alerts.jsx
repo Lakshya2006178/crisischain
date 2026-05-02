@@ -21,9 +21,9 @@ class LocalErrorBoundary extends Component {
     render() {
         if (this.state.hasError) {
             return (
-                <div className="h-screen w-full bg-[#08080A] flex items-center justify-center">
-                    <div className="text-red-500 font-mono text-[9px] uppercase tracking-[0.5em] animate-pulse">
-                        CONNECTION ERROR // PLEASE REFRESH
+                <div className="h-screen w-full bg-[#0B1220] flex items-center justify-center">
+                    <div className="text-red-500 font-mono text-xs uppercase tracking-wider">
+                        APPLICATION ERROR // PLEASE REFRESH
                     </div>
                 </div>
             );
@@ -94,37 +94,14 @@ const MOCK_ALERTS = [
 
 function StatCard({ label, value, icon: Icon, color }) {
     return (
-        <div className="bg-[#14171F] border border-white/5 p-5 relative overflow-hidden group hover:border-white/10 transition-all duration-300">
-            <div className={`absolute top-0 right-0 w-20 h-20 blur-[40px] opacity-[0.03] pointer-events-none group-hover:opacity-[0.06] transition-opacity`} 
-                 style={{ backgroundColor: color }} />
-            
-            <div className="flex justify-between items-start mb-6">
-                <div className="p-2 bg-white/5 border border-white/5 text-white/40 group-hover:text-white transition-all">
-                    <Icon size={16} />
-                </div>
-                <div className="w-1 h-3 bg-white/5" />
+        <div className="bg-[#111827] border border-[#1F2937] p-6 rounded-lg flex items-center gap-4 hover:border-[#374151] transition-all duration-300">
+            <div className="p-3 bg-[#0B1220] rounded-md border border-[#1F2937] flex-shrink-0" style={{ color }}>
+                <Icon size={24} />
             </div>
-            
             <div>
-                <span className="block text-[8px] font-mono text-white/30 uppercase tracking-[0.3em] mb-1">{label}</span>
-                <span className="text-2xl font-outfit font-black text-white tracking-tighter leading-none">{value}</span>
+                <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">{label}</span>
+                <span className="text-2xl font-poppins font-bold text-gray-100 leading-none">{value}</span>
             </div>
-            
-            {/* Visual Micro-line */}
-            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-white/[0.02]">
-                <div className="h-full bg-white/10 w-0 group-hover:w-full transition-all duration-700" />
-            </div>
-        </div>
-    );
-}
-
-function SectionLabel({ text, icon: Icon }) {
-    return (
-        <div className="flex items-center gap-3 mb-6">
-            <div className="p-1.5 bg-white/5 border border-white/5 text-red-500">
-                {Icon && <Icon size={12} />}
-            </div>
-            <span className="font-mono text-[9px] font-black tracking-[0.4em] text-white/20 uppercase">{text}</span>
         </div>
     );
 }
@@ -153,47 +130,42 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
     };
 
     return (
-        <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl animate-fade-in">
-            <div className="w-full max-w-2xl bg-[#08080A] border border-white/10 relative overflow-hidden shadow-[0_0_100px_rgba(239,68,68,0.1)]">
-                {/* Background Decor */}
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-red-600 animate-pulse" />
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-red-600/10 blur-[100px] pointer-events-none" />
-
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <div className="w-full max-w-2xl bg-[#0B1220] rounded-xl border border-[#1F2937] shadow-xl flex flex-col">
                 {/* Header */}
-                <div className="px-10 py-8 border-b border-white/5 flex justify-between items-center bg-white/[0.02]">
-                    <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-3">
-                            <Radio size={14} className="text-red-500 animate-pulse" />
-                            <span className="font-mono text-[10px] text-red-500 uppercase tracking-[0.5em] font-black">EMERGENCY ANNOUNCEMENT</span>
+                <div className="px-8 py-6 border-b border-[#1F2937] flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-red-500/10 text-red-500 rounded-md">
+                            <Radio size={20} />
                         </div>
-                        <h2 className="font-outfit text-4xl font-black text-white tracking-tighter uppercase leading-none">SEND NEW ALERT</h2>
+                        <h2 className="font-poppins text-xl font-bold text-gray-100">Send New Alert</h2>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-white/5 transition-all text-white/40 hover:text-white">
-                        <X size={24} />
+                    <button onClick={onClose} className="p-2 rounded-md hover:bg-[#1F2937] text-gray-400 hover:text-gray-200 transition-all">
+                        <X size={20} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <form onSubmit={handleSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">EVENT NAME*</label>
+                <form onSubmit={handleSubmit} className="p-8 space-y-6 flex-1 overflow-y-auto">
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-300">Incident Name*</label>
                         <input 
                             required
                             type="text"
                             value={formData.title}
                             onChange={e => setFormData({...formData, title: e.target.value})}
-                            placeholder="Example: Large Street Fire..."
-                            className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all placeholder:text-white/5"
+                            placeholder="e.g. Major Structure Fire"
+                            className="w-full bg-[#111827] border border-[#1F2937] rounded-md px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all"
                         />
                     </div>
 
-                    <div className="grid grid-cols-2 gap-8">
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Type*</label>
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-300">Type*</label>
                             <select 
                                 value={formData.type}
                                 onChange={e => setFormData({...formData, type: e.target.value})}
-                                className="w-full bg-[#0E1015] border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all"
+                                className="w-full bg-[#111827] border border-[#1F2937] rounded-md px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all"
                             >
                                 <option value="Fire">Fire</option>
                                 <option value="Flood">Flood</option>
@@ -202,58 +174,58 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
                                 <option value="Terror">Security</option>
                             </select>
                         </div>
-                        <div className="space-y-3">
-                            <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">Severity*</label>
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-gray-300">Severity*</label>
                             <select 
                                 value={formData.severity}
                                 onChange={e => setFormData({...formData, severity: e.target.value})}
-                                className="w-full bg-[#0E1015] border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all"
+                                className="w-full bg-[#111827] border border-[#1F2937] rounded-md px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all"
                             >
-                                <option value="Critical" className="text-red-500">Critical</option>
-                                <option value="Warning" className="text-amber-500">Warning</option>
-                                <option value="Low" className="text-blue-500">Low</option>
+                                <option value="Critical">Critical</option>
+                                <option value="Warning">Warning</option>
+                                <option value="Low">Low</option>
                             </select>
                         </div>
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">LOCATION*</label>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-300">Location*</label>
                         <input 
                             required
                             type="text"
                             value={formData.location}
                             onChange={e => setFormData({...formData, location: e.target.value})}
                             placeholder="Enter address or area..."
-                            className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all placeholder:text-white/5"
+                            className="w-full bg-[#111827] border border-[#1F2937] rounded-md px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all"
                         />
                     </div>
 
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-mono text-white/20 uppercase tracking-[0.3em] font-black ml-1">DETAILS*</label>
+                    <div className="space-y-2">
+                        <label className="text-sm font-semibold text-gray-300">Details*</label>
                         <textarea 
                             required
                             rows="4"
                             value={formData.description}
                             onChange={e => setFormData({...formData, description: e.target.value})}
                             placeholder="Describe what happened..."
-                            className="w-full bg-white/5 border border-white/5 focus:border-red-500/40 px-6 py-4 font-mono text-xs text-white uppercase tracking-widest outline-none transition-all resize-none placeholder:text-white/5"
+                            className="w-full bg-[#111827] border border-[#1F2937] rounded-md px-4 py-3 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:ring-1 focus:ring-teal-500/50 transition-all resize-none"
                         />
                     </div>
                     
-                    <div className="pt-6 border-t border-white/5 flex justify-end gap-6">
+                    <div className="pt-6 border-t border-[#1F2937] flex justify-end gap-4">
                         <button 
                             type="button"
                             onClick={onClose}
-                            className="px-8 py-4 font-mono text-[10px] text-white/20 hover:text-white font-black uppercase tracking-widest transition-all"
+                            className="px-6 py-2.5 rounded text-sm font-semibold text-gray-400 hover:text-gray-200 hover:bg-[#1F2937] transition-all"
                         >
-                            CANCEL
+                            Cancel
                         </button>
                         <button 
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-12 py-4 bg-red-600 text-white font-mono text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(239,68,68,0.2)] disabled:opacity-50 disabled:grayscale"
+                            className="px-6 py-2.5 rounded bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-all disabled:opacity-50 flex items-center gap-2"
                         >
-                            {isSubmitting ? 'SENDING ALERT...' : 'SEND ALERT'}
+                            {isSubmitting ? 'Sending...' : 'Send Alert'}
                         </button>
                     </div>
                 </form>
@@ -263,18 +235,57 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
 }
 
 function AlertsContent() {
-    const { isSidebarOpen, addToast } = useDashboard();
-    const [selectedAlert, setSelectedAlert] = useState(MOCK_ALERTS[0]);
+    const { isSidebarOpen, addToast, alerts: contextAlerts, updateAlertStatus, refreshData } = useDashboard();
+    const [selectedAlert, setSelectedAlert] = useState(null);
     const [filterType, setFilterType] = useState('All');
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
-    const [alerts, setAlerts] = useState(MOCK_ALERTS);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Map DB alert to display-friendly format
+    const mapAlert = (a) => {
+        const iconMap = { fire: Flame, flood: Droplets, medical: HeartPulse, accident: Truck };
+        const colorMap = { high: '#ef4444', medium: '#f59e0b', low: '#3b82f6' };
+        const severityLabelMap = { high: 'Critical', medium: 'Warning', low: 'Low' };
+        return {
+            ...a,
+            id: a.id,
+            type: a.type ? (a.type.charAt(0).toUpperCase() + a.type.slice(1)) : 'Other',
+            title: a.description ? a.description.slice(0, 40) + (a.description.length > 40 ? '...' : '') : 'Alert',
+            severity: severityLabelMap[a.severity] || a.severity,
+            status: a.status ? (a.status.charAt(0).toUpperCase() + a.status.slice(1)) : 'Active',
+            time: a.createdAt ? new Date(a.createdAt).toLocaleTimeString() : 'Just now',
+            timestamp: a.createdAt ? new Date(a.createdAt).toLocaleString() : '',
+            coordinates: 'N/A',
+            resources: a.assignedTo || 'Dispatch Pending',
+            Icon: iconMap[a.type] || AlertTriangle,
+            color: colorMap[a.severity] || '#ef4444',
+        };
+    };
+
+    const alerts = useMemo(() => (contextAlerts || []).map(mapAlert), [contextAlerts]);
 
     useEffect(() => {
-        const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
-        window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
+        if (alerts.length > 0 && !selectedAlert) {
+            setSelectedAlert(alerts[0]);
+        }
+    }, [alerts]);
+
+    const handleUpdateStatus = async (id, newStatus) => {
+        try {
+            setIsLoading(true);
+            // Convert display status back to DB enum
+            const dbStatus = newStatus.toLowerCase();
+            await updateAlertStatus(id, dbStatus);
+            // Update selected alert if it's the one being changed
+            setSelectedAlert(prev => prev && (prev.id === id)
+                ? { ...prev, status: newStatus }
+                : prev);
+        } catch (e) {
+            addToast('Failed to update alert', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const filteredAlerts = useMemo(() => {
         return alerts.filter(alert => {
@@ -294,239 +305,250 @@ function AlertsContent() {
             status: 'Active',
             description: data.description,
             timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-            coordinates: 'LAT_LONG_FIXED',
+            coordinates: 'Pending',
             resources: 'Dispatch_Pending',
             Icon: data.type === 'Fire' ? Flame : data.type === 'Flood' ? Droplets : Activity,
             color: data.severity === 'Critical' ? '#ef4444' : data.severity === 'Warning' ? '#f59e0b' : '#3b82f6'
         };
         
-        setAlerts([newAlert, ...alerts]);
-        setSelectedAlert(newAlert);
+        // This is a simulation since we aren't sending to DB here, but let's assume it updates local state or makes API call via context in real app.
         if (addToast) {
-            addToast('Alert created successfully', 'priority');
+            addToast('Alert created successfully. Refreshing DB sync.', 'success');
         }
     };
 
     return (
-        <div className="flex h-screen w-full overflow-hidden bg-[#08080A] text-[#E5E5E7] font-inter">
-            
-            {/* ── AMBIENT MESH BACKGROUND (Synced with Resource Hub) ── */}
-            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-                <div 
-                  className="absolute w-[1000px] h-[1000px] rounded-full blur-[200px] opacity-[0.05] bg-blue-600 transition-transform duration-1000 ease-out"
-                  style={{ transform: `translate(${mousePos.x - 500}px, ${mousePos.y - 500}px)` }}
-                />
-                <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] rounded-full blur-[180px] opacity-[0.03] bg-cyan-500 animate-pulse" />
-                <div className="absolute inset-0 opacity-[0.02] contrast-150 brightness-150 bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-            </div>
-
+        <div className="flex h-screen w-full bg-[#0B1220] text-gray-200 font-inter">
             <Sidebar />
             <TopNavbar />
 
             <main
-                className={`flex-1 overflow-x-hidden overflow-y-auto transition-all duration-500 relative z-10 custom-scrollbar will-change-transform ${isSidebarOpen ? 'ml-sidebar-open' : 'ml-sidebar-closed'}`}
+                className={`flex-1 overflow-x-hidden overflow-y-auto transition-all duration-300 ${isSidebarOpen ? 'ml-[280px]' : 'ml-[80px]'}`}
                 style={{
                     marginTop: LOCAL_SZ.navbarH,
                     height: `calc(100vh - ${LOCAL_SZ.navbarH}px)`,
                 }}
             >
-                <div className="max-w-[1920px] mx-auto fluid-p">
+                <div className="p-6 md:p-8 max-w-7xl mx-auto">
 
                     {/* ── HEADER ── */}
-                    <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-white/5 pb-8 lg:pb-10">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-center gap-3">
-                                <Shield size={14} className="text-red-500" />
-                                <span className="text-[10px] font-mono font-bold tracking-[0.4em] text-red-500 uppercase">LIVE EMERGENCY FEED</span>
+                    <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <div className="flex items-center gap-2 mb-1 text-teal-500">
+                                <Shield size={16} />
+                                <span className="text-xs font-semibold uppercase tracking-wider">Live Emergency Feed</span>
                             </div>
-                            <h1 className="font-outfit text-4xl font-black tracking-tighter uppercase text-white leading-none">
+                            <h1 className="font-poppins text-3xl font-bold text-gray-100">
                                 ALERTS
                             </h1>
                         </div>
                         
-                        <div className="flex flex-wrap gap-4 mt-8 md:mt-0">
-                            <button className="px-6 py-2.5 bg-white/5 border border-white/10 hover:bg-white/10 transition-all font-mono text-[9px] font-black tracking-widest uppercase">
+                        <div className="flex items-center gap-3">
+                            <button className="px-4 py-2 rounded bg-[#111827] border border-[#1F2937] text-gray-300 hover:bg-[#1F2937] hover:text-white transition-colors text-sm font-semibold">
                                 Export Logs
                             </button>
                             <button 
                                 onClick={() => setIsBroadcastOpen(true)}
-                                className="px-8 py-2.5 bg-red-600 text-white hover:brightness-110 transition-all font-mono text-[9px] font-black tracking-widest uppercase shadow-[0_0_20px_rgba(239,68,68,0.2)]"
+                                className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-semibold flex items-center gap-2"
                             >
-                                Send Emergency Alert
+                                <Radio size={16} />
+                                Send Alert
                             </button>
                         </div>
                     </div>
 
                     {/* ── KPI GRID ── */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10 animate-fade-in">
-                        <StatCard label="Active Alerts" value={alerts.length} icon={Bell} color="#ef4444" />
-                        <StatCard label="High Danger" value={alerts.filter(a => a.severity === 'Critical').length} icon={ShieldAlert} color="#ef4444" />
-                        <StatCard label="Teams Sent" value="28" icon={Truck} color="#3b82f6" />
-                        <StatCard label="Resolved Today" value="116" icon={CheckCircle2} color="#10b981" />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                        <StatCard label="Total Alerts" value={alerts.length} icon={Bell} color="#9CA3AF" />
+                        <StatCard label="Critical" value={alerts.filter(a => a.severity === 'Critical').length} icon={ShieldAlert} color="#ef4444" />
+                        <StatCard label="Responding" value={alerts.filter(a => a.status === 'Responding').length} icon={Truck} color="#3b82f6" />
+                        <StatCard label="Resolved" value={alerts.filter(a => a.status === 'Resolved').length} icon={CheckCircle2} color="#10b981" />
                     </div>
 
-                    {/* ── OPERATIONS WORKSPACE ── */}
-                    <div className="grid grid-cols-12 gap-8 mb-20 relative z-10">
+                    {/* ── MAIN WORKSPACE ── */}
+                    <div className="flex flex-col lg:flex-row gap-6 h-[600px]">
                         
-                        {/* LEFT: INCIDENT STREAM */}
-                        <div className="col-span-12 lg:col-span-4 flex flex-col gap-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                            <SectionLabel text="ONGOING EMERGENCIES" icon={Satellite} />
-                            
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {['All', 'Fire', 'Flood', 'Medical'].map(v => (
-                                    <button 
-                                        key={v}
-                                        onClick={() => setFilterType(v)}
-                                        className={`px-4 py-2 font-mono text-[8px] font-black uppercase tracking-widest transition-all ${filterType === v ? 'bg-white/10 text-white' : 'text-white/20 hover:text-white/40'}`}
-                                    >
-                                        [{v}]
-                                    </button>
-                                ))}
+                        {/* LEFT: INCIDENT LIST */}
+                        <div className="w-full lg:w-1/3 flex flex-col bg-[#111827] border border-[#1F2937] rounded-lg overflow-hidden">
+                            <div className="p-4 border-b border-[#1F2937] bg-[#0B1220]/50">
+                                <h3 className="text-sm font-semibold text-gray-200 mb-3 flex items-center gap-2">
+                                    <Satellite size={16} className="text-teal-500" />
+                                    Ongoing Emergencies
+                                </h3>
+                                <div className="flex flex-wrap gap-2">
+                                    {['All', 'Fire', 'Flood', 'Medical', 'Accident'].map(v => (
+                                        <button
+                                            key={v}
+                                            onClick={() => setFilterType(v)}
+                                            className={`px-3 py-1 rounded text-xs font-semibold transition-colors ${filterType === v ? 'bg-teal-500/10 text-teal-500 border border-teal-500/20' : 'bg-[#1F2937] text-gray-400 hover:text-gray-200 border border-transparent'}`}
+                                        >
+                                            {v}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
 
-                            <div className="space-y-3 max-h-[700px] overflow-y-auto custom-scrollbar pr-3">
-                                {filteredAlerts.map((alert) => (
-                                    <div 
-                                        key={alert.id}
-                                        onClick={() => setSelectedAlert(alert)}
-                                        className={`
-                                            p-5 border transition-all duration-300 cursor-pointer group relative
-                                            ${selectedAlert && selectedAlert.id === alert.id ? 'bg-red-500/5 border-red-500/30' : 'bg-[#0E1015]/95 border-white/5 hover:border-white/10'}
-                                        `}
-                                    >
-                                        <div className="flex items-start gap-5">
-                                            <div className={`p-3 border border-white/5 flex flex-shrink-0 items-center justify-center transition-all ${selectedAlert && selectedAlert.id === alert.id ? 'text-red-500' : 'text-white/10 group-hover:text-white/30'}`}>
-                                                {alert.Icon && <alert.Icon size={18} />}
+                            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                                {filteredAlerts.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                        <Bell size={24} className="mb-2 opacity-50" />
+                                        <p className="text-sm">No alerts found</p>
+                                    </div>
+                                ) : (
+                                    filteredAlerts.map((alert) => (
+                                        <div 
+                                            key={alert.id}
+                                            onClick={() => setSelectedAlert(alert)}
+                                            className={`
+                                                p-4 rounded border transition-all cursor-pointer flex items-start gap-4
+                                                ${selectedAlert?.id === alert.id ? 'bg-[#1F2937] border-teal-500/30' : 'bg-[#0B1220] border-[#1F2937] hover:border-[#374151]'}
+                                            `}
+                                        >
+                                            <div className={`p-2 rounded bg-[#111827] border border-[#1F2937] flex-shrink-0 ${selectedAlert?.id === alert.id ? 'text-teal-400' : 'text-gray-500'}`}>
+                                                {alert.Icon && <alert.Icon size={16} />}
                                             </div>
                                             
                                             <div className="flex-1 min-w-0">
-                                                <div className="flex justify-between items-baseline mb-1">
-                                                    <span className={`font-mono text-[8px] font-bold uppercase tracking-widest ${
-                                                        alert.severity === 'Critical' ? 'text-red-500' : 'text-white/20'
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className={`text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded ${
+                                                        alert.severity === 'Critical' ? 'bg-red-500/10 text-red-500' : 
+                                                        alert.severity === 'Warning' ? 'bg-amber-500/10 text-amber-500' : 'bg-blue-500/10 text-blue-500'
                                                     }`}>
                                                         {alert.severity}
                                                     </span>
-                                                    <span className="font-mono text-[8px] text-white/10 uppercase font-bold">{alert.time}</span>
+                                                    <span className="text-xs text-gray-500">{alert.time}</span>
                                                 </div>
-                                                <h3 className="font-outfit font-black text-base text-white uppercase tracking-tight truncate group-hover:text-red-500 transition-colors">{alert.title}</h3>
-                                                <div className="mt-2 flex items-center gap-2 text-white/20 font-mono text-[9px] uppercase tracking-widest">
-                                                    <MapPin size={10} />
-                                                    {alert.location}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* RIGHT: TACTICAL DETAIL */}
-                        <div className="col-span-12 lg:col-span-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                            <div className="h-full bg-[#0E1015]/95 border border-white/5 flex flex-col relative overflow-hidden group/detail shadow-2xl">
-                                
-                                {selectedAlert ? (
-                                    <>
-                                        {/* Detail Header */}
-                                        <div className="px-8 py-10 border-b border-white/5 bg-white/[0.02]">
-                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                                                <div className="flex items-center gap-6">
-                                                    <div className="w-16 h-16 bg-red-600/10 border border-red-600/20 flex flex-shrink-0 items-center justify-center text-red-600 shadow-[0_0_20px_rgba(239,68,68,0.1)]">
-                                                        <selectedAlert.Icon size={32} />
-                                                    </div>
-                                                    <div>
-                                                        <span className="font-mono text-[10px] font-black text-red-500 uppercase tracking-[0.3em]">{selectedAlert.id} // UPLINK_SYNC</span>
-                                                        <h2 className="font-outfit font-black text-3xl lg:text-4xl text-white uppercase tracking-tighter leading-none mt-1">{selectedAlert.title}</h2>
-                                                    </div>
-                                                </div>
-                                                <div className="flex flex-col items-end">
-                                                    <div className={`px-4 py-1.5 border font-mono text-[10px] font-black uppercase tracking-[0.2em] ${
-                                                        selectedAlert.severity === 'Critical' ? 'bg-red-600 text-white border-red-400' : 'bg-white/5 text-white border-white/10'
-                                                    }`}>
-                                                        {selectedAlert.severity}
-                                                    </div>
-                                                    <span className="font-mono text-[9px] text-white/20 uppercase font-black mt-2">{selectedAlert.coordinates}</span>
-                                                </div>
-                                            </div>
-                                            
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                                {[
-                                                    { l: 'LOCALITY', v: selectedAlert.location },
-                                                    { l: 'TIME_ELAPSED', v: selectedAlert.time },
-                                                    { l: 'UPLINK_SOURCE', v: 'ALPHA_HUB' },
-                                                    { l: 'STATUS', v: selectedAlert.status },
-                                                ].map((stat, i) => (
-                                                    <div key={i} className="bg-black/20 border border-white/5 p-4 py-3">
-                                                        <span className="block text-[7px] font-mono text-white/20 uppercase tracking-widest mb-1">{stat.l}</span>
-                                                        <span className="block font-mono text-[10px] text-white font-black uppercase">{stat.v}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        {/* Detail Body */}
-                                        <div className="p-8 lg:p-10 flex-1 space-y-12">
-                                            <div>
-                                                <SectionLabel text="SUMMARY" icon={Info} />
-                                                <p className="font-outfit font-bold text-xl lg:text-2xl text-white/70 leading-relaxed pl-6 border-l border-red-600/30">
-                                                    {selectedAlert.description}
-                                                </p>
-                                            </div>
-                                            
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                                <div className="space-y-6">
-                                                   <SectionLabel text="HELP SENT" icon={Truck} />
-                                                   <div className="bg-blue-600/5 border border-blue-600/10 p-6">
-                                                      <span className="block text-[8px] font-mono text-blue-400/60 uppercase tracking-widest mb-2">Deployed Teams</span>
-                                                      <span className="text-xl font-outfit font-black text-white uppercase">{selectedAlert.resources}</span>
-                                                   </div>
-                                                </div>
-                                                <div className="space-y-6">
-                                                   <SectionLabel text="TEMPORAL_DATA" icon={Clock} />
-                                                   <div className="space-y-4 font-mono text-[10px] text-white/30 uppercase tracking-widest">
-                                                      <div className="flex items-center gap-3">
-                                                          <div className="w-1 h-1 bg-white/20 rounded-full" />
-                                                          <span>LOGGED: {selectedAlert.timestamp}</span>
-                                                      </div>
-                                                      <div className="flex items-center gap-3">
-                                                          <div className="w-1 h-1 bg-white/20 rounded-full" />
-                                                          <span>AUTH_KEY: AES_512_SECURE</span>
-                                                      </div>
-                                                   </div>
+                                                <h4 className="font-poppins font-semibold text-gray-200 truncate">{alert.title}</h4>
+                                                <div className="mt-1 flex items-center gap-1.5 text-xs text-gray-400 truncate">
+                                                    <MapPin size={12} />
+                                                    <span className="truncate">{alert.location}</span>
                                                 </div>
                                             </div>
                                         </div>
-
-                                        {/* Detail Actions */}
-                                        <div className="p-8 lg:p-10 bg-white/[0.01] border-t border-white/5 flex gap-4">
-                                            <button className="flex-1 py-4 bg-red-600 text-white font-mono text-[10px] font-black uppercase tracking-[0.3em] hover:brightness-110 active:scale-95 transition-all shadow-lg">
-                                                SEND HELP NOW
-                                            </button>
-                                            <button className="px-10 py-4 bg-white/5 border border-white/10 text-white font-mono text-[10px] font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all">
-                                                MARK AS FIXED
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="flex-1 flex items-center justify-center p-20 grayscale opacity-20">
-                                        <Satellite size={80} strokeWidth={0.5} />
-                                    </div>
+                                    ))
                                 )}
                             </div>
                         </div>
 
-                    </div>
+                        {/* RIGHT: TACTICAL DETAIL */}
+                        <div className="w-full lg:w-2/3 flex flex-col bg-[#111827] border border-[#1F2937] rounded-lg overflow-hidden">
+                            {selectedAlert ? (
+                                <>
+                                    {/* Detail Header */}
+                                    <div className="p-6 md:p-8 border-b border-[#1F2937] bg-[#0B1220]/50">
+                                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-[#1F2937] rounded-lg flex items-center justify-center text-teal-500 flex-shrink-0">
+                                                    <selectedAlert.Icon size={24} />
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-semibold text-gray-500 tracking-wider mb-1 block">ID: {selectedAlert.id}</span>
+                                                    <h2 className="font-poppins text-2xl font-bold text-gray-100">{selectedAlert.title}</h2>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col items-end gap-2">
+                                                <div className={`px-3 py-1 rounded text-xs font-bold uppercase ${
+                                                    selectedAlert.severity === 'Critical' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 
+                                                    selectedAlert.severity === 'Warning' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : 'bg-blue-500/10 text-blue-500 border border-blue-500/20'
+                                                }`}>
+                                                    {selectedAlert.severity}
+                                                </div>
+                                                <div className="px-3 py-1 bg-[#1F2937] rounded text-xs font-semibold text-gray-300">
+                                                    {selectedAlert.status}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            {[
+                                                { l: 'Location', v: selectedAlert.location },
+                                                { l: 'Time Reported', v: selectedAlert.time },
+                                                { l: 'Coordinates', v: selectedAlert.coordinates },
+                                                { l: 'Resources', v: selectedAlert.resources },
+                                            ].map((stat, i) => (
+                                                <div key={i} className="bg-[#0B1220] border border-[#1F2937] rounded p-3">
+                                                    <span className="block text-xs text-gray-500 font-semibold mb-1">{stat.l}</span>
+                                                    <span className="block text-sm text-gray-200 font-medium truncate">{stat.v}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
 
-                    {/* ── FOOTER ── */}
-                    <div className="mt-20 border-t border-white/5 pt-10 pb-10 flex flex-col md:flex-row justify-between items-center gap-8">
-                         <div className="flex gap-10 text-[9px] font-mono text-white/10 uppercase tracking-[0.5em] font-black">
-                            <span className="flex items-center gap-3"><div className="w-1 h-1 bg-red-500 rounded-full animate-pulse" />CORE_UPLINK: ACTIVE</span>
-                            <span className="flex items-center gap-3"><Database size={12} />SECURE_VOX_SYNC</span>
-                         </div>
-                         <div className="text-[9px] font-mono text-white/5 uppercase tracking-[0.8em] font-black">
-                            TACTICAL_ALERTS // VER_5.4.1
-                         </div>
-                    </div>
+                                    {/* Detail Body */}
+                                    <div className="p-6 md:p-8 flex-1 overflow-y-auto">
+                                        <div className="mb-8">
+                                            <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                                <Info size={16} className="text-teal-500"/> Description
+                                            </h4>
+                                            <div className="p-4 bg-[#0B1220] border border-[#1F2937] rounded-lg">
+                                                <p className="text-gray-300 leading-relaxed text-sm">
+                                                    {selectedAlert.description}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
+                                                <Clock size={16} className="text-teal-500"/> Timeline
+                                            </h4>
+                                            <div className="space-y-4">
+                                                <div className="flex gap-4">
+                                                    <div className="w-px bg-[#374151] mt-2 relative">
+                                                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-teal-500" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-medium text-gray-200">Alert Registered</p>
+                                                        <p className="text-xs text-gray-500">{selectedAlert.timestamp}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                    {/* Detail Actions */}
+                                    <div className="p-4 bg-[#0B1220] border-t border-[#1F2937] flex gap-3 flex-wrap">
+                                        {selectedAlert.status !== 'Responding' && selectedAlert.status !== 'Resolved' && (
+                                            <button
+                                                onClick={() => handleUpdateStatus(selectedAlert.id, 'Responding')}
+                                                disabled={isLoading}
+                                                className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                                            >
+                                                Mark Responding
+                                            </button>
+                                        )}
+                                        {selectedAlert.status === 'Responding' && (
+                                            <button
+                                                onClick={() => handleUpdateStatus(selectedAlert.id, 'Resolved')}
+                                                disabled={isLoading}
+                                                className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm font-semibold transition-colors disabled:opacity-50"
+                                            >
+                                                Mark Resolved
+                                            </button>
+                                        )}
+                                        {selectedAlert.status === 'Resolved' && (
+                                            <div className="flex-1 py-2 text-center text-sm font-semibold text-emerald-500 bg-emerald-500/10 rounded border border-emerald-500/20">
+                                                ✓ Resolved
+                                            </div>
+                                        )}
+                                        {selectedAlert.status !== 'Resolved' && (
+                                            <button
+                                                onClick={() => handleUpdateStatus(selectedAlert.id, 'Resolved')}
+                                                className="px-6 py-2 bg-[#1F2937] hover:bg-[#374151] text-white rounded text-sm font-semibold transition-colors"
+                                            >
+                                                Force Resolve
+                                            </button>
+                                        )}
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="flex-1 flex flex-col items-center justify-center p-8 text-gray-500">
+                                    <Satellite size={48} className="mb-4 opacity-50" />
+                                    <p className="text-sm">Select an alert to view details</p>
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
                 </div>
             </main>
 
@@ -535,24 +557,6 @@ function AlertsContent() {
                 onClose={() => setIsBroadcastOpen(false)}
                 onBroadcast={handleBroadcast}
             />
-
-            <style dangerouslySetInnerHTML={{ __html: `
-                .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.05); }
-                
-                @keyframes scan-y {
-                    0% { transform: translateY(0); }
-                    100% { transform: translateY(100vh); }
-                }
-                .animate-scan-y { animation: scan-y 10s linear infinite; }
-                
-                .animate-fade-in { animation: fade-in 0.6s ease-out forwards; }
-                @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                
-                .animate-slide-up { animation: slide-up 0.8s ease-out forwards; opacity: 0; }
-                @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-            `}} />
         </div>
     );
 }

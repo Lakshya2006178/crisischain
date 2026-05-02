@@ -23,7 +23,7 @@ const AlertToast = ({ alert, onClose }) => {
     <div className={`
       fixed top-4 right-4 z-50 transform transition-all duration-300 ease-in-out
       ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
-      w-80 p-4 rounded-xl border-l-[4px] shadow-2xl backdrop-blur-md
+      w-80 p-4 rounded-xl border-l-[4px] shadow-2xl 
       bg-slate-900/90 border border-slate-700
       ${priorityColors[alert.priority] || priorityColors.P3}
     `}>

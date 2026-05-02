@@ -12,8 +12,8 @@
   "dependencies": {
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
+    "@supabase/supabase-js": "^2.105.1",
     "@tailwindcss/vite": "^4.2.2",
-    "axios": "^1.14.0",
     "lucide-react": "^0.577.0",
     "prop-types": "^15.8.1",
     "react": "^19.2.4",
@@ -37,5 +37,8 @@
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.2",
     "vite": "^8.0.0"
+  },
+  "overrides": {
+    "d3-color": "^3.1.0"
   }
 }
