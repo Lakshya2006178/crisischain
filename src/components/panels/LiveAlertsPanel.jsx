@@ -1,10 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import { useDashboard } from '../../context/DashboardContext';
 import { ShieldAlert, Zap, Clock, Terminal, Activity, ChevronRight, Activity as Heartbeat } from 'lucide-react';
+import * as api from '../../api/index.js';
 
 export default function LiveAlertsPanel() {
     const navigate = useNavigate();
-    const { alerts, getIcon, addToast, updateStatus, user } = useDashboard();
+    const { liveAlerts, getIcon, addToast, user } = useDashboard();
+    
+    // Map backend liveAlerts to component state
+    const alerts = (liveAlerts || []).map(a => ({
+        ...a,
+        critical: a.severity === 'Critical' || a.severity === 'High',
+        status: a.status.toLowerCase()
+    }));
+    
     const criticalCount = alerts.filter(a => a.critical).length;
 
     return (
@@ -68,15 +77,17 @@ export default function LiveAlertsPanel() {
                                         ID: {Math.random().toString(36).substr(2, 6).toUpperCase()}
                                     </div>
                                     <div className={`px-3 py-1 border font-mono text-[8px] font-black tracking-widest uppercase ${alert.critical ? 'border-red-500/20 text-red-500 bg-red-500/5' : 'border-blue-500/20 text-blue-400 bg-blue-500/5'}`}>
-                                        {alert.status === 'active' ? 'ACTIVE_UNASSIGNED' : alert.status === 'responding' ? 'RESPONDERS_DISPATCHED' : 'RESOLVED'}
+                                        {alert.status === 'reported' ? 'ACTIVE_UNASSIGNED' : 
+                                         alert.status === 'responding' || alert.status === 'inprogress' ? 'RESPONDERS_DISPATCHED' : 
+                                         'RESOLVED'}
                                     </div>
                                     
                                     {/* Responder Actions */}
                                     {(user?.role === 'responder' || user?.role === 'admin') && (
                                        <div className="flex gap-2">
-                                          {alert.status === 'active' && (
+                                          {alert.status === 'reported' && (
                                             <button 
-                                              onClick={async (e) => { e.stopPropagation(); await updateStatus(alert.id, 'responding'); }}
+                                              onClick={async (e) => { e.stopPropagation(); await api.updateAlertStatus(alert.id, 'responding'); }}
                                               className="px-3 py-1 bg-blue-600 text-white font-mono text-[8px] font-black uppercase hover:bg-blue-700"
                                             >
                                               Dispatch
@@ -84,7 +95,7 @@ export default function LiveAlertsPanel() {
                                           )}
                                           {alert.status === 'responding' && (
                                             <button 
-                                              onClick={async (e) => { e.stopPropagation(); await updateStatus(alert.id, 'resolved'); }}
+                                              onClick={async (e) => { e.stopPropagation(); await api.updateAlertStatus(alert.id, 'resolved'); }}
                                               className="px-3 py-1 bg-green-600 text-white font-mono text-[8px] font-black uppercase hover:bg-green-700"
                                             >
                                               Resolve
