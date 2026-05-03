@@ -50,7 +50,8 @@ export default function LiveAlertsPanel() {
                                 <div className={`w-10 h-10 border flex items-center justify-center transition-all group-hover/alert:scale-110 ${alert.critical ? 'bg-red-500/5 border-red-500/20 text-red-500' : 'bg-[#1F2937] border-[#1F2937] text-[#9CA3AF]'}`}>
                                     <Icon className="w-5 h-5" />
                                 </div>
-                                {alert.critical && 
+                                {alert.critical && <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping" />}
+                            </div>
 
                             {/* Content Block */}
                             <div className="flex-1 min-w-0 flex flex-col gap-2">

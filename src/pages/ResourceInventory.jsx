@@ -34,20 +34,13 @@ function ToastContainer({ toasts }) {
 }
 
 // MiniMap visual for Hospital cards
-const MiniMap = ({ isFull, isNear, name }) => {
+const MiniMap = ({ isFull, isNear, name, lat, lng }) => {
     const colorClass = isFull ? "text-red-500 border-red-500" : isNear ? "text-yellow-500 border-yellow-500" : "text-[#00FFCC] border-[#00FFCC]";
     const bgColor = isFull ? "bg-red-500" : isNear ? "bg-yellow-500" : "bg-[#00FFCC]";
     const pulseColor = isFull ? "border-red-500" : isNear ? "border-yellow-500" : "border-[#00FFCC]";
     const strokeHex = isFull ? "#ef4444" : isNear ? "#eab308" : "#00FFCC";
 
-    const hospitalMapUrls = {
-        'KMC Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d89409.20010188918!2d74.76266016798641!3d12.864473489530893!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba35a4993ec4925%3A0xf7e8eff2463b0352!2sKMC%20Hospital%20Mangaluru!5e0!3m2!1sen!2sin!4v1775760943203!5m2!1sen!2sin',
-        'Nitte Gajria Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3883.994456940208!2d75.01262507522131!3d13.225664309256933!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbb565b412ead03%3A0x3839509d5330bc3c!2sNitte%20Gajria%20Hospital!5e0!3m2!1sen!2sin!4v1775761094453!5m2!1sen!2sin',
-        'Government Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31076.9030041291!2d74.90696630606598!3d13.18679130000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbca9bf5c9c8fb3%3A0x291d1b1d7251f9e5!2sGovernment%20hospital!5e0!3m2!1sen!2sin!4v1775761152125!5m2!1sen!2sin',
-        'Dr.T.M.A. Pai Rotary Hospital': 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3884.029250511082!2d74.9757000752213!3d13.223480209305636!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bbb562e3379f8e5%3A0x2cb05b81270b6f4d!2sDr.T.M.A.%20Pai%20Rotary%20Hospital!5e0!3m2!1sen!2sin!4v1775761216332!5m2!1sen!2sin'
-    };
-
-    const mapSrc = name && hospitalMapUrls[name];
+    const mapSrc = (lat && lng) ? `https://maps.google.com/maps?q=${lat},${lng}&z=14&output=embed` : null;
 
     return (
         <div className="relative w-full h-24 bg-black/40 rounded-xl overflow-hidden border border-white/5 mb-5 flex items-center justify-center">
@@ -495,6 +488,9 @@ export default function ResourceInventory() {
                                                             <MapPin className="w-3 h-3 text-[#00FFCC]" /> {center.distance_km} KM
                                                         </span>
                                                     </div>
+                                                    
+                                                    <MiniMap name={center.name} isFull={false} isNear={center.distance_km < 5} lat={center.latitude} lng={center.longitude} />
+
 
                                                     {/* Name */}
                                                     <div className="flex items-start gap-5 mb-8">

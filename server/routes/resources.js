@@ -1,6 +1,6 @@
 import express from 'express';
 import { getResources, getNearbyCenters, updateResourceStatus } from '../controllers/resourceController.js';
-import { auth, authorize } from './alerts.js';
+import { auth, authorize } from '../middleware/auth.js';
 
 const router = express.Router();
 

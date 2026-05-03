@@ -82,18 +82,13 @@ export default function SignUpPage() {
     setLoading(true);
     
     try {
-      // Map UI roles to backend system roles
-      let systemRole = 'citizen';
-      if (form.role === 'First Responder') systemRole = 'responder';
-      if (form.role === 'Government Official') systemRole = 'admin';
-
       await signup({
         full_name: form.name,
         email: form.email,
         phone_number: form.phone,
         aadhar: form.aadhar,
         password: form.password,
-        role: systemRole
+        role: form.role
       });
       
       setLoading(false); 

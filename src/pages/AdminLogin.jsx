@@ -31,7 +31,7 @@ export default function AdminLogin() {
     if (!name.trim() || !aadhar.trim() || !password) { setError('Credentials required.'); return; }
     setLoading(true);
     try {
-      await login({ name, aadhar, password }, true);
+      await login({ name, aadhar, password, role: 'admin' }, true);
       setLoading(false); 
       nav('/dashboard');
     } catch (err) {

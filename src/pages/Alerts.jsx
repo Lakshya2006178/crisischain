@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, Component } from 'react';
 import { useDashboard } from '../context/DashboardContext';
+import * as api from '../api/index.js';
 import Sidebar from '../components/Sidebar';
 import TopNavbar from '../components/TopNavbar';
 import { 
@@ -7,8 +8,43 @@ import {
     Clock, MapPin, ShieldAlert, ChevronRight,
     Search, Filter, Calendar, Zap, Bell,
     CheckCircle2, Truck, Info, Navigation,
-    Database, Globe, HeartPulse, Send, Satellite, Shield, X, Radio, Wind, Radiation, Loader2
+    Database, Globe, HeartPulse, Send, Satellite, Shield, X, Radio, Wind, Radiation, Loader2, Siren
 } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const createNumberedIcon = (number, color) => {
+    return L.divIcon({
+        className: 'custom-numbered-icon',
+        html: `<div style="background-color: ${color}; color: #fff; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 0 10px ${color}; font-size: 12px; font-family: monospace;">${number}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12],
+        popupAnchor: [0, -12]
+    });
+};
+
+// Auto-center map component helper
+function MapUpdater({ alerts }) {
+    const map = useMap();
+    useEffect(() => {
+        if (alerts && alerts.length > 0) {
+            const coords = alerts
+                .filter(a => a.coordinates && a.coordinates !== 'N/A' && a.coordinates !== 'Pending')
+                .map(a => {
+                    const [lat, lng] = a.coordinates.split(',').map(Number);
+                    return [lat, lng];
+                })
+                .filter(c => !isNaN(c[0]) && !isNaN(c[1]));
+            
+            if (coords.length > 0) {
+                const bounds = L.latLngBounds(coords);
+                map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 });
+            }
+        }
+    }, [alerts, map]);
+    return null;
+}
 
 // ── ERROR BOUNDARY ──
 
@@ -192,12 +228,66 @@ function BroadcastModal({ isOpen, onClose, onBroadcast }) {
     );
 }
 
+function NewEmergencyModal({ alert, onClose }) {
+    if (!alert) return null;
+    return (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md transition-all duration-300">
+            <div className="w-full max-w-lg bg-[#2b0d0d] rounded-xl border border-red-500/50 shadow-[0_0_50px_rgba(239,68,68,0.3)] flex flex-col overflow-hidden relative">
+                {/* Flashing background effect */}
+                <div className="absolute inset-0 bg-red-500/10 animate-pulse pointer-events-none" />
+                
+                <div className="px-8 py-6 border-b border-red-500/30 flex items-center justify-between relative z-10 bg-[#1a0808]">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-red-600 text-white rounded-md animate-bounce">
+                            <Siren size={24} />
+                        </div>
+                        <h2 className="font-poppins text-xl font-black text-red-400 tracking-wider">NEW EMERGENCY DETECTED</h2>
+                    </div>
+                    <button onClick={onClose} className="text-red-400 hover:text-white transition-all">
+                        <X size={24} />
+                    </button>
+                </div>
+                
+                <div className="p-8 space-y-6 relative z-10 flex flex-col items-center">
+                    <div className="text-center w-full">
+                        <h3 className="text-2xl font-bold text-white mb-2 uppercase">{alert.title || alert.type}</h3>
+                        <div className="flex items-center justify-center gap-2 text-red-200/80 font-mono text-sm mb-6">
+                            <MapPin size={14} className="text-red-400"/> {alert.location}
+                        </div>
+                        
+                        <div className={`inline-block px-6 py-2 border font-bold tracking-widest uppercase rounded-full ${
+                                alert.severity === 'Critical' ? 'bg-red-500/20 border-red-500/50 text-red-400' : 
+                                alert.severity === 'Warning' ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 
+                                'bg-blue-500/20 border-blue-500/50 text-blue-400'
+                            }`}>
+                            Severity: {alert.severity}
+                        </div>
+                    </div>
+                    
+                    <button 
+                        onClick={onClose}
+                        className="w-full py-4 mt-2 bg-red-600 hover:bg-red-500 text-white font-bold tracking-widest rounded-lg transition-all shadow-[0_0_15px_rgba(239,68,68,0.5)]"
+                    >
+                        ACKNOWLEDGE & VIEW
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function AlertsContent() {
     const { isSidebarOpen, addToast, liveAlerts, fetchLiveAlerts } = useDashboard();
     const [selectedAlert, setSelectedAlert] = useState(null);
     const [filterType, setFilterType] = useState('All');
     const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    
+    // Popup tracking state
+    const [newEmergencyPopup, setNewEmergencyPopup] = useState(null);
+    const isInitialLoad = React.useRef(true);
+    const prevAlertsRef = React.useRef([]);
 
     // Enrich each alert with resolved icon component
     const alerts = useMemo(() => (liveAlerts || []).map(a => ({
@@ -205,6 +295,35 @@ function AlertsContent() {
         Icon: resolveIcon(a.iconName),
         color: a.color || (a.severity === 'Critical' || a.severity === 'High' ? '#ef4444' : a.severity === 'Medium' ? '#f59e0b' : '#3b82f6'),
     })), [liveAlerts]);
+
+    // Track new alerts for popup
+    useEffect(() => {
+        if (!liveAlerts || liveAlerts.length === 0) return;
+
+        if (isInitialLoad.current) {
+            isInitialLoad.current = false;
+            prevAlertsRef.current = liveAlerts;
+            return;
+        }
+
+        const prevIds = new Set(prevAlertsRef.current.map(a => a.id));
+        const newlyAdded = liveAlerts.filter(a => !prevIds.has(a.id));
+
+        if (newlyAdded.length > 0) {
+            // Pick the highest severity new alert, or just the first one
+            const criticals = newlyAdded.filter(a => a.severity === 'Critical' || a.severity === 'High');
+            const alertToShow = criticals.length > 0 ? criticals[0] : newlyAdded[0];
+            
+            setNewEmergencyPopup(alertToShow);
+            
+            // Auto-close after 8 seconds
+            const timer = setTimeout(() => setNewEmergencyPopup(null), 8000);
+            prevAlertsRef.current = liveAlerts;
+            return () => clearTimeout(timer);
+        }
+
+        prevAlertsRef.current = liveAlerts;
+    }, [liveAlerts]);
 
     // Initial load + 15-second polling for live updates
     useEffect(() => {
@@ -224,7 +343,7 @@ function AlertsContent() {
             setIsLoading(true);
             // Convert display status back to DB enum
             const dbStatus = newStatus.toLowerCase();
-            await updateAlertStatus(id, dbStatus);
+            await api.updateAlertStatus(id, dbStatus);
             // Update selected alert if it's the one being changed
             setSelectedAlert(prev => prev && (prev.id === id)
                 ? { ...prev, status: newStatus }
@@ -314,8 +433,37 @@ function AlertsContent() {
                         <StatCard label="Resolved" value={alerts.filter(a => a.status === 'Resolved').length} icon={CheckCircle2} color="#10b981" />
                     </div>
 
+                    {/* ── GLOBAL MAP ── */}
+                    <div className="w-full h-80 bg-[#111827] border border-[#1F2937] rounded-lg overflow-hidden mb-6 relative">
+                        <MapContainer center={[12.8719, 74.8422]} zoom={12} style={{ height: '100%', width: '100%', backgroundColor: '#0B1220' }}>
+                            <TileLayer
+                                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                                attribution='&copy; <a href="https://carto.com/attributions">CARTO</a>'
+                            />
+                            <MapUpdater alerts={filteredAlerts} />
+                            {filteredAlerts.map((alert, idx) => {
+                                if (!alert.coordinates || alert.coordinates === 'N/A' || alert.coordinates === 'Pending') return null;
+                                const [lat, lng] = alert.coordinates.split(',').map(Number);
+                                if (isNaN(lat) || isNaN(lng)) return null;
+                                return (
+                                    <Marker 
+                                        key={alert.id}
+                                        position={[lat, lng]}
+                                        icon={createNumberedIcon(idx + 1, alert.color)}
+                                        eventHandlers={{ click: () => setSelectedAlert(alert) }}
+                                    >
+                                        <Popup className="custom-popup">
+                                            <div className="font-poppins font-bold">{alert.title}</div>
+                                            <div className="text-xs">{alert.severity} • {alert.status}</div>
+                                        </Popup>
+                                    </Marker>
+                                );
+                            })}
+                        </MapContainer>
+                    </div>
+
                     {/* ── MAIN WORKSPACE ── */}
-                    <div className="flex flex-col lg:flex-row gap-6 h-[600px]">
+                    <div className="flex flex-col lg:flex-row gap-6 h-[500px]">
                         
                         {/* LEFT: INCIDENT LIST */}
                         <div className="w-full lg:w-1/3 flex flex-col bg-[#111827] border border-[#1F2937] rounded-lg overflow-hidden">
@@ -349,15 +497,18 @@ function AlertsContent() {
                                         <p className="font-mono text-[9px] uppercase tracking-widest">No alerts found</p>
                                     </div>
                                 ) : (
-                                    filteredAlerts.map((alert) => (
+                                    filteredAlerts.map((alert, idx) => (
                                         <div 
                                             key={alert.id}
                                             onClick={() => setSelectedAlert(alert)}
                                             className={`
-                                                p-4 rounded border transition-all cursor-pointer flex items-start gap-4
+                                                p-4 rounded border transition-all cursor-pointer flex items-start gap-4 relative
                                                 ${selectedAlert?.id === alert.id ? 'bg-[#1F2937] border-teal-500/30' : 'bg-[#0B1220] border-[#1F2937] hover:border-[#374151]'}
                                             `}
                                         >
+                                            <div className="absolute -top-1.5 -left-1.5 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold border border-[#1F2937] shadow-lg" style={{ backgroundColor: alert.color, color: '#fff' }}>
+                                                {idx + 1}
+                                            </div>
                                             <div className={`p-2 rounded bg-[#111827] border border-[#1F2937] flex-shrink-0 ${selectedAlert?.id === alert.id ? 'text-teal-400' : 'text-gray-500'}`}>
                                                 {alert.Icon && <alert.Icon size={16} />}
                                             </div>
@@ -440,6 +591,9 @@ function AlertsContent() {
                                                 </p>
                                             </div>
                                         </div>
+
+
+
                                         
                                         <div>
                                             <h4 className="text-sm font-semibold text-gray-300 mb-3 flex items-center gap-2">
@@ -510,6 +664,11 @@ function AlertsContent() {
                 isOpen={isBroadcastOpen} 
                 onClose={() => setIsBroadcastOpen(false)}
                 onBroadcast={handleBroadcast}
+            />
+
+            <NewEmergencyModal 
+                alert={newEmergencyPopup} 
+                onClose={() => setNewEmergencyPopup(null)} 
             />
         </div>
     );

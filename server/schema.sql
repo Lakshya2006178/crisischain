@@ -239,3 +239,12 @@ CREATE TABLE IF NOT EXISTS notification (
         FOREIGN KEY (incident_id) REFERENCES incident(incident_id)
         ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- 11. DUMMY ADMIN USER
+--     Name: ADMIN_USERNAME
+--     Aadhar: 000000000000
+--     Password: admin123
+-- ============================================================
+INSERT IGNORE INTO users (aadhar_id, full_name, email, phone_number, password_hash, role, is_verified) 
+VALUES ('f7b11509f4d675c3c44f0dd37ca830bb02e8cfa58f04c46283c4bfcbdce1ff45', 'ADMIN_USERNAME', 'admin@crisischain.com', '0000000000', '$2a$10$B4OXDSqG1AWH5/WKI5GYfe62cqrAzO7rfkftUFYoNhvwPnktp26/y', 'admin', 1);
